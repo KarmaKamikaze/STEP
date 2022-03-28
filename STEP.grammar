@@ -40,7 +40,22 @@ Tokens
   if = 'if';
   endif = 'end if';
   else = 'else';
-
+  continue = 'continue';
+  break = 'break';
+  repeatwhile = 'repeat while';
+  endwhile = 'end while';
+  repeatfor = 'repeat for';
+  endfor = 'end for';
+  to = 'to';
+  increaseby = 'increase by';
+  decreaseby = 'decrease by';
+  switch = 'switch';
+  endswitch = 'end switch';
+  when = 'when';
+  do = 'do';
+  fallthrough = 'fallthrough';
+  otherwisedo = 'otherwise do';
+  return = 'return';
 
 Productions
   Program = (Setup | Loop | Setup Loop) [Functions];
@@ -51,3 +66,15 @@ Productions
   Params = lparen [Type {lbrack rbrack} id {comma Type {lbrack rbrack} id} rparen;
   Type = number | string | boolean;
   Stmt = (IfStmt | WhileStmt | ForStmt | VarDcl | AssStmt | FuncCall | RetStmt | SwitchStmt | SkipStmt) nl;
+  IfStmt = if lparen BExpr rparen {Stmt} endif | if lparen BExpr rparen {Stmt} else {Stmt} endif;
+  WhileStmt = repeatwhile lparen BExpr rparen {(Stmt | continue nl | break nl)} endwhile;
+  ForStmt = repeatfor lparen (NumDcl | AssDcl | id [ArrIndex]) to AExpr comma (increaseby | decreaseby) AExpr rparen {(Stmt | continue nl | break nl)} endfor;
+  SwitchStmt = switch lparen id [ArrIndex] rparen {WhenCase} [OtherwiseCase] endswitch;
+  WhenCase = when numliteral do {Stmt} [fallthrough];
+  OtherwiseCase = otherwisedo {Stmt};
+  AssStmt = id [ArrIndex] assign Expr;
+  FuncCall = id lparen [Expr {comma Expr}] rparen;
+  RetStmt = return Expr;
+  ArrIndex = lbrack AExpr rbrack;
+  SkipStmt = nl;
+  Expr = (AExpr | BExpr | SExpr);
