@@ -26,21 +26,28 @@ Tokens
   whitespace = (' ')+;
   comma = ',';
   setup = 'setup';
+  endsetup = 'end setup';
   loop = 'loop';
+  endloop = 'end loop';
   function = 'function';
+  endfunction = 'end function';
   functions = 'functions';
+  endfunctions = 'end functions';
   blank = 'blank';
   number = 'number';
   string = 'string';
   boolean = 'boolean';
-  end = 'end';
+  if = 'if';
+  endif = 'end if';
+  else = 'else';
 
 
 Productions
   Program = (Setup | Loop | Setup Loop) [Functions];
-  Setup = setup {Stmt} end setup nl;
-  Loop = loop {Stmt} end loop nl;
-  Functions = functions {FuncDcl} end functions nl;
-  FuncDcl = Type [lbrack rbrack] function id Params {Stmt} RetStmt end nl | blank function id Params {Stmt} end function nl;
+  Setup = setup {Stmt} endsetup nl;
+  Loop = loop {Stmt} endloop nl;
+  Functions = functions {FuncDcl} endfunctions nl;
+  FuncDcl = Type [lbrack rbrack] function id Params {Stmt} RetStmt endfunction nl | blank function id Params {Stmt} endfunction nl;
   Params = lparen [Type {lbrack rbrack} id {comma Type {lbrack rbrack} id} rparen;
   Type = number | string | boolean;
+  Stmt = (IfStmt | WhileStmt | ForStmt | VarDcl | AssStmt | FuncCall | RetStmt | SwitchStmt | SkipStmt) nl;
