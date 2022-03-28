@@ -1,5 +1,11 @@
 Package STEP;
 
+Helper
+  tab = 9;
+  cr = 13;
+  lf = 10;
+  eol = cr lf | cr | lf;
+
 Tokens
   lparen = '(';
   rparan = ')';
@@ -23,8 +29,10 @@ Tokens
   neq = '!=';
   neg = '!';
   nl = '\r?\n';
-  whitespace = (' ')+;
+  whitespace = (' ' | tab | eol)+;
   comma = ',';
+
+
   setup = 'setup';
   endsetup = 'end setup';
   loop = 'loop';
@@ -62,6 +70,9 @@ Tokens
   number = 'number';
   string = 'string';
   boolean = 'boolean';
+
+Ignored Tokens
+  whitespace;
 
 Productions
   Program = (Setup | Loop | Setup Loop) [Functions];
