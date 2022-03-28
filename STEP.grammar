@@ -1,20 +1,25 @@
 Package STEP;
 
-Helper
+Helpers
   tab = 9;
   cr = 13;
   lf = 10;
   eol = cr lf | cr | lf;
+  lowercase = ['a' .. 'z'];
+  uppercase = ['A' .. 'Z'];
+  letter = lowercase | uppercase | '_';
+  digit = ['0' .. '9'];
+  letter_or_digit = letter | digit;
 
 Tokens
   lparen = '(';
   rparan = ')';
   lbrack = '[';
   rbrack = ']';
-  numliteral = (((0|[1-6][0-9]*)[.][0.9]+)|(0|[1-9][0-9]*));
+  numliteral = digit+ | digit+ '.' digit*;
   strliteral = '\".*\"';
   boolliteral = 'true'|'false';
-  id = [a-zA-Z][a-zA-Z0-9]*;
+  id = letter letter_or_digit*;
   assign = '=';
   plus = '+';
   minus = '-';
