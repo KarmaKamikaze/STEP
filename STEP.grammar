@@ -83,3 +83,4 @@ Productions
   BExpr = [neg] BExpr [BOp BExpr] | AExpr RelOp AExpr | lparen BExpr rparen | id [ArrIndex] | boolliteral | FuncCall;
   RelOp = grthen | grthaneq | lthan | lthaneq | eq | neq;
   BOp = and | or | eq | neq;
+  SExpr = SExpr [plus SExpr] | id [ArrIndex] | strliteral | FuncCall;
