@@ -84,3 +84,7 @@ Productions
   RelOp = grthen | grthaneq | lthan | lthaneq | eq | neq;
   BOp = and | or | eq | neq;
   SExpr = SExpr [plus SExpr] | id [ArrIndex] | strliteral | FuncCall;
+  AExpr = AExpr (plus | minus) Term | Term;
+  Term = Term (mult | divide) Factor | Factor;
+  Factor = Exp pow Factor | Exp;
+  Exp = lparen AExpr rparen | [minus] (numliteral | id [ArrIndex] | FuncCall);
