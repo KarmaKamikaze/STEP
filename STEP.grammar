@@ -56,6 +56,8 @@ Tokens
   fallthrough = 'fallthrough';
   otherwisedo = 'otherwise do';
   return = 'return';
+  and = 'and';
+  or = 'or';
 
 Productions
   Program = (Setup | Loop | Setup Loop) [Functions];
@@ -78,3 +80,6 @@ Productions
   ArrIndex = lbrack AExpr rbrack;
   SkipStmt = nl;
   Expr = (AExpr | BExpr | SExpr);
+  BExpr = [neg] BExpr [BOp BExpr] | AExpr RelOp AExpr | lparen BExpr rparen | id [ArrIndex] | boolliteral | FuncCall;
+  RelOp = grthen | grthaneq | lthan | lthaneq | eq | neq;
+  BOp = and | or | eq | neq;
