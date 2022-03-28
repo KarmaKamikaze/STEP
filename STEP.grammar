@@ -58,6 +58,10 @@ Tokens
   return = 'return';
   and = 'and';
   or = 'or';
+  constant = 'constant';
+  number = 'number';
+  string = 'string';
+  boolean = 'boolean';
 
 Productions
   Program = (Setup | Loop | Setup Loop) [Functions];
@@ -88,3 +92,9 @@ Productions
   Term = Term (mult | divide) Factor | Factor;
   Factor = Exp pow Factor | Exp;
   Exp = lparen AExpr rparen | [minus] (numliteral | id [ArrIndex] | FuncCall);
+  VarDcl = [constant] (NumDcl | StringDcl | BoolDcl | ArrDcl | StringArrDcl | BoolArrDcl) nl;
+  NumDcl = number id assign AExpr nl;
+  StringDcl = string id assign SExpr nl;
+  BoolDcl = boolean id assign BExpr nl;
+  ArrDcl = Type ArrSizeDcl {ArrSizeDcl} id assign (id | lbrack [Expr {comma Expr}] rbrack);
+  ArrSizeDcl = lbrack numliteral rbrack;
