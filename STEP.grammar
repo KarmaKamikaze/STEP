@@ -25,3 +25,13 @@ Tokens
   nl = '\r?\n';
   whitespace = (' ')+;
   comma = ',';
+  setup = 'setup';
+  loop = 'loop';
+  functions = 'functions';
+  end = 'end';
+
+Productions
+  Program = (Setup | Loop | Setup Loop) [Functions];
+  Setup = setup {Stmt} end setup nl;
+  Loop = loop {Stmt} end loop nl;
+  Functions = functions {FuncDcl} end functions nl;
