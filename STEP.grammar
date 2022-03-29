@@ -107,7 +107,7 @@ Productions
   funccall = id lparen params_options? rparen;
   params_options = expr multi_expr*;
   multi_expr = comma expr;
-  retstmt = {one} return expr | {two} return cond;
+  retstmt = {one} return cond;
   arrindex = lbrack expr rbrack;
   skipstmt = nl;
   
@@ -119,8 +119,8 @@ Productions
   // Boolean expressions
   comp = {one} expr | {two} [fst]:expr relop [snd]:expr;
   relop = {one} grthan | {two} grthaneq | {three} lthan | {four} lthaneq | {five} eq | {six} neq;
-  cond = {one} comp | {two} [fst]:cond bop [snd]:cond;
-  bop = {one} and | {two} or | {three} eq | {four} neq;
+  cond = {one} comp | {two} [fst]:comp bop [snd]:cond;
+  bop = {one} and | {two} or;
   
   // Variable declarations
   vardcl = T.constant? var_options nl;
