@@ -112,7 +112,8 @@ Productions
   skipstmt = nl;
   
   // Arithmetic expressions
-  expr = {one} value | {two} [left]:value plus [right]:value | {three} [left]:value minus [right]:value | {four} [left]:value mult [right]:value | {five} [left]:value divide [right]:value | {six} [left]:value pow [right]:value;
+  expr = {one} value | {two} expr aop value;
+  aop = {one} plus | {two} minus | {three} mult | {four} divide | {five} pow;
   value = {one} P.constant | {two} id | {three} lparen expr rparen;
   constant = {one} numliteral | {two} strliteral | {three} boolliteral;
   

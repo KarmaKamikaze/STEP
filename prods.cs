@@ -124,6 +124,10 @@ public abstract class PExpr : Node
 {
 }
 
+public abstract class PAop : Node
+{
+}
+
 public abstract class PValue : Node
 {
 }
@@ -8283,31 +8287,31 @@ public sealed class AOneExpr : PExpr
 }
 public sealed class ATwoExpr : PExpr
 {
-    private PValue _left_;
-    private TPlus _plus_;
-    private PValue _right_;
+    private PExpr _expr_;
+    private PAop _aop_;
+    private PValue _value_;
 
     public ATwoExpr ()
     {
     }
 
     public ATwoExpr (
-            PValue _left_,
-            TPlus _plus_,
-            PValue _right_
+            PExpr _expr_,
+            PAop _aop_,
+            PValue _value_
     )
     {
-        SetLeft (_left_);
-        SetPlus (_plus_);
-        SetRight (_right_);
+        SetExpr (_expr_);
+        SetAop (_aop_);
+        SetValue (_value_);
     }
 
     public override Object Clone()
     {
         return new ATwoExpr (
-            (PValue)CloneNode (_left_),
-            (TPlus)CloneNode (_plus_),
-            (PValue)CloneNode (_right_)
+            (PExpr)CloneNode (_expr_),
+            (PAop)CloneNode (_aop_),
+            (PValue)CloneNode (_value_)
         );
     }
 
@@ -8316,16 +8320,16 @@ public sealed class ATwoExpr : PExpr
         ((Analysis) sw).CaseATwoExpr(this);
     }
 
-    public PValue GetLeft ()
+    public PExpr GetExpr ()
     {
-        return _left_;
+        return _expr_;
     }
 
-    public void SetLeft (PValue node)
+    public void SetExpr (PExpr node)
     {
-        if(_left_ != null)
+        if(_expr_ != null)
         {
-            _left_.Parent(null);
+            _expr_.Parent(null);
         }
 
         if(node != null)
@@ -8338,8 +8342,132 @@ public sealed class ATwoExpr : PExpr
             node.Parent(this);
         }
 
-        _left_ = node;
+        _expr_ = node;
     }
+    public PAop GetAop ()
+    {
+        return _aop_;
+    }
+
+    public void SetAop (PAop node)
+    {
+        if(_aop_ != null)
+        {
+            _aop_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _aop_ = node;
+    }
+    public PValue GetValue ()
+    {
+        return _value_;
+    }
+
+    public void SetValue (PValue node)
+    {
+        if(_value_ != null)
+        {
+            _value_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _value_ = node;
+    }
+
+    public override string ToString()
+    {
+        return ""
+            + ToString (_expr_)
+            + ToString (_aop_)
+            + ToString (_value_)
+        ;
+    }
+
+    internal override void RemoveChild(Node child)
+    {
+        if ( _expr_ == child )
+        {
+            _expr_ = null;
+            return;
+        }
+        if ( _aop_ == child )
+        {
+            _aop_ = null;
+            return;
+        }
+        if ( _value_ == child )
+        {
+            _value_ = null;
+            return;
+        }
+    }
+
+    internal override void ReplaceChild(Node oldChild, Node newChild)
+    {
+        if ( _expr_ == oldChild )
+        {
+            SetExpr ((PExpr) newChild);
+            return;
+        }
+        if ( _aop_ == oldChild )
+        {
+            SetAop ((PAop) newChild);
+            return;
+        }
+        if ( _value_ == oldChild )
+        {
+            SetValue ((PValue) newChild);
+            return;
+        }
+    }
+
+}
+public sealed class AOneAop : PAop
+{
+    private TPlus _plus_;
+
+    public AOneAop ()
+    {
+    }
+
+    public AOneAop (
+            TPlus _plus_
+    )
+    {
+        SetPlus (_plus_);
+    }
+
+    public override Object Clone()
+    {
+        return new AOneAop (
+            (TPlus)CloneNode (_plus_)
+        );
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseAOneAop(this);
+    }
+
     public TPlus GetPlus ()
     {
         return _plus_;
@@ -8364,138 +8492,60 @@ public sealed class ATwoExpr : PExpr
 
         _plus_ = node;
     }
-    public PValue GetRight ()
-    {
-        return _right_;
-    }
-
-    public void SetRight (PValue node)
-    {
-        if(_right_ != null)
-        {
-            _right_.Parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.Parent() != null)
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            node.Parent(this);
-        }
-
-        _right_ = node;
-    }
 
     public override string ToString()
     {
         return ""
-            + ToString (_left_)
             + ToString (_plus_)
-            + ToString (_right_)
         ;
     }
 
     internal override void RemoveChild(Node child)
     {
-        if ( _left_ == child )
-        {
-            _left_ = null;
-            return;
-        }
         if ( _plus_ == child )
         {
             _plus_ = null;
-            return;
-        }
-        if ( _right_ == child )
-        {
-            _right_ = null;
             return;
         }
     }
 
     internal override void ReplaceChild(Node oldChild, Node newChild)
     {
-        if ( _left_ == oldChild )
-        {
-            SetLeft ((PValue) newChild);
-            return;
-        }
         if ( _plus_ == oldChild )
         {
             SetPlus ((TPlus) newChild);
             return;
         }
-        if ( _right_ == oldChild )
-        {
-            SetRight ((PValue) newChild);
-            return;
-        }
     }
 
 }
-public sealed class AThreeExpr : PExpr
+public sealed class ATwoAop : PAop
 {
-    private PValue _left_;
     private TMinus _minus_;
-    private PValue _right_;
 
-    public AThreeExpr ()
+    public ATwoAop ()
     {
     }
 
-    public AThreeExpr (
-            PValue _left_,
-            TMinus _minus_,
-            PValue _right_
+    public ATwoAop (
+            TMinus _minus_
     )
     {
-        SetLeft (_left_);
         SetMinus (_minus_);
-        SetRight (_right_);
     }
 
     public override Object Clone()
     {
-        return new AThreeExpr (
-            (PValue)CloneNode (_left_),
-            (TMinus)CloneNode (_minus_),
-            (PValue)CloneNode (_right_)
+        return new ATwoAop (
+            (TMinus)CloneNode (_minus_)
         );
     }
 
     public override void Apply(Switch sw)
     {
-        ((Analysis) sw).CaseAThreeExpr(this);
+        ((Analysis) sw).CaseATwoAop(this);
     }
 
-    public PValue GetLeft ()
-    {
-        return _left_;
-    }
-
-    public void SetLeft (PValue node)
-    {
-        if(_left_ != null)
-        {
-            _left_.Parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.Parent() != null)
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            node.Parent(this);
-        }
-
-        _left_ = node;
-    }
     public TMinus GetMinus ()
     {
         return _minus_;
@@ -8520,138 +8570,60 @@ public sealed class AThreeExpr : PExpr
 
         _minus_ = node;
     }
-    public PValue GetRight ()
-    {
-        return _right_;
-    }
-
-    public void SetRight (PValue node)
-    {
-        if(_right_ != null)
-        {
-            _right_.Parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.Parent() != null)
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            node.Parent(this);
-        }
-
-        _right_ = node;
-    }
 
     public override string ToString()
     {
         return ""
-            + ToString (_left_)
             + ToString (_minus_)
-            + ToString (_right_)
         ;
     }
 
     internal override void RemoveChild(Node child)
     {
-        if ( _left_ == child )
-        {
-            _left_ = null;
-            return;
-        }
         if ( _minus_ == child )
         {
             _minus_ = null;
-            return;
-        }
-        if ( _right_ == child )
-        {
-            _right_ = null;
             return;
         }
     }
 
     internal override void ReplaceChild(Node oldChild, Node newChild)
     {
-        if ( _left_ == oldChild )
-        {
-            SetLeft ((PValue) newChild);
-            return;
-        }
         if ( _minus_ == oldChild )
         {
             SetMinus ((TMinus) newChild);
             return;
         }
-        if ( _right_ == oldChild )
-        {
-            SetRight ((PValue) newChild);
-            return;
-        }
     }
 
 }
-public sealed class AFourExpr : PExpr
+public sealed class AThreeAop : PAop
 {
-    private PValue _left_;
     private TMult _mult_;
-    private PValue _right_;
 
-    public AFourExpr ()
+    public AThreeAop ()
     {
     }
 
-    public AFourExpr (
-            PValue _left_,
-            TMult _mult_,
-            PValue _right_
+    public AThreeAop (
+            TMult _mult_
     )
     {
-        SetLeft (_left_);
         SetMult (_mult_);
-        SetRight (_right_);
     }
 
     public override Object Clone()
     {
-        return new AFourExpr (
-            (PValue)CloneNode (_left_),
-            (TMult)CloneNode (_mult_),
-            (PValue)CloneNode (_right_)
+        return new AThreeAop (
+            (TMult)CloneNode (_mult_)
         );
     }
 
     public override void Apply(Switch sw)
     {
-        ((Analysis) sw).CaseAFourExpr(this);
+        ((Analysis) sw).CaseAThreeAop(this);
     }
 
-    public PValue GetLeft ()
-    {
-        return _left_;
-    }
-
-    public void SetLeft (PValue node)
-    {
-        if(_left_ != null)
-        {
-            _left_.Parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.Parent() != null)
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            node.Parent(this);
-        }
-
-        _left_ = node;
-    }
     public TMult GetMult ()
     {
         return _mult_;
@@ -8676,138 +8648,60 @@ public sealed class AFourExpr : PExpr
 
         _mult_ = node;
     }
-    public PValue GetRight ()
-    {
-        return _right_;
-    }
-
-    public void SetRight (PValue node)
-    {
-        if(_right_ != null)
-        {
-            _right_.Parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.Parent() != null)
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            node.Parent(this);
-        }
-
-        _right_ = node;
-    }
 
     public override string ToString()
     {
         return ""
-            + ToString (_left_)
             + ToString (_mult_)
-            + ToString (_right_)
         ;
     }
 
     internal override void RemoveChild(Node child)
     {
-        if ( _left_ == child )
-        {
-            _left_ = null;
-            return;
-        }
         if ( _mult_ == child )
         {
             _mult_ = null;
-            return;
-        }
-        if ( _right_ == child )
-        {
-            _right_ = null;
             return;
         }
     }
 
     internal override void ReplaceChild(Node oldChild, Node newChild)
     {
-        if ( _left_ == oldChild )
-        {
-            SetLeft ((PValue) newChild);
-            return;
-        }
         if ( _mult_ == oldChild )
         {
             SetMult ((TMult) newChild);
             return;
         }
-        if ( _right_ == oldChild )
-        {
-            SetRight ((PValue) newChild);
-            return;
-        }
     }
 
 }
-public sealed class AFiveExpr : PExpr
+public sealed class AFourAop : PAop
 {
-    private PValue _left_;
     private TDivide _divide_;
-    private PValue _right_;
 
-    public AFiveExpr ()
+    public AFourAop ()
     {
     }
 
-    public AFiveExpr (
-            PValue _left_,
-            TDivide _divide_,
-            PValue _right_
+    public AFourAop (
+            TDivide _divide_
     )
     {
-        SetLeft (_left_);
         SetDivide (_divide_);
-        SetRight (_right_);
     }
 
     public override Object Clone()
     {
-        return new AFiveExpr (
-            (PValue)CloneNode (_left_),
-            (TDivide)CloneNode (_divide_),
-            (PValue)CloneNode (_right_)
+        return new AFourAop (
+            (TDivide)CloneNode (_divide_)
         );
     }
 
     public override void Apply(Switch sw)
     {
-        ((Analysis) sw).CaseAFiveExpr(this);
+        ((Analysis) sw).CaseAFourAop(this);
     }
 
-    public PValue GetLeft ()
-    {
-        return _left_;
-    }
-
-    public void SetLeft (PValue node)
-    {
-        if(_left_ != null)
-        {
-            _left_.Parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.Parent() != null)
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            node.Parent(this);
-        }
-
-        _left_ = node;
-    }
     public TDivide GetDivide ()
     {
         return _divide_;
@@ -8832,138 +8726,60 @@ public sealed class AFiveExpr : PExpr
 
         _divide_ = node;
     }
-    public PValue GetRight ()
-    {
-        return _right_;
-    }
-
-    public void SetRight (PValue node)
-    {
-        if(_right_ != null)
-        {
-            _right_.Parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.Parent() != null)
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            node.Parent(this);
-        }
-
-        _right_ = node;
-    }
 
     public override string ToString()
     {
         return ""
-            + ToString (_left_)
             + ToString (_divide_)
-            + ToString (_right_)
         ;
     }
 
     internal override void RemoveChild(Node child)
     {
-        if ( _left_ == child )
-        {
-            _left_ = null;
-            return;
-        }
         if ( _divide_ == child )
         {
             _divide_ = null;
-            return;
-        }
-        if ( _right_ == child )
-        {
-            _right_ = null;
             return;
         }
     }
 
     internal override void ReplaceChild(Node oldChild, Node newChild)
     {
-        if ( _left_ == oldChild )
-        {
-            SetLeft ((PValue) newChild);
-            return;
-        }
         if ( _divide_ == oldChild )
         {
             SetDivide ((TDivide) newChild);
             return;
         }
-        if ( _right_ == oldChild )
-        {
-            SetRight ((PValue) newChild);
-            return;
-        }
     }
 
 }
-public sealed class ASixExpr : PExpr
+public sealed class AFiveAop : PAop
 {
-    private PValue _left_;
     private TPow _pow_;
-    private PValue _right_;
 
-    public ASixExpr ()
+    public AFiveAop ()
     {
     }
 
-    public ASixExpr (
-            PValue _left_,
-            TPow _pow_,
-            PValue _right_
+    public AFiveAop (
+            TPow _pow_
     )
     {
-        SetLeft (_left_);
         SetPow (_pow_);
-        SetRight (_right_);
     }
 
     public override Object Clone()
     {
-        return new ASixExpr (
-            (PValue)CloneNode (_left_),
-            (TPow)CloneNode (_pow_),
-            (PValue)CloneNode (_right_)
+        return new AFiveAop (
+            (TPow)CloneNode (_pow_)
         );
     }
 
     public override void Apply(Switch sw)
     {
-        ((Analysis) sw).CaseASixExpr(this);
+        ((Analysis) sw).CaseAFiveAop(this);
     }
 
-    public PValue GetLeft ()
-    {
-        return _left_;
-    }
-
-    public void SetLeft (PValue node)
-    {
-        if(_left_ != null)
-        {
-            _left_.Parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.Parent() != null)
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            node.Parent(this);
-        }
-
-        _left_ = node;
-    }
     public TPow GetPow ()
     {
         return _pow_;
@@ -8988,74 +8804,28 @@ public sealed class ASixExpr : PExpr
 
         _pow_ = node;
     }
-    public PValue GetRight ()
-    {
-        return _right_;
-    }
-
-    public void SetRight (PValue node)
-    {
-        if(_right_ != null)
-        {
-            _right_.Parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.Parent() != null)
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            node.Parent(this);
-        }
-
-        _right_ = node;
-    }
 
     public override string ToString()
     {
         return ""
-            + ToString (_left_)
             + ToString (_pow_)
-            + ToString (_right_)
         ;
     }
 
     internal override void RemoveChild(Node child)
     {
-        if ( _left_ == child )
-        {
-            _left_ = null;
-            return;
-        }
         if ( _pow_ == child )
         {
             _pow_ = null;
-            return;
-        }
-        if ( _right_ == child )
-        {
-            _right_ = null;
             return;
         }
     }
 
     internal override void ReplaceChild(Node oldChild, Node newChild)
     {
-        if ( _left_ == oldChild )
-        {
-            SetLeft ((PValue) newChild);
-            return;
-        }
         if ( _pow_ == oldChild )
         {
             SetPow ((TPow) newChild);
-            return;
-        }
-        if ( _right_ == oldChild )
-        {
-            SetRight ((PValue) newChild);
             return;
         }
     }

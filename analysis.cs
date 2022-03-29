@@ -64,10 +64,11 @@ public interface Analysis : Switch
     void CaseASkipstmt(ASkipstmt node);
     void CaseAOneExpr(AOneExpr node);
     void CaseATwoExpr(ATwoExpr node);
-    void CaseAThreeExpr(AThreeExpr node);
-    void CaseAFourExpr(AFourExpr node);
-    void CaseAFiveExpr(AFiveExpr node);
-    void CaseASixExpr(ASixExpr node);
+    void CaseAOneAop(AOneAop node);
+    void CaseATwoAop(ATwoAop node);
+    void CaseAThreeAop(AThreeAop node);
+    void CaseAFourAop(AFourAop node);
+    void CaseAFiveAop(AFiveAop node);
     void CaseAOneValue(AOneValue node);
     void CaseATwoValue(ATwoValue node);
     void CaseAThreeValue(AThreeValue node);
@@ -419,19 +420,23 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseAThreeExpr(AThreeExpr node)
+    public virtual void CaseAOneAop(AOneAop node)
     {
         DefaultCase(node);
     }
-    public virtual void CaseAFourExpr(AFourExpr node)
+    public virtual void CaseATwoAop(ATwoAop node)
     {
         DefaultCase(node);
     }
-    public virtual void CaseAFiveExpr(AFiveExpr node)
+    public virtual void CaseAThreeAop(AThreeAop node)
     {
         DefaultCase(node);
     }
-    public virtual void CaseASixExpr(ASixExpr node)
+    public virtual void CaseAFourAop(AFourAop node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseAFiveAop(AFiveAop node)
     {
         DefaultCase(node);
     }
@@ -2205,127 +2210,114 @@ public class DepthFirstAdapter : AnalysisAdapter
     public override void CaseATwoExpr(ATwoExpr node)
     {
         InATwoExpr(node);
-        if(node.GetLeft() != null)
+        if(node.GetExpr() != null)
         {
-            node.GetLeft().Apply(this);
+            node.GetExpr().Apply(this);
         }
+        if(node.GetAop() != null)
+        {
+            node.GetAop().Apply(this);
+        }
+        if(node.GetValue() != null)
+        {
+            node.GetValue().Apply(this);
+        }
+        OutATwoExpr(node);
+    }
+    public virtual void InAOneAop(AOneAop node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAOneAop(AOneAop node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAOneAop(AOneAop node)
+    {
+        InAOneAop(node);
         if(node.GetPlus() != null)
         {
             node.GetPlus().Apply(this);
         }
-        if(node.GetRight() != null)
-        {
-            node.GetRight().Apply(this);
-        }
-        OutATwoExpr(node);
+        OutAOneAop(node);
     }
-    public virtual void InAThreeExpr(AThreeExpr node)
+    public virtual void InATwoAop(ATwoAop node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAThreeExpr(AThreeExpr node)
+    public virtual void OutATwoAop(ATwoAop node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAThreeExpr(AThreeExpr node)
+    public override void CaseATwoAop(ATwoAop node)
     {
-        InAThreeExpr(node);
-        if(node.GetLeft() != null)
-        {
-            node.GetLeft().Apply(this);
-        }
+        InATwoAop(node);
         if(node.GetMinus() != null)
         {
             node.GetMinus().Apply(this);
         }
-        if(node.GetRight() != null)
-        {
-            node.GetRight().Apply(this);
-        }
-        OutAThreeExpr(node);
+        OutATwoAop(node);
     }
-    public virtual void InAFourExpr(AFourExpr node)
+    public virtual void InAThreeAop(AThreeAop node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAFourExpr(AFourExpr node)
+    public virtual void OutAThreeAop(AThreeAop node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAFourExpr(AFourExpr node)
+    public override void CaseAThreeAop(AThreeAop node)
     {
-        InAFourExpr(node);
-        if(node.GetLeft() != null)
-        {
-            node.GetLeft().Apply(this);
-        }
+        InAThreeAop(node);
         if(node.GetMult() != null)
         {
             node.GetMult().Apply(this);
         }
-        if(node.GetRight() != null)
-        {
-            node.GetRight().Apply(this);
-        }
-        OutAFourExpr(node);
+        OutAThreeAop(node);
     }
-    public virtual void InAFiveExpr(AFiveExpr node)
+    public virtual void InAFourAop(AFourAop node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAFiveExpr(AFiveExpr node)
+    public virtual void OutAFourAop(AFourAop node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAFiveExpr(AFiveExpr node)
+    public override void CaseAFourAop(AFourAop node)
     {
-        InAFiveExpr(node);
-        if(node.GetLeft() != null)
-        {
-            node.GetLeft().Apply(this);
-        }
+        InAFourAop(node);
         if(node.GetDivide() != null)
         {
             node.GetDivide().Apply(this);
         }
-        if(node.GetRight() != null)
-        {
-            node.GetRight().Apply(this);
-        }
-        OutAFiveExpr(node);
+        OutAFourAop(node);
     }
-    public virtual void InASixExpr(ASixExpr node)
+    public virtual void InAFiveAop(AFiveAop node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutASixExpr(ASixExpr node)
+    public virtual void OutAFiveAop(AFiveAop node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseASixExpr(ASixExpr node)
+    public override void CaseAFiveAop(AFiveAop node)
     {
-        InASixExpr(node);
-        if(node.GetLeft() != null)
-        {
-            node.GetLeft().Apply(this);
-        }
+        InAFiveAop(node);
         if(node.GetPow() != null)
         {
             node.GetPow().Apply(this);
         }
-        if(node.GetRight() != null)
-        {
-            node.GetRight().Apply(this);
-        }
-        OutASixExpr(node);
+        OutAFiveAop(node);
     }
     public virtual void InAOneValue(AOneValue node)
     {
@@ -4425,127 +4417,114 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
     public override void CaseATwoExpr(ATwoExpr node)
     {
         InATwoExpr(node);
-        if(node.GetRight() != null)
+        if(node.GetValue() != null)
         {
-            node.GetRight().Apply(this);
+            node.GetValue().Apply(this);
         }
+        if(node.GetAop() != null)
+        {
+            node.GetAop().Apply(this);
+        }
+        if(node.GetExpr() != null)
+        {
+            node.GetExpr().Apply(this);
+        }
+        OutATwoExpr(node);
+    }
+    public virtual void InAOneAop(AOneAop node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAOneAop(AOneAop node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAOneAop(AOneAop node)
+    {
+        InAOneAop(node);
         if(node.GetPlus() != null)
         {
             node.GetPlus().Apply(this);
         }
-        if(node.GetLeft() != null)
-        {
-            node.GetLeft().Apply(this);
-        }
-        OutATwoExpr(node);
+        OutAOneAop(node);
     }
-    public virtual void InAThreeExpr(AThreeExpr node)
+    public virtual void InATwoAop(ATwoAop node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAThreeExpr(AThreeExpr node)
+    public virtual void OutATwoAop(ATwoAop node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAThreeExpr(AThreeExpr node)
+    public override void CaseATwoAop(ATwoAop node)
     {
-        InAThreeExpr(node);
-        if(node.GetRight() != null)
-        {
-            node.GetRight().Apply(this);
-        }
+        InATwoAop(node);
         if(node.GetMinus() != null)
         {
             node.GetMinus().Apply(this);
         }
-        if(node.GetLeft() != null)
-        {
-            node.GetLeft().Apply(this);
-        }
-        OutAThreeExpr(node);
+        OutATwoAop(node);
     }
-    public virtual void InAFourExpr(AFourExpr node)
+    public virtual void InAThreeAop(AThreeAop node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAFourExpr(AFourExpr node)
+    public virtual void OutAThreeAop(AThreeAop node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAFourExpr(AFourExpr node)
+    public override void CaseAThreeAop(AThreeAop node)
     {
-        InAFourExpr(node);
-        if(node.GetRight() != null)
-        {
-            node.GetRight().Apply(this);
-        }
+        InAThreeAop(node);
         if(node.GetMult() != null)
         {
             node.GetMult().Apply(this);
         }
-        if(node.GetLeft() != null)
-        {
-            node.GetLeft().Apply(this);
-        }
-        OutAFourExpr(node);
+        OutAThreeAop(node);
     }
-    public virtual void InAFiveExpr(AFiveExpr node)
+    public virtual void InAFourAop(AFourAop node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAFiveExpr(AFiveExpr node)
+    public virtual void OutAFourAop(AFourAop node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAFiveExpr(AFiveExpr node)
+    public override void CaseAFourAop(AFourAop node)
     {
-        InAFiveExpr(node);
-        if(node.GetRight() != null)
-        {
-            node.GetRight().Apply(this);
-        }
+        InAFourAop(node);
         if(node.GetDivide() != null)
         {
             node.GetDivide().Apply(this);
         }
-        if(node.GetLeft() != null)
-        {
-            node.GetLeft().Apply(this);
-        }
-        OutAFiveExpr(node);
+        OutAFourAop(node);
     }
-    public virtual void InASixExpr(ASixExpr node)
+    public virtual void InAFiveAop(AFiveAop node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutASixExpr(ASixExpr node)
+    public virtual void OutAFiveAop(AFiveAop node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseASixExpr(ASixExpr node)
+    public override void CaseAFiveAop(AFiveAop node)
     {
-        InASixExpr(node);
-        if(node.GetRight() != null)
-        {
-            node.GetRight().Apply(this);
-        }
+        InAFiveAop(node);
         if(node.GetPow() != null)
         {
             node.GetPow().Apply(this);
         }
-        if(node.GetLeft() != null)
-        {
-            node.GetLeft().Apply(this);
-        }
-        OutASixExpr(node);
+        OutAFiveAop(node);
     }
     public virtual void InAOneValue(AOneValue node)
     {
