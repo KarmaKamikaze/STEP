@@ -77,10 +77,13 @@ Ignored Tokens
   whitespace;
 
 Productions
+  // Program
   program = setuploop P.functions?;
   setuploop = {one} P.setup | {two} P.loop | {three} P.setup P.loop;
   setup = T.setup stmt* endsetup nl;
   loop = T.loop stmt* endloop nl;
+  
+  // Function declarations
   functions = T.functions funcdcl* endfunctions nl;
   funcdcl = {one} type brackets? T.function id params stmt* retstmt endfunction nl | {two} blank T.function id params stmt* endfunction nl;
   brackets = lbrack rbrack;
@@ -88,11 +91,13 @@ Productions
   params_content = type brackets* id params_multi*;
   params_multi = comma type brackets* id;
   type = {one} number | {two} string | {three} boolean;
+  
+  // Statements
   stmt = {one} ifstmt nl | {two} whilestmt nl | {three} forstmt nl | {four} vardcl nl | {five} assstmt nl | {six} funccall nl | {seven} retstmt nl | {eight} switchstmt nl | {nine} skipstmt nl;
-  ifstmt = {nonelse} if lparen bexpr rparen stmt* endif | {withelse} if lparen bexpr rparen [fst]:stmt* else [snd]:stmt* endif;
-  whilestmt = repeatwhile lparen bexpr rparen option_stmt_continue_break* endwhile;
+  ifstmt = {nonelse} if lparen cond rparen stmt* endif | {withelse} if lparen cond rparen [fst]:stmt* else [snd]:stmt* endif;
+  whilestmt = repeatwhile lparen cond rparen option_stmt_continue_break* endwhile;
   option_stmt_continue_break = {one} stmt | {two} continue nl | {three} break nl;
-  forstmt = repeatfor lparen forstmt_iterator_options to [fst]:aexpr comma option_increase_decrease [snd]:aexpr rparen option_stmt_continue_break* endfor;
+  forstmt = repeatfor lparen forstmt_iterator_options to [fst]:expr comma option_increase_decrease [snd]:expr rparen option_stmt_continue_break* endfor;
   forstmt_iterator_options = {one} numdcl | {two} assstmt | {three} id arrindex?;
   option_increase_decrease = {one} increaseby | {two} decreaseby;
   switchstmt = switch lparen id arrindex? rparen whencase* otherwisecase? endswitch;
@@ -102,28 +107,27 @@ Productions
   funccall = id lparen params_options? rparen;
   params_options = expr multi_expr*;
   multi_expr = comma expr;
-  retstmt = return expr;
-  arrindex = lbrack aexpr rbrack;
+  retstmt = {one} return expr | {two} return cond;
+  arrindex = lbrack expr rbrack;
   skipstmt = nl;
-  expr = {one} aexpr | {two} bexpr | {three} sexpr;
-  bexpr = {one} neg? bexpr binary_bexpr? | {two} [fst]:aexpr relop [snd]:aexpr | {three} lparen bexpr rparen | {four} id arrindex? | {five} boolliteral | {six} funccall;
-  binary_bexpr = bop bexpr;
+  
+  // Arithmetic expressions
+  expr = {one} value | {two} [left]:value plus [right]:value | {three} [left]:value minus [right]:value | {four} [left]:value mult [right]:value | {five} [left]:value divide [right]:value | {six} [left]:value pow [right]:value;
+  value = {one} P.constant | {two} id | {three} lparen expr rparen;
+  constant = {one} numliteral | {two} strliteral | {three} boolliteral;
+  
+  // Boolean expressions
+  comp = {one} expr | {two} [fst]:expr relop [snd]:expr;
   relop = {one} grthan | {two} grthaneq | {three} lthan | {four} lthaneq | {five} eq | {six} neq;
+  cond = {one} comp | {two} [fst]:cond bop [snd]:cond;
   bop = {one} and | {two} or | {three} eq | {four} neq;
-  sexpr = {one} sexpr binary_sexpr? | {two} id arrindex? | {three} strliteral | {four} funccall;
-  binary_sexpr = plus sexpr;
-  aexpr = {one} aexpr plus_or_minus term | {two} term;
-  plus_or_minus = {one} plus | {two} minus;
-  term = {one} term mult_or_divide factor | {two} factor;
-  mult_or_divide = {one} mult | {two} divide;
-  factor = {one} exp pow factor | {two} exp;
-  exp = {one} lparen aexpr rparen | {two} minus? exp_alternatives;
-  exp_alternatives = {one} numliteral | {two} id arrindex? | {three} funccall;
-  vardcl = constant? var_options nl;
+  
+  // Variable declarations
+  vardcl = T.constant? var_options nl;
   var_options = {one} numdcl | {two} stringdcl | {three} booldcl | {four} arrdcl;
-  numdcl = number id assign aexpr nl;
-  stringdcl = string id assign sexpr nl;
-  booldcl = boolean id assign bexpr nl;
+  numdcl = number id assign expr nl;
+  stringdcl = string id assign expr nl;
+  booldcl = boolean id assign cond nl;
   arrdcl = type [fst]:arrsizedcl [multi]:arrsizedcl* id assign arr_id_or_expr;
   arr_id_or_expr = {one} id | {two} lbrack params_options? rbrack;
   arrsizedcl = lbrack numliteral rbrack;
