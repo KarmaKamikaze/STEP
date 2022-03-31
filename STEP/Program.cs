@@ -1,4 +1,5 @@
 ﻿using STEP.lexer;
+using STEP.node;
 using STEP.parser;
 
 namespace STEP;
@@ -17,6 +18,20 @@ class Program
             
             // Parse the source code
             Parser parser = new Parser(lexer);
+            Start ast = null;
+
+            try
+            {
+                ast = parser.Parse();
+            }
+            catch (Exception e)
+            {
+                Exit(e.ToString());
+            }
+            
+            // Print AST
+            AstPrinter printer = new AstPrinter();
+            ast.Apply(printer);
         }
         
         Exit("Finished!");

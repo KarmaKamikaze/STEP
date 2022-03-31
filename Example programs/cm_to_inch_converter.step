@@ -1,0 +1,15 @@
+constant number inch_per_cm = 0.3937
+
+setup
+    print("Centimeter to inch converter\n")
+    print("  CM  |  INCH  \n")
+    repeat for(number i = 1 to 100, increase by 1)
+        printLine(i + "     " + cmToInch(i))
+    end for
+end setup
+
+functions
+    number function cmToInch(number cm)
+        return cm * inch_per_cm
+    end function
+end functions
