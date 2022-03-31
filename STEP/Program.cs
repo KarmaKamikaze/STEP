@@ -37,7 +37,7 @@ class Program
         Exit("Finished!");
     }
 
-    private static void Exit(string? message)
+    private static void Exit(string message)
     {
         if (message != null)
             Console.WriteLine(message);
