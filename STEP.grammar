@@ -44,6 +44,8 @@ Tokens
   endloop = 'end loop';
   function = 'function';
   endfunction = 'end function';
+  globalvariables = 'globalvariables';
+  endglobalvariables = 'end global variables';
   functions = 'functions';
   endfunctions = 'end functions';
   blank = 'blank';
@@ -78,10 +80,13 @@ Ignored Tokens
 
 Productions
   // Program
-  program = setuploop P.functions?;
+  program = P.globalvariables? setuploop P.functions?;
   setuploop = {one} P.setup | {two} P.loop | {three} P.setup P.loop;
   setup = T.setup stmt* endsetup nl;
   loop = T.loop stmt* endloop nl;
+  
+  // Global variable declarations
+  globalvariables = T.globalvariables vardcl* endglobalvariables nl;
   
   // Function declarations
   functions = T.functions funcdcl* endfunctions nl;
