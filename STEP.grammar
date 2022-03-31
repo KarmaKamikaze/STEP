@@ -45,7 +45,7 @@ Tokens
   function = 'function';
   endfunction = 'end function';
   globalvariables = 'globalvariables';
-  endglobalvariables = 'end global variables';
+  endglobalvariables = 'end globalvariables';
   functions = 'functions';
   endfunctions = 'end functions';
   blank = 'blank';
