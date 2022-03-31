@@ -85,7 +85,7 @@ Productions
   
   // Function declarations
   functions = T.functions funcdcl* endfunctions nl;
-  funcdcl = {one} type brackets? T.function id params stmt* retstmt endfunction nl | {two} blank T.function id params stmt* endfunction nl;
+  funcdcl = {one} type brackets* T.function id params stmt* retstmt endfunction nl | {two} blank T.function id params stmt* endfunction nl;
   brackets = lbrack rbrack;
   params = lparen params_content? rparen;
   params_content = type brackets* id params_multi*;
@@ -107,14 +107,14 @@ Productions
   funccall = id lparen params_options? rparen;
   params_options = expr multi_expr*;
   multi_expr = comma expr;
-  retstmt = {one} return cond;
+  retstmt = {one} return cond | {two} return;
   arrindex = lbrack expr rbrack;
   skipstmt = nl;
   
   // Arithmetic expressions
   expr = {one} value | {two} expr aop value;
   aop = {one} plus | {two} minus | {three} mult | {four} divide | {five} pow;
-  value = {one} P.constant | {two} id | {three} lparen expr rparen;
+  value = {one} P.constant | {two} id arrindex? | {three} lparen expr rparen;
   constant = {one} numliteral | {two} strliteral | {three} boolliteral;
   
   // Boolean expressions
@@ -130,5 +130,7 @@ Productions
   stringdcl = string id assign expr nl;
   booldcl = boolean id assign cond nl;
   arrdcl = type [fst]:arrsizedcl [multi]:arrsizedcl* id assign arr_id_or_expr;
-  arr_id_or_expr = {one} id | {two} lbrack params_options? rbrack;
+ arr_id_or_expr = {one} id | {two} lbrack arr_lit* rbrack;
+ arr_lit = {one} params_options? | {two}  lbrack params_options? rbrack | {three} lbrack params_options? rbrack comma 
+ arr_lit;
   arrsizedcl = lbrack numliteral rbrack;
