@@ -4,7 +4,6 @@ Helpers
   tab = 9;
   cr = 13;
   lf = 10;
-  eol = cr lf | cr | lf;
   lowercase = ['a' .. 'z'];
   uppercase = ['A' .. 'Z'];
   letter = lowercase | uppercase | '_';
@@ -19,7 +18,6 @@ Tokens
   numliteral = digit+ | digit+ '.' digit*;
   strliteral = '\".*\"';
   boolliteral = 'true'|'false';
-  id = letter letter_or_digit*;
   assign = '=';
   plus = '+';
   minus = '-';
@@ -33,21 +31,21 @@ Tokens
   eq = '==';
   neq = '!=';
   neg = '!';
-  nl = '\r?\n';
-  whitespace = (' ' | tab | eol)+;
+  whitespace = (' ' | tab)+;
   comma = ',';
+  nl = cr? lf;
 
 // Keywords
   setup = 'setup';
   endsetup = 'end setup';
   loop = 'loop';
   endloop = 'end loop';
+  functions = 'functions';
+  endfunctions = 'end functions';
   function = 'function';
   endfunction = 'end function';
   variables = 'variables';
   endvariables = 'end variables';
-  functions = 'functions';
-  endfunctions = 'end functions';
   blank = 'blank';
   number = 'number';
   string = 'string';
@@ -74,23 +72,27 @@ Tokens
   and = 'and';
   or = 'or';
   constant = 'constant';
+  id = letter letter_or_digit*; 
 
 Ignored Tokens
   whitespace;
 
 Productions
   // Program
-  program = P.variables? setuploop P.functions?;
-  setuploop = {one} P.setup | {two} P.loop | {three} P.setup P.loop;
+  program = P.variables? setuploop P.functions;
+  setuploop = {one} P.setup nl* | {two} P.loop nl* | {three} P.setup [fst]:nl* P.loop [snd]:nl*;
   setup = T.setup stmt* endsetup nl;
   loop = T.loop stmt* endloop nl;
   
   // Global variable declarations
-  variables = T.variables vardcl* endvariables nl;
+  variables = T.variables var_or_nl* endvariables nl*;
+  var_or_nl = {one} vardcl | {two} nl;
   
   // Function declarations
-  functions = T.functions funcdcl* endfunctions nl;
-  funcdcl = {one} type brackets* T.function id params stmt* retstmt endfunction nl | {two} blank T.function id params stmt* endfunction nl;
+  functions = T.functions funcdcl_or_nl* endfunctions nl*;
+  funcdcl = {one} type brackets* T.function id params stmt* retstmt [fst]:nl endfunction [snd]:nl | {two} blank T.function id params stmt* endfunction nl;
+  funcdcl_or_nl = {one} funcdcl | {two} nl;
+  
   brackets = lbrack rbrack;
   params = lparen params_content? rparen;
   params_content = type brackets* id params_multi*;
@@ -98,8 +100,9 @@ Productions
   type = {one} number | {two} string | {three} boolean;
   
   // Statements
-  stmt = {one} ifstmt nl | {two} whilestmt nl | {three} forstmt nl | {four} vardcl nl | {five} assstmt nl | {six} funccall nl | {seven} retstmt nl | {eight} switchstmt nl | {nine} skipstmt nl;
-  ifstmt = {nonelse} if lparen cond rparen stmt* endif | {withelse} if lparen cond rparen [fst]:stmt* else [snd]:stmt* endif;
+  stmt = stmts nl;
+  stmts = {one} ifstmt | {two} whilestmt | {three} forstmt | {four} vardcl | {five} assstmt | {six} funccall | {seven} retstmt | {eight} switchstmt |  ;
+  ifstmt = {nonelse} if lparen cond rparen stmt* endif| {withelse} if lparen cond rparen [fst]:stmt* else [snd]:stmt* endif;
   whilestmt = repeatwhile lparen cond rparen option_stmt_continue_break* endwhile;
   option_stmt_continue_break = {one} stmt | {two} continue nl | {three} break nl;
   forstmt = repeatfor lparen forstmt_iterator_options to [fst]:expr comma option_increase_decrease [snd]:expr rparen option_stmt_continue_break* endfor;
@@ -114,12 +117,11 @@ Productions
   multi_expr = comma expr;
   retstmt = {one} return cond | {two} return;
   arrindex = lbrack expr rbrack;
-  skipstmt = nl;
   
   // Arithmetic expressions
   expr = {one} value | {two} expr aop value;
   aop = {one} plus | {two} minus | {three} mult | {four} divide | {five} pow;
-  value = {one} P.constant | {two} id arrindex? | {three} lparen expr rparen;
+  value = {one} P.constant | {two} id | {three} lparen expr rparen | {four} funccall;
   constant = {one} numliteral | {two} strliteral | {three} boolliteral;
   
   // Boolean expressions
@@ -129,13 +131,11 @@ Productions
   bop = {one} and | {two} or;
   
   // Variable declarations
-  vardcl = T.constant? var_options nl;
+  vardcl = T.constant? var_options;
   var_options = {one} numdcl | {two} stringdcl | {three} booldcl | {four} arrdcl;
   numdcl = number id assign expr nl;
   stringdcl = string id assign expr nl;
   booldcl = boolean id assign cond nl;
   arrdcl = type [fst]:arrsizedcl [multi]:arrsizedcl* id assign arr_id_or_expr;
-  arr_id_or_expr = {one} id | {two} lbrack arr_lit* rbrack;
-  arr_lit = {one} params_options? | {two}  lbrack params_options? rbrack | {three} lbrack params_options? rbrack comma 
-  arr_lit;
+  arr_id_or_expr = {one} id | {two} lbrack params_options? rbrack;
   arrsizedcl = lbrack numliteral rbrack;
