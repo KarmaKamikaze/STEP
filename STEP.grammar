@@ -44,8 +44,8 @@ Tokens
   endloop = 'end loop';
   function = 'function';
   endfunction = 'end function';
-  globalvariables = 'globalvariables';
-  endglobalvariables = 'end globalvariables';
+  variables = 'variables';
+  endvariables = 'end variables';
   functions = 'functions';
   endfunctions = 'end functions';
   blank = 'blank';
@@ -80,13 +80,13 @@ Ignored Tokens
 
 Productions
   // Program
-  program = P.globalvariables? setuploop P.functions?;
+  program = P.variables? setuploop P.functions?;
   setuploop = {one} P.setup | {two} P.loop | {three} P.setup P.loop;
   setup = T.setup stmt* endsetup nl;
   loop = T.loop stmt* endloop nl;
   
   // Global variable declarations
-  globalvariables = T.globalvariables vardcl* endglobalvariables nl;
+  variables = T.variables vardcl* endvariables nl;
   
   // Function declarations
   functions = T.functions funcdcl* endfunctions nl;
@@ -135,7 +135,7 @@ Productions
   stringdcl = string id assign expr nl;
   booldcl = boolean id assign cond nl;
   arrdcl = type [fst]:arrsizedcl [multi]:arrsizedcl* id assign arr_id_or_expr;
- arr_id_or_expr = {one} id | {two} lbrack arr_lit* rbrack;
- arr_lit = {one} params_options? | {two}  lbrack params_options? rbrack | {three} lbrack params_options? rbrack comma 
- arr_lit;
+  arr_id_or_expr = {one} id | {two} lbrack arr_lit* rbrack;
+  arr_lit = {one} params_options? | {two}  lbrack params_options? rbrack | {three} lbrack params_options? rbrack comma 
+  arr_lit;
   arrsizedcl = lbrack numliteral rbrack;
