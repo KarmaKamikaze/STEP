@@ -1,18 +1,40 @@
-
+# simple table printing program
 variables
-constant number inch_per_cm = 0.3937
+constant number inch_per_cm = 0.3937 # this is a constant value
 end variables
 
 setup
     print("Centimeter to inch converter\n")
     print("  CM  |  INCH  \n")
-    repeat for(number i = 1 to 100, increase by 1)
+    repeat for(number i = 1 to 100, increase by 1) # 100 steps, 1 to 100
         printLine(i + "     " + cmToInch(i))
     end for
+
+    switch(i)
+        ##when 1 do
+
+        when 2 do
+            fallthrough
+
+
+        when 3 do
+            ass(b)
+
+        otherwise do##end switch
+
+        a[2 + 5] = a[3 - 2 - 1]
 end setup
+
+##  this is a multiline comment
+    isn't it cool? ##
 
 functions
     number function cmToInch(number cm)
         return cm * inch_per_cm
     end function
 end functions
+
+#program over
+
+
+
