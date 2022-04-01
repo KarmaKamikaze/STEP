@@ -1,4 +1,7 @@
+
+variables
 constant number inch_per_cm = 0.3937
+end variables
 
 setup
     print("Centimeter to inch converter\n")

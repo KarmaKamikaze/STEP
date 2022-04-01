@@ -4,20 +4,20 @@ Helpers
   tab = 9;
   cr = 13;
   lf = 10;
+  dblquote = 34;
   lowercase = ['a' .. 'z'];
   uppercase = ['A' .. 'Z'];
   letter = lowercase | uppercase | '_';
   digit = ['0' .. '9'];
   letter_or_digit = letter | digit;
+  all_chars = [0 .. 65535];
+  string_content = [all_chars - dblquote];
 
 Tokens
   lparen = '(';
   rparen = ')';
   lbrack = '[';
   rbrack = ']';
-  numliteral = digit+ | digit+ '.' digit*;
-  strliteral = '\".*\"';
-  boolliteral = 'true'|'false';
   assign = '=';
   plus = '+';
   minus = '-';
@@ -34,6 +34,9 @@ Tokens
   whitespace = (' ' | tab)+;
   comma = ',';
   nl = cr? lf;
+  numliteral = '-'? digit+ | '-'? digit+ '.' digit*;
+  strliteral = dblquote string_content* dblquote;
+  boolliteral = '!'? 'true'| '!'? 'false';
 
 // Keywords
   setup = 'setup';
@@ -79,10 +82,10 @@ Ignored Tokens
 
 Productions
   // Program
-  program = P.variables? setuploop P.functions;
+  program = nl* P.variables? setuploop P.functions?;
   setuploop = {one} P.setup nl* | {two} P.loop nl* | {three} P.setup [fst]:nl* P.loop [snd]:nl*;
-  setup = T.setup stmt* endsetup nl;
-  loop = T.loop stmt* endloop nl;
+  setup = T.setup stmt* endsetup;
+  loop = T.loop stmt* endloop;
   
   // Global variable declarations
   variables = T.variables var_or_nl* endvariables nl*;
@@ -119,23 +122,24 @@ Productions
   arrindex = lbrack expr rbrack;
   
   // Arithmetic expressions
-  expr = {one} value | {two} expr aop value;
-  aop = {one} plus | {two} minus | {three} mult | {four} divide | {five} pow;
-  value = {one} P.constant | {two} id | {three} lparen expr rparen | {four} funccall;
+  expr = {one} expr plus term | {two} expr minus term | {three} term;
+  term = {one} term mult factor | {two} term divide factor | {three} factor;
+  factor = {one} factor pow value | {two} value;
+  value = {one} P.constant | {two} id arrindex? | {three} lparen expr rparen | {four} funccall;
   constant = {one} numliteral | {two} strliteral | {three} boolliteral;
   
   // Boolean expressions
+  cond = {one} neg? comp | {two} neg? [fst]:comp bop [snd]:cond;
   comp = {one} expr | {two} [fst]:expr relop [snd]:expr;
   relop = {one} grthan | {two} grthaneq | {three} lthan | {four} lthaneq | {five} eq | {six} neq;
-  cond = {one} comp | {two} [fst]:comp bop [snd]:cond;
   bop = {one} and | {two} or;
   
   // Variable declarations
   vardcl = T.constant? var_options;
   var_options = {one} numdcl | {two} stringdcl | {three} booldcl | {four} arrdcl;
-  numdcl = number id assign expr nl;
-  stringdcl = string id assign expr nl;
-  booldcl = boolean id assign cond nl;
+  numdcl = number id assign expr;
+  stringdcl = string id assign expr;
+  booldcl = boolean id assign cond;
   arrdcl = type [fst]:arrsizedcl [multi]:arrsizedcl* id assign arr_id_or_expr;
   arr_id_or_expr = {one} id | {two} lbrack params_options? rbrack;
   arrsizedcl = lbrack numliteral rbrack;
