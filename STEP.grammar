@@ -7,11 +7,12 @@ Helpers
   dblquote = 34;
   lowercase = ['a' .. 'z'];
   uppercase = ['A' .. 'Z'];
-  letter = lowercase | uppercase | '_';
+  letter = lowercase | uppercase;
   digit = ['0' .. '9'];
-  letter_or_digit = letter | digit;
+  id_body = letter | digit | '_';
   all_chars = [0 .. 65535];
   string_content = [all_chars - dblquote];
+  comment_content = [all_chars - cr - lf];
 
 Tokens
   lparen = '(';
@@ -32,6 +33,7 @@ Tokens
   neq = '!=';
   neg = '!';
   whitespace = (' ' | tab)+;
+  single_comment = '//' comment_content* nl;
   comma = ',';
   nl = cr? lf;
   numliteral = '-'? digit+ | '-'? digit+ '.' digit*;
@@ -75,10 +77,11 @@ Tokens
   and = 'and';
   or = 'or';
   constant = 'constant';
-  id = letter letter_or_digit*; 
+  id = letter id_body*;
 
 Ignored Tokens
   whitespace;
+  single_comment;
 
 Productions
   // Program
