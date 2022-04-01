@@ -60,6 +60,7 @@ public interface Analysis : Switch
     void CaseATwoOptionIncreaseDecrease(ATwoOptionIncreaseDecrease node);
     void CaseASwitchstmt(ASwitchstmt node);
     void CaseAWhencase(AWhencase node);
+    void CaseAFallthroughStmt(AFallthroughStmt node);
     void CaseAOtherwisecase(AOtherwisecase node);
     void CaseAAssstmt(AAssstmt node);
     void CaseAFunccall(AFunccall node);
@@ -108,6 +109,8 @@ public interface Analysis : Switch
     void CaseATwoArrIdOrExpr(ATwoArrIdOrExpr node);
     void CaseAArrsizedcl(AArrsizedcl node);
 
+    void CaseTEndOfLineComment(TEndOfLineComment node);
+    void CaseTMultilineComment(TMultilineComment node);
     void CaseTLparen(TLparen node);
     void CaseTRparen(TRparen node);
     void CaseTLbrack(TLbrack node);
@@ -126,8 +129,8 @@ public interface Analysis : Switch
     void CaseTNeq(TNeq node);
     void CaseTNeg(TNeg node);
     void CaseTWhitespace(TWhitespace node);
-    void CaseTComma(TComma node);
     void CaseTNl(TNl node);
+    void CaseTComma(TComma node);
     void CaseTNumliteral(TNumliteral node);
     void CaseTStrliteral(TStrliteral node);
     void CaseTBoolliteral(TBoolliteral node);
@@ -414,6 +417,10 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
+    public virtual void CaseAFallthroughStmt(AFallthroughStmt node)
+    {
+        DefaultCase(node);
+    }
     public virtual void CaseAOtherwisecase(AOtherwisecase node)
     {
         DefaultCase(node);
@@ -603,6 +610,14 @@ public class AnalysisAdapter : Analysis
         DefaultCase(node);
     }
 
+    public virtual void CaseTEndOfLineComment(TEndOfLineComment node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseTMultilineComment(TMultilineComment node)
+    {
+        DefaultCase(node);
+    }
     public virtual void CaseTLparen(TLparen node)
     {
         DefaultCase(node);
@@ -675,11 +690,11 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseTComma(TComma node)
+    public virtual void CaseTNl(TNl node)
     {
         DefaultCase(node);
     }
-    public virtual void CaseTNl(TNl node)
+    public virtual void CaseTComma(TComma node)
     {
         DefaultCase(node);
     }
@@ -2109,6 +2124,18 @@ public class DepthFirstAdapter : AnalysisAdapter
         {
             node.GetRparen().Apply(this);
         }
+        if(node.GetFst() != null)
+        {
+            node.GetFst().Apply(this);
+        }
+        {
+            Object[] temp = new Object[node.GetSnd().Count];
+            node.GetSnd().CopyTo(temp, 0);
+            for(int i = 0; i < temp.Length; i++)
+            {
+                ((TNl) temp[i]).Apply(this);
+            }
+        }
         {
             Object[] temp = new Object[node.GetWhencase().Count];
             node.GetWhencase().CopyTo(temp, 0);
@@ -2152,6 +2179,10 @@ public class DepthFirstAdapter : AnalysisAdapter
         {
             node.GetDo().Apply(this);
         }
+        if(node.GetNl() != null)
+        {
+            node.GetNl().Apply(this);
+        }
         {
             Object[] temp = new Object[node.GetStmt().Count];
             node.GetStmt().CopyTo(temp, 0);
@@ -2160,11 +2191,42 @@ public class DepthFirstAdapter : AnalysisAdapter
                 ((PStmt) temp[i]).Apply(this);
             }
         }
+        if(node.GetFallthroughStmt() != null)
+        {
+            node.GetFallthroughStmt().Apply(this);
+        }
+        OutAWhencase(node);
+    }
+    public virtual void InAFallthroughStmt(AFallthroughStmt node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAFallthroughStmt(AFallthroughStmt node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAFallthroughStmt(AFallthroughStmt node)
+    {
+        InAFallthroughStmt(node);
         if(node.GetFallthrough() != null)
         {
             node.GetFallthrough().Apply(this);
         }
-        OutAWhencase(node);
+        if(node.GetFst() != null)
+        {
+            node.GetFst().Apply(this);
+        }
+        {
+            Object[] temp = new Object[node.GetSnd().Count];
+            node.GetSnd().CopyTo(temp, 0);
+            for(int i = 0; i < temp.Length; i++)
+            {
+                ((TNl) temp[i]).Apply(this);
+            }
+        }
+        OutAFallthroughStmt(node);
     }
     public virtual void InAOtherwisecase(AOtherwisecase node)
     {
@@ -2182,6 +2244,10 @@ public class DepthFirstAdapter : AnalysisAdapter
         if(node.GetOtherwisedo() != null)
         {
             node.GetOtherwisedo().Apply(this);
+        }
+        if(node.GetNl() != null)
+        {
+            node.GetNl().Apply(this);
         }
         {
             Object[] temp = new Object[node.GetStmt().Count];
@@ -4524,6 +4590,18 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
                 ((PWhencase) temp[i]).Apply(this);
             }
         }
+        {
+            Object[] temp = new Object[node.GetSnd().Count];
+            node.GetSnd().CopyTo(temp, 0);
+            for(int i = temp.Length - 1; i >= 0; i--)
+            {
+                ((TNl) temp[i]).Apply(this);
+            }
+        }
+        if(node.GetFst() != null)
+        {
+            node.GetFst().Apply(this);
+        }
         if(node.GetRparen() != null)
         {
             node.GetRparen().Apply(this);
@@ -4559,9 +4637,9 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
     public override void CaseAWhencase(AWhencase node)
     {
         InAWhencase(node);
-        if(node.GetFallthrough() != null)
+        if(node.GetFallthroughStmt() != null)
         {
-            node.GetFallthrough().Apply(this);
+            node.GetFallthroughStmt().Apply(this);
         }
         {
             Object[] temp = new Object[node.GetStmt().Count];
@@ -4570,6 +4648,10 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
             {
                 ((PStmt) temp[i]).Apply(this);
             }
+        }
+        if(node.GetNl() != null)
+        {
+            node.GetNl().Apply(this);
         }
         if(node.GetDo() != null)
         {
@@ -4584,6 +4666,37 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
             node.GetWhen().Apply(this);
         }
         OutAWhencase(node);
+    }
+    public virtual void InAFallthroughStmt(AFallthroughStmt node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAFallthroughStmt(AFallthroughStmt node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAFallthroughStmt(AFallthroughStmt node)
+    {
+        InAFallthroughStmt(node);
+        {
+            Object[] temp = new Object[node.GetSnd().Count];
+            node.GetSnd().CopyTo(temp, 0);
+            for(int i = temp.Length - 1; i >= 0; i--)
+            {
+                ((TNl) temp[i]).Apply(this);
+            }
+        }
+        if(node.GetFst() != null)
+        {
+            node.GetFst().Apply(this);
+        }
+        if(node.GetFallthrough() != null)
+        {
+            node.GetFallthrough().Apply(this);
+        }
+        OutAFallthroughStmt(node);
     }
     public virtual void InAOtherwisecase(AOtherwisecase node)
     {
@@ -4605,6 +4718,10 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
             {
                 ((PStmt) temp[i]).Apply(this);
             }
+        }
+        if(node.GetNl() != null)
+        {
+            node.GetNl().Apply(this);
         }
         if(node.GetOtherwisedo() != null)
         {

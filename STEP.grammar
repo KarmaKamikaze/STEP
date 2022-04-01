@@ -4,7 +4,9 @@ Helpers
   tab = 9;
   cr = 13;
   lf = 10;
+  line_terminator = lf | cr | cr lf;
   dblquote = 34;
+  hashtag = 35;
   lowercase = ['a' .. 'z'];
   uppercase = ['A' .. 'Z'];
   letter = lowercase | uppercase;
@@ -12,9 +14,12 @@ Helpers
   id_body = letter | digit | '_';
   all_chars = [0 .. 65535];
   string_content = [all_chars - dblquote];
-  comment_content = [all_chars - cr - lf];
+  ml_comment_content = [all_chars - hashtag];
+  eol_comment_content = [all_chars - [cr + [lf + hashtag]]];
 
 Tokens
+  end_of_line_comment = '#' eol_comment_content* line_terminator?;
+  multiline_comment = '##' ml_comment_content* '##';
   lparen = '(';
   rparen = ')';
   lbrack = '[';
@@ -33,9 +38,8 @@ Tokens
   neq = '!=';
   neg = '!';
   whitespace = (' ' | tab)+;
-  single_comment = '//' comment_content* nl;
+  nl = line_terminator;
   comma = ',';
-  nl = cr? lf;
   numliteral = '-'? digit+ | '-'? digit+ '.' digit*;
   strliteral = dblquote string_content* dblquote;
   boolliteral = '!'? 'true'| '!'? 'false';
@@ -80,8 +84,9 @@ Tokens
   id = letter id_body*;
 
 Ignored Tokens
-  whitespace;
-  single_comment;
+  whitespace,
+  end_of_line_comment,
+  multiline_comment;
 
 Productions
   // Program
@@ -114,9 +119,10 @@ Productions
   forstmt = repeatfor lparen forstmt_iterator_options to [fst]:expr comma option_increase_decrease [snd]:expr rparen option_stmt_continue_break* endfor;
   forstmt_iterator_options = {one} numdcl | {two} assstmt | {three} id arrindex?;
   option_increase_decrease = {one} increaseby | {two} decreaseby;
-  switchstmt = switch lparen id arrindex? rparen whencase* otherwisecase? endswitch;
-  whencase = when numliteral do stmt* fallthrough?;
-  otherwisecase = otherwisedo stmt*;
+  switchstmt = switch lparen id arrindex? rparen [fst]:nl [snd]:nl* whencase* otherwisecase? endswitch;
+  whencase = when numliteral do nl stmt* fallthrough_stmt?;
+  fallthrough_stmt = fallthrough [fst]:nl [snd]:nl*;
+  otherwisecase = otherwisedo nl stmt*;
   assstmt = id arrindex? assign expr;
   funccall = id lparen params_options? rparen;
   params_options = expr multi_expr*;

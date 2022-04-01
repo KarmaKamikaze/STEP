@@ -9,6 +9,56 @@ using  STEP.analysis;
 namespace STEP.node {
 
 
+public sealed class TEndOfLineComment : Token
+{
+    public TEndOfLineComment(string text)
+    {
+        Text = text;
+    }
+
+    public TEndOfLineComment(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TEndOfLineComment(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTEndOfLineComment(this);
+    }
+}
+
+public sealed class TMultilineComment : Token
+{
+    public TMultilineComment(string text)
+    {
+        Text = text;
+    }
+
+    public TMultilineComment(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TMultilineComment(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTMultilineComment(this);
+    }
+}
+
 public sealed class TLparen : Token
 {
     public TLparen(string text)
@@ -459,31 +509,6 @@ public sealed class TWhitespace : Token
     }
 }
 
-public sealed class TComma : Token
-{
-    public TComma(string text)
-    {
-        Text = text;
-    }
-
-    public TComma(string text, int line, int pos)
-    {
-        Text = text;
-        Line = line;
-        Pos = pos;
-    }
-
-    public override Object Clone()
-    {
-      return new TComma(Text, Line, Pos);
-    }
-
-    public override void Apply(Switch sw)
-    {
-        ((Analysis) sw).CaseTComma(this);
-    }
-}
-
 public sealed class TNl : Token
 {
     public TNl(string text)
@@ -506,6 +531,31 @@ public sealed class TNl : Token
     public override void Apply(Switch sw)
     {
         ((Analysis) sw).CaseTNl(this);
+    }
+}
+
+public sealed class TComma : Token
+{
+    public TComma(string text)
+    {
+        Text = text;
+    }
+
+    public TComma(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TComma(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTComma(this);
     }
 }
 

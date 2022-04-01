@@ -104,6 +104,10 @@ public abstract class PWhencase : Node
 {
 }
 
+public abstract class PFallthroughStmt : Node
+{
+}
+
 public abstract class POtherwisecase : Node
 {
 }
@@ -7159,12 +7163,15 @@ public sealed class ASwitchstmt : PSwitchstmt
     private TId _id_;
     private PArrindex _arrindex_;
     private TRparen _rparen_;
+    private TNl _fst_;
+    private TypedList _snd_;
     private TypedList _whencase_;
     private POtherwisecase _otherwisecase_;
     private TEndswitch _endswitch_;
 
     public ASwitchstmt ()
     {
+        this._snd_ = new TypedList(new Snd_Cast(this));
         this._whencase_ = new TypedList(new Whencase_Cast(this));
     }
 
@@ -7174,6 +7181,8 @@ public sealed class ASwitchstmt : PSwitchstmt
             TId _id_,
             PArrindex _arrindex_,
             TRparen _rparen_,
+            TNl _fst_,
+            IList _snd_,
             IList _whencase_,
             POtherwisecase _otherwisecase_,
             TEndswitch _endswitch_
@@ -7184,6 +7193,10 @@ public sealed class ASwitchstmt : PSwitchstmt
         SetId (_id_);
         SetArrindex (_arrindex_);
         SetRparen (_rparen_);
+        SetFst (_fst_);
+        this._snd_ = new TypedList(new Snd_Cast(this));
+        this._snd_.Clear();
+        this._snd_.AddAll(_snd_);
         this._whencase_ = new TypedList(new Whencase_Cast(this));
         this._whencase_.Clear();
         this._whencase_.AddAll(_whencase_);
@@ -7199,6 +7212,8 @@ public sealed class ASwitchstmt : PSwitchstmt
             (TId)CloneNode (_id_),
             (PArrindex)CloneNode (_arrindex_),
             (TRparen)CloneNode (_rparen_),
+            (TNl)CloneNode (_fst_),
+            CloneList (_snd_),
             CloneList (_whencase_),
             (POtherwisecase)CloneNode (_otherwisecase_),
             (TEndswitch)CloneNode (_endswitch_)
@@ -7330,6 +7345,40 @@ public sealed class ASwitchstmt : PSwitchstmt
 
         _rparen_ = node;
     }
+    public TNl GetFst ()
+    {
+        return _fst_;
+    }
+
+    public void SetFst (TNl node)
+    {
+        if(_fst_ != null)
+        {
+            _fst_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _fst_ = node;
+    }
+    public IList GetSnd ()
+    {
+        return _snd_;
+    }
+
+    public void setSnd (IList list)
+    {
+        _snd_.Clear();
+        _snd_.AddAll(list);
+    }
     public IList GetWhencase ()
     {
         return _whencase_;
@@ -7397,6 +7446,8 @@ public sealed class ASwitchstmt : PSwitchstmt
             + ToString (_id_)
             + ToString (_arrindex_)
             + ToString (_rparen_)
+            + ToString (_fst_)
+            + ToString (_snd_)
             + ToString (_whencase_)
             + ToString (_otherwisecase_)
             + ToString (_endswitch_)
@@ -7428,6 +7479,16 @@ public sealed class ASwitchstmt : PSwitchstmt
         if ( _rparen_ == child )
         {
             _rparen_ = null;
+            return;
+        }
+        if ( _fst_ == child )
+        {
+            _fst_ = null;
+            return;
+        }
+        if ( _snd_.Contains(child) )
+        {
+            _snd_.Remove(child);
             return;
         }
         if ( _whencase_.Contains(child) )
@@ -7474,6 +7535,28 @@ public sealed class ASwitchstmt : PSwitchstmt
             SetRparen ((TRparen) newChild);
             return;
         }
+        if ( _fst_ == oldChild )
+        {
+            SetFst ((TNl) newChild);
+            return;
+        }
+        for ( int i = 0; i < _snd_.Count; i++ )
+        {
+            Node n = (Node)_snd_[i];
+            if(n == oldChild)
+            {
+                if(newChild != null)
+                {
+                    _snd_[i] = newChild;
+                    oldChild.Parent(null);
+                    return;
+                }
+
+                _snd_.RemoveAt(i);
+                oldChild.Parent(null);
+                return;
+            }
+        }
         for ( int i = 0; i < _whencase_.Count; i++ )
         {
             Node n = (Node)_whencase_[i];
@@ -7503,6 +7586,41 @@ public sealed class ASwitchstmt : PSwitchstmt
         }
     }
 
+    private class Snd_Cast : Cast
+    {
+        ASwitchstmt obj;
+
+        internal Snd_Cast (ASwitchstmt obj)
+        {
+          this.obj = obj;
+        }
+
+        public Object Cast(Object o)
+        {
+            TNl node = (TNl) o;
+
+            if((node.Parent() != null) &&
+                (node.Parent() != obj))
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            if((node.Parent() == null) ||
+                (node.Parent() != obj))
+            {
+                node.Parent(obj);
+            }
+
+            return node;
+        }
+
+        public Object UnCast(Object o)
+        {
+            TNl node = (TNl) o;
+            node.Parent(null);
+            return node;
+        }
+    }
     private class Whencase_Cast : Cast
     {
         ASwitchstmt obj;
@@ -7544,8 +7662,9 @@ public sealed class AWhencase : PWhencase
     private TWhen _when_;
     private TNumliteral _numliteral_;
     private TDo _do_;
+    private TNl _nl_;
     private TypedList _stmt_;
-    private TFallthrough _fallthrough_;
+    private PFallthroughStmt _fallthrough_stmt_;
 
     public AWhencase ()
     {
@@ -7556,17 +7675,19 @@ public sealed class AWhencase : PWhencase
             TWhen _when_,
             TNumliteral _numliteral_,
             TDo _do_,
+            TNl _nl_,
             IList _stmt_,
-            TFallthrough _fallthrough_
+            PFallthroughStmt _fallthrough_stmt_
     )
     {
         SetWhen (_when_);
         SetNumliteral (_numliteral_);
         SetDo (_do_);
+        SetNl (_nl_);
         this._stmt_ = new TypedList(new Stmt_Cast(this));
         this._stmt_.Clear();
         this._stmt_.AddAll(_stmt_);
-        SetFallthrough (_fallthrough_);
+        SetFallthroughStmt (_fallthrough_stmt_);
     }
 
     public override Object Clone()
@@ -7575,8 +7696,9 @@ public sealed class AWhencase : PWhencase
             (TWhen)CloneNode (_when_),
             (TNumliteral)CloneNode (_numliteral_),
             (TDo)CloneNode (_do_),
+            (TNl)CloneNode (_nl_),
             CloneList (_stmt_),
-            (TFallthrough)CloneNode (_fallthrough_)
+            (PFallthroughStmt)CloneNode (_fallthrough_stmt_)
         );
     }
 
@@ -7657,26 +7779,16 @@ public sealed class AWhencase : PWhencase
 
         _do_ = node;
     }
-    public IList GetStmt ()
+    public TNl GetNl ()
     {
-        return _stmt_;
+        return _nl_;
     }
 
-    public void setStmt (IList list)
+    public void SetNl (TNl node)
     {
-        _stmt_.Clear();
-        _stmt_.AddAll(list);
-    }
-    public TFallthrough GetFallthrough ()
-    {
-        return _fallthrough_;
-    }
-
-    public void SetFallthrough (TFallthrough node)
-    {
-        if(_fallthrough_ != null)
+        if(_nl_ != null)
         {
-            _fallthrough_.Parent(null);
+            _nl_.Parent(null);
         }
 
         if(node != null)
@@ -7689,7 +7801,41 @@ public sealed class AWhencase : PWhencase
             node.Parent(this);
         }
 
-        _fallthrough_ = node;
+        _nl_ = node;
+    }
+    public IList GetStmt ()
+    {
+        return _stmt_;
+    }
+
+    public void setStmt (IList list)
+    {
+        _stmt_.Clear();
+        _stmt_.AddAll(list);
+    }
+    public PFallthroughStmt GetFallthroughStmt ()
+    {
+        return _fallthrough_stmt_;
+    }
+
+    public void SetFallthroughStmt (PFallthroughStmt node)
+    {
+        if(_fallthrough_stmt_ != null)
+        {
+            _fallthrough_stmt_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _fallthrough_stmt_ = node;
     }
 
     public override string ToString()
@@ -7698,8 +7844,9 @@ public sealed class AWhencase : PWhencase
             + ToString (_when_)
             + ToString (_numliteral_)
             + ToString (_do_)
+            + ToString (_nl_)
             + ToString (_stmt_)
-            + ToString (_fallthrough_)
+            + ToString (_fallthrough_stmt_)
         ;
     }
 
@@ -7720,14 +7867,19 @@ public sealed class AWhencase : PWhencase
             _do_ = null;
             return;
         }
+        if ( _nl_ == child )
+        {
+            _nl_ = null;
+            return;
+        }
         if ( _stmt_.Contains(child) )
         {
             _stmt_.Remove(child);
             return;
         }
-        if ( _fallthrough_ == child )
+        if ( _fallthrough_stmt_ == child )
         {
-            _fallthrough_ = null;
+            _fallthrough_stmt_ = null;
             return;
         }
     }
@@ -7749,6 +7901,11 @@ public sealed class AWhencase : PWhencase
             SetDo ((TDo) newChild);
             return;
         }
+        if ( _nl_ == oldChild )
+        {
+            SetNl ((TNl) newChild);
+            return;
+        }
         for ( int i = 0; i < _stmt_.Count; i++ )
         {
             Node n = (Node)_stmt_[i];
@@ -7766,9 +7923,9 @@ public sealed class AWhencase : PWhencase
                 return;
             }
         }
-        if ( _fallthrough_ == oldChild )
+        if ( _fallthrough_stmt_ == oldChild )
         {
-            SetFallthrough ((TFallthrough) newChild);
+            SetFallthroughStmt ((PFallthroughStmt) newChild);
             return;
         }
     }
@@ -7809,9 +7966,202 @@ public sealed class AWhencase : PWhencase
         }
     }
 }
+public sealed class AFallthroughStmt : PFallthroughStmt
+{
+    private TFallthrough _fallthrough_;
+    private TNl _fst_;
+    private TypedList _snd_;
+
+    public AFallthroughStmt ()
+    {
+        this._snd_ = new TypedList(new Snd_Cast(this));
+    }
+
+    public AFallthroughStmt (
+            TFallthrough _fallthrough_,
+            TNl _fst_,
+            IList _snd_
+    )
+    {
+        SetFallthrough (_fallthrough_);
+        SetFst (_fst_);
+        this._snd_ = new TypedList(new Snd_Cast(this));
+        this._snd_.Clear();
+        this._snd_.AddAll(_snd_);
+    }
+
+    public override Object Clone()
+    {
+        return new AFallthroughStmt (
+            (TFallthrough)CloneNode (_fallthrough_),
+            (TNl)CloneNode (_fst_),
+            CloneList (_snd_)
+        );
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseAFallthroughStmt(this);
+    }
+
+    public TFallthrough GetFallthrough ()
+    {
+        return _fallthrough_;
+    }
+
+    public void SetFallthrough (TFallthrough node)
+    {
+        if(_fallthrough_ != null)
+        {
+            _fallthrough_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _fallthrough_ = node;
+    }
+    public TNl GetFst ()
+    {
+        return _fst_;
+    }
+
+    public void SetFst (TNl node)
+    {
+        if(_fst_ != null)
+        {
+            _fst_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _fst_ = node;
+    }
+    public IList GetSnd ()
+    {
+        return _snd_;
+    }
+
+    public void setSnd (IList list)
+    {
+        _snd_.Clear();
+        _snd_.AddAll(list);
+    }
+
+    public override string ToString()
+    {
+        return ""
+            + ToString (_fallthrough_)
+            + ToString (_fst_)
+            + ToString (_snd_)
+        ;
+    }
+
+    internal override void RemoveChild(Node child)
+    {
+        if ( _fallthrough_ == child )
+        {
+            _fallthrough_ = null;
+            return;
+        }
+        if ( _fst_ == child )
+        {
+            _fst_ = null;
+            return;
+        }
+        if ( _snd_.Contains(child) )
+        {
+            _snd_.Remove(child);
+            return;
+        }
+    }
+
+    internal override void ReplaceChild(Node oldChild, Node newChild)
+    {
+        if ( _fallthrough_ == oldChild )
+        {
+            SetFallthrough ((TFallthrough) newChild);
+            return;
+        }
+        if ( _fst_ == oldChild )
+        {
+            SetFst ((TNl) newChild);
+            return;
+        }
+        for ( int i = 0; i < _snd_.Count; i++ )
+        {
+            Node n = (Node)_snd_[i];
+            if(n == oldChild)
+            {
+                if(newChild != null)
+                {
+                    _snd_[i] = newChild;
+                    oldChild.Parent(null);
+                    return;
+                }
+
+                _snd_.RemoveAt(i);
+                oldChild.Parent(null);
+                return;
+            }
+        }
+    }
+
+    private class Snd_Cast : Cast
+    {
+        AFallthroughStmt obj;
+
+        internal Snd_Cast (AFallthroughStmt obj)
+        {
+          this.obj = obj;
+        }
+
+        public Object Cast(Object o)
+        {
+            TNl node = (TNl) o;
+
+            if((node.Parent() != null) &&
+                (node.Parent() != obj))
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            if((node.Parent() == null) ||
+                (node.Parent() != obj))
+            {
+                node.Parent(obj);
+            }
+
+            return node;
+        }
+
+        public Object UnCast(Object o)
+        {
+            TNl node = (TNl) o;
+            node.Parent(null);
+            return node;
+        }
+    }
+}
 public sealed class AOtherwisecase : POtherwisecase
 {
     private TOtherwisedo _otherwisedo_;
+    private TNl _nl_;
     private TypedList _stmt_;
 
     public AOtherwisecase ()
@@ -7821,10 +8171,12 @@ public sealed class AOtherwisecase : POtherwisecase
 
     public AOtherwisecase (
             TOtherwisedo _otherwisedo_,
+            TNl _nl_,
             IList _stmt_
     )
     {
         SetOtherwisedo (_otherwisedo_);
+        SetNl (_nl_);
         this._stmt_ = new TypedList(new Stmt_Cast(this));
         this._stmt_.Clear();
         this._stmt_.AddAll(_stmt_);
@@ -7834,6 +8186,7 @@ public sealed class AOtherwisecase : POtherwisecase
     {
         return new AOtherwisecase (
             (TOtherwisedo)CloneNode (_otherwisedo_),
+            (TNl)CloneNode (_nl_),
             CloneList (_stmt_)
         );
     }
@@ -7867,6 +8220,30 @@ public sealed class AOtherwisecase : POtherwisecase
 
         _otherwisedo_ = node;
     }
+    public TNl GetNl ()
+    {
+        return _nl_;
+    }
+
+    public void SetNl (TNl node)
+    {
+        if(_nl_ != null)
+        {
+            _nl_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _nl_ = node;
+    }
     public IList GetStmt ()
     {
         return _stmt_;
@@ -7882,6 +8259,7 @@ public sealed class AOtherwisecase : POtherwisecase
     {
         return ""
             + ToString (_otherwisedo_)
+            + ToString (_nl_)
             + ToString (_stmt_)
         ;
     }
@@ -7891,6 +8269,11 @@ public sealed class AOtherwisecase : POtherwisecase
         if ( _otherwisedo_ == child )
         {
             _otherwisedo_ = null;
+            return;
+        }
+        if ( _nl_ == child )
+        {
+            _nl_ = null;
             return;
         }
         if ( _stmt_.Contains(child) )
@@ -7905,6 +8288,11 @@ public sealed class AOtherwisecase : POtherwisecase
         if ( _otherwisedo_ == oldChild )
         {
             SetOtherwisedo ((TOtherwisedo) newChild);
+            return;
+        }
+        if ( _nl_ == oldChild )
+        {
+            SetNl ((TNl) newChild);
             return;
         }
         for ( int i = 0; i < _stmt_.Count; i++ )
