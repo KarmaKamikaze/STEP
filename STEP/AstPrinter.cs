@@ -16,38 +16,12 @@ public class AstPrinter : DepthFirstAdapter
     {
         PrintIndent();
 
+        // Print node name
         Console.ForegroundColor = ConsoleColor.White;
         Console.Write(RemoveNodeIndividualizers(node.GetType().ToString()));
+        // Print node value
         Console.ForegroundColor = ConsoleColor.DarkGray;
         Console.WriteLine("  " + node);
-        
-        // switch (node)
-        // {
-        //     case AOneExpr:
-        //         goto NodeValuePrint;
-        //     case ATwoExpr:
-        //         goto NodeValuePrint;
-        //     case AThreeExpr:
-        //         goto NodeValuePrint;
-        //     case AMultiExpr:
-        //         goto NodeValuePrint;
-        //     case AOneFactor:
-        //         goto NodeValuePrint;
-        //     case ATwoFactor:
-        //         goto NodeValuePrint;
-        //     case AOneConstant:
-        //         goto NodeValuePrint;
-        //     case ATwoConstant:
-        //         goto NodeValuePrint;
-        //     case AThreeConstant:
-        //         NodeValuePrint:
-        //         Console.ForegroundColor = ConsoleColor.DarkGray;
-        //         Console.WriteLine("  " + node);
-        //         break;
-        //     default:
-        //         Console.WriteLine();
-        //         break;
-        // }
     }
 
     public override void DefaultIn(Node node)

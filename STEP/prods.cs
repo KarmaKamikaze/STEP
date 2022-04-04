@@ -3619,8 +3619,7 @@ public sealed class AParamsMulti : PParamsMulti
 
         _comma_ = node;
     }
-
-    private PType GetType ()
+    public new PType GetType ()
     {
         return _type_;
     }
@@ -13158,7 +13157,7 @@ public sealed class AArrdcl : PArrdcl
         ((Analysis) sw).CaseAArrdcl(this);
     }
 
-    private PType GetType ()
+    public new PType GetType ()
     {
         return _type_;
     }

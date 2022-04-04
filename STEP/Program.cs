@@ -6,6 +6,9 @@ namespace STEP;
 
 class Program
 {
+    /* The main function takes a file path as its first argument.
+     * It takes additional optional arguments:
+     * -pp for pretty-printing the AST */
     private static void Main(string[] args)
     {
         if (args.Length < 1)
@@ -29,7 +32,7 @@ class Program
                 Exit(e.ToString());
             }
 
-            if (args.Length > 1 && args[1] == "-pp")
+            if (args.Length > 1 && args.Contains("-pp"))
             {
                 // Print AST
                 AstPrinter printer = new AstPrinter();
