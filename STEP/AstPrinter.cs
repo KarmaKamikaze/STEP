@@ -18,22 +18,36 @@ public class AstPrinter : DepthFirstAdapter
 
         Console.ForegroundColor = ConsoleColor.White;
         Console.Write(RemoveNodeIndividualizers(node.GetType().ToString()));
-
-        switch (node)
-        {
-            case AOneConstant:
-                goto ThreeConstant;
-            case ATwoConstant:
-                goto ThreeConstant;
-            case AThreeConstant:
-                ThreeConstant:
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine("  " + node);
-                break;
-            default:
-                Console.WriteLine();
-                break;
-        }
+        Console.ForegroundColor = ConsoleColor.DarkGray;
+        Console.WriteLine("  " + node);
+        
+        // switch (node)
+        // {
+        //     case AOneExpr:
+        //         goto NodeValuePrint;
+        //     case ATwoExpr:
+        //         goto NodeValuePrint;
+        //     case AThreeExpr:
+        //         goto NodeValuePrint;
+        //     case AMultiExpr:
+        //         goto NodeValuePrint;
+        //     case AOneFactor:
+        //         goto NodeValuePrint;
+        //     case ATwoFactor:
+        //         goto NodeValuePrint;
+        //     case AOneConstant:
+        //         goto NodeValuePrint;
+        //     case ATwoConstant:
+        //         goto NodeValuePrint;
+        //     case AThreeConstant:
+        //         NodeValuePrint:
+        //         Console.ForegroundColor = ConsoleColor.DarkGray;
+        //         Console.WriteLine("  " + node);
+        //         break;
+        //     default:
+        //         Console.WriteLine();
+        //         break;
+        // }
     }
 
     public override void DefaultIn(Node node)
@@ -65,9 +79,9 @@ public class AstPrinter : DepthFirstAdapter
         else if (result.Contains("Six"))
             result = result.Replace("Six", "");
         else if (result.Contains("Nonelse"))
-            result = result.Replace("Six", "");
+            result = result.Replace("Nonelse", "");
         else if (result.Contains("Withelse"))
-            result = result.Replace("Six", "");
+            result = result.Replace("Withelse", "");
 
         return result;
     }

@@ -8,8 +8,8 @@ class Program
 {
     private static void Main(string[] args)
     {
-        if (args.Length != 1)
-            Exit("Usage: STEP.exe filename");
+        if (args.Length < 1)
+            Exit("Usage: STEP.exe filename [Optional: -pp]");
 
         using (StreamReader streamReader = new StreamReader(File.Open(args[0], FileMode.Open)))
         {
@@ -28,10 +28,13 @@ class Program
             {
                 Exit(e.ToString());
             }
-            
-            // Print AST
-            AstPrinter printer = new AstPrinter();
-            if (ast != null) ast.Apply(printer);
+
+            if (args.Length > 1 && args[1] == "-pp")
+            {
+                // Print AST
+                AstPrinter printer = new AstPrinter();
+                if (ast != null) ast.Apply(printer);
+            }
         }
         
         Exit("Finished!");

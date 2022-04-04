@@ -1221,13 +1221,9 @@ public class DepthFirstAdapter : AnalysisAdapter
         {
             node.GetType().Apply(this);
         }
+        if(node.GetBrackets() != null)
         {
-            Object[] temp = new Object[node.GetBrackets().Count];
-            node.GetBrackets().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PBrackets) temp[i]).Apply(this);
-            }
+            node.GetBrackets().Apply(this);
         }
         if(node.GetFunction() != null)
         {
@@ -1419,13 +1415,9 @@ public class DepthFirstAdapter : AnalysisAdapter
         {
             node.GetType().Apply(this);
         }
+        if(node.GetBrackets() != null)
         {
-            Object[] temp = new Object[node.GetBrackets().Count];
-            node.GetBrackets().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PBrackets) temp[i]).Apply(this);
-            }
+            node.GetBrackets().Apply(this);
         }
         if(node.GetId() != null)
         {
@@ -1462,13 +1454,9 @@ public class DepthFirstAdapter : AnalysisAdapter
         {
             node.GetType().Apply(this);
         }
+        if(node.GetBrackets() != null)
         {
-            Object[] temp = new Object[node.GetBrackets().Count];
-            node.GetBrackets().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PBrackets) temp[i]).Apply(this);
-            }
+            node.GetBrackets().Apply(this);
         }
         if(node.GetId() != null)
         {
@@ -3238,17 +3226,9 @@ public class DepthFirstAdapter : AnalysisAdapter
         {
             node.GetType().Apply(this);
         }
-        if(node.GetFst() != null)
+        if(node.GetArrsizedcl() != null)
         {
-            node.GetFst().Apply(this);
-        }
-        {
-            Object[] temp = new Object[node.GetMulti().Count];
-            node.GetMulti().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PArrsizedcl) temp[i]).Apply(this);
-            }
+            node.GetArrsizedcl().Apply(this);
         }
         if(node.GetId() != null)
         {
@@ -3723,13 +3703,9 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
         {
             node.GetFunction().Apply(this);
         }
+        if(node.GetBrackets() != null)
         {
-            Object[] temp = new Object[node.GetBrackets().Count];
-            node.GetBrackets().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PBrackets) temp[i]).Apply(this);
-            }
+            node.GetBrackets().Apply(this);
         }
         if(node.GetType() != null)
         {
@@ -3897,13 +3873,9 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
         {
             node.GetId().Apply(this);
         }
+        if(node.GetBrackets() != null)
         {
-            Object[] temp = new Object[node.GetBrackets().Count];
-            node.GetBrackets().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PBrackets) temp[i]).Apply(this);
-            }
+            node.GetBrackets().Apply(this);
         }
         if(node.GetType() != null)
         {
@@ -3928,13 +3900,9 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
         {
             node.GetId().Apply(this);
         }
+        if(node.GetBrackets() != null)
         {
-            Object[] temp = new Object[node.GetBrackets().Count];
-            node.GetBrackets().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PBrackets) temp[i]).Apply(this);
-            }
+            node.GetBrackets().Apply(this);
         }
         if(node.GetType() != null)
         {
@@ -5716,17 +5684,9 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
         {
             node.GetId().Apply(this);
         }
+        if(node.GetArrsizedcl() != null)
         {
-            Object[] temp = new Object[node.GetMulti().Count];
-            node.GetMulti().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PArrsizedcl) temp[i]).Apply(this);
-            }
-        }
-        if(node.GetFst() != null)
-        {
-            node.GetFst().Apply(this);
+            node.GetArrsizedcl().Apply(this);
         }
         if(node.GetType() != null)
         {
