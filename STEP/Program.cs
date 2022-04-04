@@ -31,7 +31,7 @@ class Program
             
             // Print AST
             AstPrinter printer = new AstPrinter();
-            ast.Apply(printer);
+            if (ast != null) ast.Apply(printer);
         }
         
         Exit("Finished!");
@@ -45,7 +45,7 @@ class Program
             Console.WriteLine();
 
         Console.WriteLine("Press any key to exit...");
-        Console.Read();
+        Console.ReadKey();
         Environment.Exit(0);
     }
 }
