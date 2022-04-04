@@ -9,6 +9,56 @@ using  STEP.analysis;
 namespace STEP.node {
 
 
+public sealed class TEndOfLineComment : Token
+{
+    public TEndOfLineComment(string text)
+    {
+        Text = text;
+    }
+
+    public TEndOfLineComment(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TEndOfLineComment(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTEndOfLineComment(this);
+    }
+}
+
+public sealed class TMultilineComment : Token
+{
+    public TMultilineComment(string text)
+    {
+        Text = text;
+    }
+
+    public TMultilineComment(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TMultilineComment(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTMultilineComment(this);
+    }
+}
+
 public sealed class TLparen : Token
 {
     public TLparen(string text)
@@ -106,106 +156,6 @@ public sealed class TRbrack : Token
     public override void Apply(Switch sw)
     {
         ((Analysis) sw).CaseTRbrack(this);
-    }
-}
-
-public sealed class TNumliteral : Token
-{
-    public TNumliteral(string text)
-    {
-        Text = text;
-    }
-
-    public TNumliteral(string text, int line, int pos)
-    {
-        Text = text;
-        Line = line;
-        Pos = pos;
-    }
-
-    public override Object Clone()
-    {
-      return new TNumliteral(Text, Line, Pos);
-    }
-
-    public override void Apply(Switch sw)
-    {
-        ((Analysis) sw).CaseTNumliteral(this);
-    }
-}
-
-public sealed class TStrliteral : Token
-{
-    public TStrliteral(string text)
-    {
-        Text = text;
-    }
-
-    public TStrliteral(string text, int line, int pos)
-    {
-        Text = text;
-        Line = line;
-        Pos = pos;
-    }
-
-    public override Object Clone()
-    {
-      return new TStrliteral(Text, Line, Pos);
-    }
-
-    public override void Apply(Switch sw)
-    {
-        ((Analysis) sw).CaseTStrliteral(this);
-    }
-}
-
-public sealed class TBoolliteral : Token
-{
-    public TBoolliteral(string text)
-    {
-        Text = text;
-    }
-
-    public TBoolliteral(string text, int line, int pos)
-    {
-        Text = text;
-        Line = line;
-        Pos = pos;
-    }
-
-    public override Object Clone()
-    {
-      return new TBoolliteral(Text, Line, Pos);
-    }
-
-    public override void Apply(Switch sw)
-    {
-        ((Analysis) sw).CaseTBoolliteral(this);
-    }
-}
-
-public sealed class TId : Token
-{
-    public TId(string text)
-    {
-        Text = text;
-    }
-
-    public TId(string text, int line, int pos)
-    {
-        Text = text;
-        Line = line;
-        Pos = pos;
-    }
-
-    public override Object Clone()
-    {
-      return new TId(Text, Line, Pos);
-    }
-
-    public override void Apply(Switch sw)
-    {
-        ((Analysis) sw).CaseTId(this);
     }
 }
 
@@ -534,31 +484,6 @@ public sealed class TNeg : Token
     }
 }
 
-public sealed class TNl : Token
-{
-    public TNl(string text)
-    {
-        Text = text;
-    }
-
-    public TNl(string text, int line, int pos)
-    {
-        Text = text;
-        Line = line;
-        Pos = pos;
-    }
-
-    public override Object Clone()
-    {
-      return new TNl(Text, Line, Pos);
-    }
-
-    public override void Apply(Switch sw)
-    {
-        ((Analysis) sw).CaseTNl(this);
-    }
-}
-
 public sealed class TWhitespace : Token
 {
     public TWhitespace(string text)
@@ -584,6 +509,31 @@ public sealed class TWhitespace : Token
     }
 }
 
+public sealed class TNl : Token
+{
+    public TNl(string text)
+    {
+        Text = text;
+    }
+
+    public TNl(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TNl(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTNl(this);
+    }
+}
+
 public sealed class TComma : Token
 {
     public TComma(string text)
@@ -606,6 +556,81 @@ public sealed class TComma : Token
     public override void Apply(Switch sw)
     {
         ((Analysis) sw).CaseTComma(this);
+    }
+}
+
+public sealed class TNumliteral : Token
+{
+    public TNumliteral(string text)
+    {
+        Text = text;
+    }
+
+    public TNumliteral(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TNumliteral(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTNumliteral(this);
+    }
+}
+
+public sealed class TStrliteral : Token
+{
+    public TStrliteral(string text)
+    {
+        Text = text;
+    }
+
+    public TStrliteral(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TStrliteral(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTStrliteral(this);
+    }
+}
+
+public sealed class TBoolliteral : Token
+{
+    public TBoolliteral(string text)
+    {
+        Text = text;
+    }
+
+    public TBoolliteral(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TBoolliteral(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTBoolliteral(this);
     }
 }
 
@@ -709,6 +734,56 @@ public sealed class TEndloop : Token
     }
 }
 
+public sealed class TFunctions : Token
+{
+    public TFunctions(string text)
+    {
+        Text = text;
+    }
+
+    public TFunctions(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TFunctions(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTFunctions(this);
+    }
+}
+
+public sealed class TEndfunctions : Token
+{
+    public TEndfunctions(string text)
+    {
+        Text = text;
+    }
+
+    public TEndfunctions(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TEndfunctions(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTEndfunctions(this);
+    }
+}
+
 public sealed class TFunction : Token
 {
     public TFunction(string text)
@@ -759,14 +834,14 @@ public sealed class TEndfunction : Token
     }
 }
 
-public sealed class TFunctions : Token
+public sealed class TVariables : Token
 {
-    public TFunctions(string text)
+    public TVariables(string text)
     {
         Text = text;
     }
 
-    public TFunctions(string text, int line, int pos)
+    public TVariables(string text, int line, int pos)
     {
         Text = text;
         Line = line;
@@ -775,23 +850,23 @@ public sealed class TFunctions : Token
 
     public override Object Clone()
     {
-      return new TFunctions(Text, Line, Pos);
+      return new TVariables(Text, Line, Pos);
     }
 
     public override void Apply(Switch sw)
     {
-        ((Analysis) sw).CaseTFunctions(this);
+        ((Analysis) sw).CaseTVariables(this);
     }
 }
 
-public sealed class TEndfunctions : Token
+public sealed class TEndvariables : Token
 {
-    public TEndfunctions(string text)
+    public TEndvariables(string text)
     {
         Text = text;
     }
 
-    public TEndfunctions(string text, int line, int pos)
+    public TEndvariables(string text, int line, int pos)
     {
         Text = text;
         Line = line;
@@ -800,12 +875,12 @@ public sealed class TEndfunctions : Token
 
     public override Object Clone()
     {
-      return new TEndfunctions(Text, Line, Pos);
+      return new TEndvariables(Text, Line, Pos);
     }
 
     public override void Apply(Switch sw)
     {
-        ((Analysis) sw).CaseTEndfunctions(this);
+        ((Analysis) sw).CaseTEndvariables(this);
     }
 }
 
@@ -1456,6 +1531,31 @@ public sealed class TConstant : Token
     public override void Apply(Switch sw)
     {
         ((Analysis) sw).CaseTConstant(this);
+    }
+}
+
+public sealed class TId : Token
+{
+    public TId(string text)
+    {
+        Text = text;
+    }
+
+    public TId(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TId(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTId(this);
     }
 }
 
