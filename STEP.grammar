@@ -101,13 +101,13 @@ Productions
   
   // Function declarations
   functions = T.functions funcdcl_or_nl* endfunctions nl*;
-  funcdcl = {one} type brackets* T.function id params stmt* retstmt [fst]:nl endfunction [snd]:nl | {two} blank T.function id params stmt* endfunction nl;
+  funcdcl = {one} type brackets? T.function id params stmt* retstmt [fst]:nl endfunction [snd]:nl | {two} blank T.function id params stmt* endfunction nl;
   funcdcl_or_nl = {one} funcdcl | {two} nl;
   
   brackets = lbrack rbrack;
   params = lparen params_content? rparen;
-  params_content = type brackets* id params_multi*;
-  params_multi = comma type brackets* id;
+  params_content = type brackets? id params_multi*;
+  params_multi = comma type brackets? id;
   type = {one} number | {two} string | {three} boolean;
   
   // Statements
@@ -149,6 +149,6 @@ Productions
   numdcl = number id assign expr;
   stringdcl = string id assign expr;
   booldcl = boolean id assign cond;
-  arrdcl = type [fst]:arrsizedcl [multi]:arrsizedcl* id assign arr_id_or_expr;
+  arrdcl = type arrsizedcl id assign arr_id_or_expr;
   arr_id_or_expr = {one} id | {two} lbrack params_options? rbrack;
   arrsizedcl = lbrack numliteral rbrack;

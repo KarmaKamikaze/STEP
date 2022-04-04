@@ -2086,7 +2086,7 @@ public sealed class AFunctions : PFunctions
 public sealed class AOneFuncdcl : PFuncdcl
 {
     private PType _type_;
-    private TypedList _brackets_;
+    private PBrackets _brackets_;
     private TFunction _function_;
     private TId _id_;
     private PParams _params_;
@@ -2098,13 +2098,12 @@ public sealed class AOneFuncdcl : PFuncdcl
 
     public AOneFuncdcl ()
     {
-        this._brackets_ = new TypedList(new Brackets_Cast(this));
         this._stmt_ = new TypedList(new Stmt_Cast(this));
     }
 
     public AOneFuncdcl (
             PType _type_,
-            IList _brackets_,
+            PBrackets _brackets_,
             TFunction _function_,
             TId _id_,
             PParams _params_,
@@ -2116,9 +2115,7 @@ public sealed class AOneFuncdcl : PFuncdcl
     )
     {
         SetType (_type_);
-        this._brackets_ = new TypedList(new Brackets_Cast(this));
-        this._brackets_.Clear();
-        this._brackets_.AddAll(_brackets_);
+        SetBrackets (_brackets_);
         SetFunction (_function_);
         SetId (_id_);
         SetParams (_params_);
@@ -2135,7 +2132,7 @@ public sealed class AOneFuncdcl : PFuncdcl
     {
         return new AOneFuncdcl (
             (PType)CloneNode (_type_),
-            CloneList (_brackets_),
+            (PBrackets)CloneNode (_brackets_),
             (TFunction)CloneNode (_function_),
             (TId)CloneNode (_id_),
             (PParams)CloneNode (_params_),
@@ -2152,7 +2149,7 @@ public sealed class AOneFuncdcl : PFuncdcl
         ((Analysis) sw).CaseAOneFuncdcl(this);
     }
 
-    public PType GetType ()
+    public new PType GetType ()
     {
         return _type_;
     }
@@ -2176,15 +2173,29 @@ public sealed class AOneFuncdcl : PFuncdcl
 
         _type_ = node;
     }
-    public IList GetBrackets ()
+    public PBrackets GetBrackets ()
     {
         return _brackets_;
     }
 
-    public void setBrackets (IList list)
+    public void SetBrackets (PBrackets node)
     {
-        _brackets_.Clear();
-        _brackets_.AddAll(list);
+        if(_brackets_ != null)
+        {
+            _brackets_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _brackets_ = node;
     }
     public TFunction GetFunction ()
     {
@@ -2388,9 +2399,9 @@ public sealed class AOneFuncdcl : PFuncdcl
             _type_ = null;
             return;
         }
-        if ( _brackets_.Contains(child) )
+        if ( _brackets_ == child )
         {
-            _brackets_.Remove(child);
+            _brackets_ = null;
             return;
         }
         if ( _function_ == child )
@@ -2442,22 +2453,10 @@ public sealed class AOneFuncdcl : PFuncdcl
             SetType ((PType) newChild);
             return;
         }
-        for ( int i = 0; i < _brackets_.Count; i++ )
+        if ( _brackets_ == oldChild )
         {
-            Node n = (Node)_brackets_[i];
-            if(n == oldChild)
-            {
-                if(newChild != null)
-                {
-                    _brackets_[i] = newChild;
-                    oldChild.Parent(null);
-                    return;
-                }
-
-                _brackets_.RemoveAt(i);
-                oldChild.Parent(null);
-                return;
-            }
+            SetBrackets ((PBrackets) newChild);
+            return;
         }
         if ( _function_ == oldChild )
         {
@@ -2513,41 +2512,6 @@ public sealed class AOneFuncdcl : PFuncdcl
         }
     }
 
-    private class Brackets_Cast : Cast
-    {
-        AOneFuncdcl obj;
-
-        internal Brackets_Cast (AOneFuncdcl obj)
-        {
-          this.obj = obj;
-        }
-
-        public Object Cast(Object o)
-        {
-            PBrackets node = (PBrackets) o;
-
-            if((node.Parent() != null) &&
-                (node.Parent() != obj))
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            if((node.Parent() == null) ||
-                (node.Parent() != obj))
-            {
-                node.Parent(obj);
-            }
-
-            return node;
-        }
-
-        public Object UnCast(Object o)
-        {
-            PBrackets node = (PBrackets) o;
-            node.Parent(null);
-            return node;
-        }
-    }
     private class Stmt_Cast : Cast
     {
         AOneFuncdcl obj;
@@ -3364,27 +3328,24 @@ public sealed class AParams : PParams
 public sealed class AParamsContent : PParamsContent
 {
     private PType _type_;
-    private TypedList _brackets_;
+    private PBrackets _brackets_;
     private TId _id_;
     private TypedList _params_multi_;
 
     public AParamsContent ()
     {
-        this._brackets_ = new TypedList(new Brackets_Cast(this));
         this._params_multi_ = new TypedList(new ParamsMulti_Cast(this));
     }
 
     public AParamsContent (
             PType _type_,
-            IList _brackets_,
+            PBrackets _brackets_,
             TId _id_,
             IList _params_multi_
     )
     {
         SetType (_type_);
-        this._brackets_ = new TypedList(new Brackets_Cast(this));
-        this._brackets_.Clear();
-        this._brackets_.AddAll(_brackets_);
+        SetBrackets (_brackets_);
         SetId (_id_);
         this._params_multi_ = new TypedList(new ParamsMulti_Cast(this));
         this._params_multi_.Clear();
@@ -3395,7 +3356,7 @@ public sealed class AParamsContent : PParamsContent
     {
         return new AParamsContent (
             (PType)CloneNode (_type_),
-            CloneList (_brackets_),
+            (PBrackets)CloneNode (_brackets_),
             (TId)CloneNode (_id_),
             CloneList (_params_multi_)
         );
@@ -3406,7 +3367,7 @@ public sealed class AParamsContent : PParamsContent
         ((Analysis) sw).CaseAParamsContent(this);
     }
 
-    public PType GetType ()
+    public new PType GetType ()
     {
         return _type_;
     }
@@ -3430,15 +3391,29 @@ public sealed class AParamsContent : PParamsContent
 
         _type_ = node;
     }
-    public IList GetBrackets ()
+    public PBrackets GetBrackets ()
     {
         return _brackets_;
     }
 
-    public void setBrackets (IList list)
+    public void SetBrackets (PBrackets node)
     {
-        _brackets_.Clear();
-        _brackets_.AddAll(list);
+        if(_brackets_ != null)
+        {
+            _brackets_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _brackets_ = node;
     }
     public TId GetId ()
     {
@@ -3492,9 +3467,9 @@ public sealed class AParamsContent : PParamsContent
             _type_ = null;
             return;
         }
-        if ( _brackets_.Contains(child) )
+        if ( _brackets_ == child )
         {
-            _brackets_.Remove(child);
+            _brackets_ = null;
             return;
         }
         if ( _id_ == child )
@@ -3516,22 +3491,10 @@ public sealed class AParamsContent : PParamsContent
             SetType ((PType) newChild);
             return;
         }
-        for ( int i = 0; i < _brackets_.Count; i++ )
+        if ( _brackets_ == oldChild )
         {
-            Node n = (Node)_brackets_[i];
-            if(n == oldChild)
-            {
-                if(newChild != null)
-                {
-                    _brackets_[i] = newChild;
-                    oldChild.Parent(null);
-                    return;
-                }
-
-                _brackets_.RemoveAt(i);
-                oldChild.Parent(null);
-                return;
-            }
+            SetBrackets ((PBrackets) newChild);
+            return;
         }
         if ( _id_ == oldChild )
         {
@@ -3557,41 +3520,6 @@ public sealed class AParamsContent : PParamsContent
         }
     }
 
-    private class Brackets_Cast : Cast
-    {
-        AParamsContent obj;
-
-        internal Brackets_Cast (AParamsContent obj)
-        {
-          this.obj = obj;
-        }
-
-        public Object Cast(Object o)
-        {
-            PBrackets node = (PBrackets) o;
-
-            if((node.Parent() != null) &&
-                (node.Parent() != obj))
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            if((node.Parent() == null) ||
-                (node.Parent() != obj))
-            {
-                node.Parent(obj);
-            }
-
-            return node;
-        }
-
-        public Object UnCast(Object o)
-        {
-            PBrackets node = (PBrackets) o;
-            node.Parent(null);
-            return node;
-        }
-    }
     private class ParamsMulti_Cast : Cast
     {
         AParamsContent obj;
@@ -3632,26 +3560,23 @@ public sealed class AParamsMulti : PParamsMulti
 {
     private TComma _comma_;
     private PType _type_;
-    private TypedList _brackets_;
+    private PBrackets _brackets_;
     private TId _id_;
 
     public AParamsMulti ()
     {
-        this._brackets_ = new TypedList(new Brackets_Cast(this));
     }
 
     public AParamsMulti (
             TComma _comma_,
             PType _type_,
-            IList _brackets_,
+            PBrackets _brackets_,
             TId _id_
     )
     {
         SetComma (_comma_);
         SetType (_type_);
-        this._brackets_ = new TypedList(new Brackets_Cast(this));
-        this._brackets_.Clear();
-        this._brackets_.AddAll(_brackets_);
+        SetBrackets (_brackets_);
         SetId (_id_);
     }
 
@@ -3660,7 +3585,7 @@ public sealed class AParamsMulti : PParamsMulti
         return new AParamsMulti (
             (TComma)CloneNode (_comma_),
             (PType)CloneNode (_type_),
-            CloneList (_brackets_),
+            (PBrackets)CloneNode (_brackets_),
             (TId)CloneNode (_id_)
         );
     }
@@ -3694,7 +3619,7 @@ public sealed class AParamsMulti : PParamsMulti
 
         _comma_ = node;
     }
-    public PType GetType ()
+    public new PType GetType ()
     {
         return _type_;
     }
@@ -3718,15 +3643,29 @@ public sealed class AParamsMulti : PParamsMulti
 
         _type_ = node;
     }
-    public IList GetBrackets ()
+    public PBrackets GetBrackets ()
     {
         return _brackets_;
     }
 
-    public void setBrackets (IList list)
+    public void SetBrackets (PBrackets node)
     {
-        _brackets_.Clear();
-        _brackets_.AddAll(list);
+        if(_brackets_ != null)
+        {
+            _brackets_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _brackets_ = node;
     }
     public TId GetId ()
     {
@@ -3775,9 +3714,9 @@ public sealed class AParamsMulti : PParamsMulti
             _type_ = null;
             return;
         }
-        if ( _brackets_.Contains(child) )
+        if ( _brackets_ == child )
         {
-            _brackets_.Remove(child);
+            _brackets_ = null;
             return;
         }
         if ( _id_ == child )
@@ -3799,22 +3738,10 @@ public sealed class AParamsMulti : PParamsMulti
             SetType ((PType) newChild);
             return;
         }
-        for ( int i = 0; i < _brackets_.Count; i++ )
+        if ( _brackets_ == oldChild )
         {
-            Node n = (Node)_brackets_[i];
-            if(n == oldChild)
-            {
-                if(newChild != null)
-                {
-                    _brackets_[i] = newChild;
-                    oldChild.Parent(null);
-                    return;
-                }
-
-                _brackets_.RemoveAt(i);
-                oldChild.Parent(null);
-                return;
-            }
+            SetBrackets ((PBrackets) newChild);
+            return;
         }
         if ( _id_ == oldChild )
         {
@@ -3823,41 +3750,6 @@ public sealed class AParamsMulti : PParamsMulti
         }
     }
 
-    private class Brackets_Cast : Cast
-    {
-        AParamsMulti obj;
-
-        internal Brackets_Cast (AParamsMulti obj)
-        {
-          this.obj = obj;
-        }
-
-        public Object Cast(Object o)
-        {
-            PBrackets node = (PBrackets) o;
-
-            if((node.Parent() != null) &&
-                (node.Parent() != obj))
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            if((node.Parent() == null) ||
-                (node.Parent() != obj))
-            {
-                node.Parent(obj);
-            }
-
-            return node;
-        }
-
-        public Object UnCast(Object o)
-        {
-            PBrackets node = (PBrackets) o;
-            node.Parent(null);
-            return node;
-        }
-    }
 }
 public sealed class AOneType : PType
 {
@@ -13225,31 +13117,25 @@ public sealed class ABooldcl : PBooldcl
 public sealed class AArrdcl : PArrdcl
 {
     private PType _type_;
-    private PArrsizedcl _fst_;
-    private TypedList _multi_;
+    private PArrsizedcl _arrsizedcl_;
     private TId _id_;
     private TAssign _assign_;
     private PArrIdOrExpr _arr_id_or_expr_;
 
     public AArrdcl ()
     {
-        this._multi_ = new TypedList(new Multi_Cast(this));
     }
 
     public AArrdcl (
             PType _type_,
-            PArrsizedcl _fst_,
-            IList _multi_,
+            PArrsizedcl _arrsizedcl_,
             TId _id_,
             TAssign _assign_,
             PArrIdOrExpr _arr_id_or_expr_
     )
     {
         SetType (_type_);
-        SetFst (_fst_);
-        this._multi_ = new TypedList(new Multi_Cast(this));
-        this._multi_.Clear();
-        this._multi_.AddAll(_multi_);
+        SetArrsizedcl (_arrsizedcl_);
         SetId (_id_);
         SetAssign (_assign_);
         SetArrIdOrExpr (_arr_id_or_expr_);
@@ -13259,8 +13145,7 @@ public sealed class AArrdcl : PArrdcl
     {
         return new AArrdcl (
             (PType)CloneNode (_type_),
-            (PArrsizedcl)CloneNode (_fst_),
-            CloneList (_multi_),
+            (PArrsizedcl)CloneNode (_arrsizedcl_),
             (TId)CloneNode (_id_),
             (TAssign)CloneNode (_assign_),
             (PArrIdOrExpr)CloneNode (_arr_id_or_expr_)
@@ -13272,7 +13157,7 @@ public sealed class AArrdcl : PArrdcl
         ((Analysis) sw).CaseAArrdcl(this);
     }
 
-    public PType GetType ()
+    public new PType GetType ()
     {
         return _type_;
     }
@@ -13296,16 +13181,16 @@ public sealed class AArrdcl : PArrdcl
 
         _type_ = node;
     }
-    public PArrsizedcl GetFst ()
+    public PArrsizedcl GetArrsizedcl ()
     {
-        return _fst_;
+        return _arrsizedcl_;
     }
 
-    public void SetFst (PArrsizedcl node)
+    public void SetArrsizedcl (PArrsizedcl node)
     {
-        if(_fst_ != null)
+        if(_arrsizedcl_ != null)
         {
-            _fst_.Parent(null);
+            _arrsizedcl_.Parent(null);
         }
 
         if(node != null)
@@ -13318,17 +13203,7 @@ public sealed class AArrdcl : PArrdcl
             node.Parent(this);
         }
 
-        _fst_ = node;
-    }
-    public IList GetMulti ()
-    {
-        return _multi_;
-    }
-
-    public void setMulti (IList list)
-    {
-        _multi_.Clear();
-        _multi_.AddAll(list);
+        _arrsizedcl_ = node;
     }
     public TId GetId ()
     {
@@ -13407,8 +13282,7 @@ public sealed class AArrdcl : PArrdcl
     {
         return ""
             + ToString (_type_)
-            + ToString (_fst_)
-            + ToString (_multi_)
+            + ToString (_arrsizedcl_)
             + ToString (_id_)
             + ToString (_assign_)
             + ToString (_arr_id_or_expr_)
@@ -13422,14 +13296,9 @@ public sealed class AArrdcl : PArrdcl
             _type_ = null;
             return;
         }
-        if ( _fst_ == child )
+        if ( _arrsizedcl_ == child )
         {
-            _fst_ = null;
-            return;
-        }
-        if ( _multi_.Contains(child) )
-        {
-            _multi_.Remove(child);
+            _arrsizedcl_ = null;
             return;
         }
         if ( _id_ == child )
@@ -13456,27 +13325,10 @@ public sealed class AArrdcl : PArrdcl
             SetType ((PType) newChild);
             return;
         }
-        if ( _fst_ == oldChild )
+        if ( _arrsizedcl_ == oldChild )
         {
-            SetFst ((PArrsizedcl) newChild);
+            SetArrsizedcl ((PArrsizedcl) newChild);
             return;
-        }
-        for ( int i = 0; i < _multi_.Count; i++ )
-        {
-            Node n = (Node)_multi_[i];
-            if(n == oldChild)
-            {
-                if(newChild != null)
-                {
-                    _multi_[i] = newChild;
-                    oldChild.Parent(null);
-                    return;
-                }
-
-                _multi_.RemoveAt(i);
-                oldChild.Parent(null);
-                return;
-            }
         }
         if ( _id_ == oldChild )
         {
@@ -13495,41 +13347,6 @@ public sealed class AArrdcl : PArrdcl
         }
     }
 
-    private class Multi_Cast : Cast
-    {
-        AArrdcl obj;
-
-        internal Multi_Cast (AArrdcl obj)
-        {
-          this.obj = obj;
-        }
-
-        public Object Cast(Object o)
-        {
-            PArrsizedcl node = (PArrsizedcl) o;
-
-            if((node.Parent() != null) &&
-                (node.Parent() != obj))
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            if((node.Parent() == null) ||
-                (node.Parent() != obj))
-            {
-                node.Parent(obj);
-            }
-
-            return node;
-        }
-
-        public Object UnCast(Object o)
-        {
-            PArrsizedcl node = (PArrsizedcl) o;
-            node.Parent(null);
-            return node;
-        }
-    }
 }
 public sealed class AOneArrIdOrExpr : PArrIdOrExpr
 {
