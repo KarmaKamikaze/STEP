@@ -17,7 +17,7 @@ public class AstPrinter : DepthFirstAdapter
         PrintIndent();
 
         Console.ForegroundColor = ConsoleColor.White;
-        Console.Write(node.GetType().ToString().Replace("STEP.node.", ""));
+        Console.Write(RemoveNodeIndividualizers(node.GetType().ToString()));
 
         switch (node)
         {
@@ -45,5 +45,30 @@ public class AstPrinter : DepthFirstAdapter
     public override void DefaultOut(Node node)
     {
         indent--;
+    }
+
+    private string RemoveNodeIndividualizers(string nodeName)
+    {
+        string result = nodeName.Replace("STEP.node.A", "");
+
+
+        if (result.Contains("One"))
+            result = result.Replace("One", "");
+        else if (result.Contains("Two"))
+            result = result.Replace("Two", "");
+        else if (result.Contains("Three"))
+            result = result.Replace("Three", "");
+        else if (result.Contains("Four"))
+            result = result.Replace("Four", "");
+        else if (result.Contains("Five"))
+            result = result.Replace("Five", "");
+        else if (result.Contains("Six"))
+            result = result.Replace("Six", "");
+        else if (result.Contains("Nonelse"))
+            result = result.Replace("Six", "");
+        else if (result.Contains("Withelse"))
+            result = result.Replace("Six", "");
+
+        return result;
     }
 }
