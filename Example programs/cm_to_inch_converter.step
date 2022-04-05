@@ -10,18 +10,6 @@ setup
         printLine(i + "     " + cmToInch(i))
     end for
 
-    switch(i)
-        ##when 1 do
-
-        when 2 do
-            fallthrough
-
-
-        when 3 do
-            ass(b)
-
-        otherwise do##end switch
-
         a[2 + 5] = a[3 - 2 - 1]
 end setup
 
@@ -35,6 +23,3 @@ functions
 end functions
 
 #program over
-
-
-

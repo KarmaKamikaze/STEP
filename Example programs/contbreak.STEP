@@ -1,0 +1,12 @@
+setup
+	repeat while(true)
+	    if(foo)
+	        bar()
+	        break
+        end if
+	end while
+end setup
+
+loop
+    #continue
+end loop
