@@ -40,7 +40,7 @@ Tokens
   whitespace = (' ' | tab)+;
   nl = line_terminator;
   comma = ',';
-  numliteral = '-'? digit+ | '-'? digit+ '.' digit*;
+  numliteral = digit+ | digit+ '.' digit*;
   strliteral = dblquote string_content* dblquote;
   boolliteral = '!'? 'true'| '!'? 'false';
 
@@ -112,14 +112,17 @@ Productions
   
   // Statements
   stmt = stmts nl;
-  stmts = {one} ifstmt | {two} whilestmt | {three} forstmt | {four} vardcl | {five} assstmt | {six} funccall | {seven} retstmt | {eight} switchstmt |  ;
+  stmts = {one} ifstmt | {two} whilestmt | {three} forstmt | {four} vardcl | {five} assstmt | {six} funccall | {seven} retstmt | ;
+  loop_stmt = loop_stmts nl;
+  loop_stmts = {one} loopifstmt | {two} whilestmt | {three} forstmt | {four} vardcl | {five} assstmt | {six} funccall | {seven} retstmt | ;
+  loopifbody = {one} loop_stmt | {two} continue nl | {three} break nl;
   ifstmt = {nonelse} if lparen cond rparen stmt* endif| {withelse} if lparen cond rparen [fst]:stmt* else [snd]:stmt* endif;
-  whilestmt = repeatwhile lparen cond rparen option_stmt_continue_break* endwhile;
-  option_stmt_continue_break = {one} stmt | {two} continue nl | {three} break nl;
-  forstmt = repeatfor lparen forstmt_iterator_options to [fst]:expr comma option_increase_decrease [snd]:expr rparen option_stmt_continue_break* endfor;
-  forstmt_iterator_options = {one} numdcl | {two} assstmt | {three} id arrindex?;
-  option_increase_decrease = {one} increaseby | {two} decreaseby;
-  switchstmt = switch lparen id arrindex? rparen [fst]:nl [snd]:nl* whencase* otherwisecase? endswitch;
+  loopifstmt = {noelse} if lparen cond rparen loopifbody* endif | {withelse} if lparen cond rparen [true]:loopifbody* else [false]:loopifbody* endif;
+  whilestmt = repeatwhile lparen cond rparen loop_stmt* endwhile;
+  forstmt = repeatfor lparen for_iter_opt to [fst]:expr comma increase_decrease [snd]:expr rparen loop_stmt* endfor;
+  for_iter_opt = {one} numdcl | {two} assstmt | {three} id arrindex?;
+  increase_decrease = {one} increaseby | {two} decreaseby;
+  // switchstmt = switch lparen id arrindex? rparen [fst]:nl [snd]:nl* whencase* otherwisecase? endswitch;
   whencase = when numliteral do nl stmt* fallthrough_stmt?;
   fallthrough_stmt = fallthrough [fst]:nl [snd]:nl*;
   otherwisecase = otherwisedo nl stmt*;
@@ -135,10 +138,10 @@ Productions
   term = {one} term mult factor | {two} term divide factor | {three} factor;
   factor = {one} factor pow value | {two} value;
   value = {one} P.constant | {two} id arrindex? | {three} lparen expr rparen | {four} funccall;
-  constant = {one} numliteral | {two} strliteral | {three} boolliteral;
+  constant = {one} minus? numliteral | {two} strliteral | {three} boolliteral;
   
   // Boolean expressions
-  cond = {one} neg? comp | {two} neg? [fst]:comp bop [snd]:cond;
+  cond = {one} neg? comp | {two} neg? comp bop cond;
   comp = {one} expr | {two} [fst]:expr relop [snd]:expr;
   relop = {one} grthan | {two} grthaneq | {three} lthan | {four} lthaneq | {five} eq | {six} neq;
   bop = {one} and | {two} or;
