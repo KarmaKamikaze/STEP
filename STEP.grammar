@@ -112,12 +112,12 @@ Productions
   
   // Statements
   stmt = stmts nl;
+  stmts = {one} ifstmt | {two} whilestmt | {three} forstmt | {four} vardcl | {five} assstmt | {six} funccall | {seven} retstmt | ;
   loop_stmt = loop_stmts nl;
-  stmts = {one} ifstmt | {two} whilestmt | {three} forstmt | {four} vardcl | {five} assstmt | {six} funccall | {seven} retstmt | ;// {eight} switchstmt |  ;
   loop_stmts = {one} loopifstmt | {two} whilestmt | {three} forstmt | {four} vardcl | {five} assstmt | {six} funccall | {seven} retstmt | ;
+  loopifbody = {one} loop_stmt | {two} continue nl | {three} break nl;
   ifstmt = {nonelse} if lparen cond rparen stmt* endif| {withelse} if lparen cond rparen [fst]:stmt* else [snd]:stmt* endif;
-  loopifstmt = {noelse} if lparen cond rparen loop_cont_break* endif | {withelse} if lparen cond rparen [true]:loop_cont_break* else [false]:loop_cont_break* endif;
-  loop_cont_break = {one} loop_stmt | {two} continue nl | {three} break nl;
+  loopifstmt = {noelse} if lparen cond rparen loopifbody* endif | {withelse} if lparen cond rparen [true]:loopifbody* else [false]:loopifbody* endif;
   whilestmt = repeatwhile lparen cond rparen loop_stmt* endwhile;
   forstmt = repeatfor lparen for_iter_opt to [fst]:expr comma increase_decrease [snd]:expr rparen loop_stmt* endfor;
   for_iter_opt = {one} numdcl | {two} assstmt | {three} id arrindex?;

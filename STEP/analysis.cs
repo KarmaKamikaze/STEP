@@ -37,7 +37,6 @@ public interface Analysis : Switch
     void CaseATwoType(ATwoType node);
     void CaseAThreeType(AThreeType node);
     void CaseAStmt(AStmt node);
-    void CaseALoopStmt(ALoopStmt node);
     void CaseAOneStmts(AOneStmts node);
     void CaseATwoStmts(ATwoStmts node);
     void CaseAThreeStmts(AThreeStmts node);
@@ -46,6 +45,7 @@ public interface Analysis : Switch
     void CaseASixStmts(ASixStmts node);
     void CaseASevenStmts(ASevenStmts node);
     void CaseAStmts(AStmts node);
+    void CaseALoopStmt(ALoopStmt node);
     void CaseAOneLoopStmts(AOneLoopStmts node);
     void CaseATwoLoopStmts(ATwoLoopStmts node);
     void CaseAThreeLoopStmts(AThreeLoopStmts node);
@@ -54,13 +54,13 @@ public interface Analysis : Switch
     void CaseASixLoopStmts(ASixLoopStmts node);
     void CaseASevenLoopStmts(ASevenLoopStmts node);
     void CaseALoopStmts(ALoopStmts node);
+    void CaseAOneLoopifbody(AOneLoopifbody node);
+    void CaseATwoLoopifbody(ATwoLoopifbody node);
+    void CaseAThreeLoopifbody(AThreeLoopifbody node);
     void CaseANonelseIfstmt(ANonelseIfstmt node);
     void CaseAWithelseIfstmt(AWithelseIfstmt node);
     void CaseANoelseLoopifstmt(ANoelseLoopifstmt node);
     void CaseAWithelseLoopifstmt(AWithelseLoopifstmt node);
-    void CaseAOneLoopContBreak(AOneLoopContBreak node);
-    void CaseATwoLoopContBreak(ATwoLoopContBreak node);
-    void CaseAThreeLoopContBreak(AThreeLoopContBreak node);
     void CaseAWhilestmt(AWhilestmt node);
     void CaseAForstmt(AForstmt node);
     void CaseAOneForIterOpt(AOneForIterOpt node);
@@ -334,10 +334,6 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseALoopStmt(ALoopStmt node)
-    {
-        DefaultCase(node);
-    }
     public virtual void CaseAOneStmts(AOneStmts node)
     {
         DefaultCase(node);
@@ -367,6 +363,10 @@ public class AnalysisAdapter : Analysis
         DefaultCase(node);
     }
     public virtual void CaseAStmts(AStmts node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseALoopStmt(ALoopStmt node)
     {
         DefaultCase(node);
     }
@@ -402,6 +402,18 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
+    public virtual void CaseAOneLoopifbody(AOneLoopifbody node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseATwoLoopifbody(ATwoLoopifbody node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseAThreeLoopifbody(AThreeLoopifbody node)
+    {
+        DefaultCase(node);
+    }
     public virtual void CaseANonelseIfstmt(ANonelseIfstmt node)
     {
         DefaultCase(node);
@@ -415,18 +427,6 @@ public class AnalysisAdapter : Analysis
         DefaultCase(node);
     }
     public virtual void CaseAWithelseLoopifstmt(AWithelseLoopifstmt node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAOneLoopContBreak(AOneLoopContBreak node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseATwoLoopContBreak(ATwoLoopContBreak node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAThreeLoopContBreak(AThreeLoopContBreak node)
     {
         DefaultCase(node);
     }
@@ -1589,29 +1589,6 @@ public class DepthFirstAdapter : AnalysisAdapter
         }
         OutAStmt(node);
     }
-    public virtual void InALoopStmt(ALoopStmt node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutALoopStmt(ALoopStmt node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseALoopStmt(ALoopStmt node)
-    {
-        InALoopStmt(node);
-        if(node.GetLoopStmts() != null)
-        {
-            node.GetLoopStmts().Apply(this);
-        }
-        if(node.GetNl() != null)
-        {
-            node.GetNl().Apply(this);
-        }
-        OutALoopStmt(node);
-    }
     public virtual void InAOneStmts(AOneStmts node)
     {
         DefaultIn(node);
@@ -1759,6 +1736,29 @@ public class DepthFirstAdapter : AnalysisAdapter
     {
         InAStmts(node);
         OutAStmts(node);
+    }
+    public virtual void InALoopStmt(ALoopStmt node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutALoopStmt(ALoopStmt node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseALoopStmt(ALoopStmt node)
+    {
+        InALoopStmt(node);
+        if(node.GetLoopStmts() != null)
+        {
+            node.GetLoopStmts().Apply(this);
+        }
+        if(node.GetNl() != null)
+        {
+            node.GetNl().Apply(this);
+        }
+        OutALoopStmt(node);
     }
     public virtual void InAOneLoopStmts(AOneLoopStmts node)
     {
@@ -1908,6 +1908,71 @@ public class DepthFirstAdapter : AnalysisAdapter
         InALoopStmts(node);
         OutALoopStmts(node);
     }
+    public virtual void InAOneLoopifbody(AOneLoopifbody node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAOneLoopifbody(AOneLoopifbody node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAOneLoopifbody(AOneLoopifbody node)
+    {
+        InAOneLoopifbody(node);
+        if(node.GetLoopStmt() != null)
+        {
+            node.GetLoopStmt().Apply(this);
+        }
+        OutAOneLoopifbody(node);
+    }
+    public virtual void InATwoLoopifbody(ATwoLoopifbody node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutATwoLoopifbody(ATwoLoopifbody node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseATwoLoopifbody(ATwoLoopifbody node)
+    {
+        InATwoLoopifbody(node);
+        if(node.GetContinue() != null)
+        {
+            node.GetContinue().Apply(this);
+        }
+        if(node.GetNl() != null)
+        {
+            node.GetNl().Apply(this);
+        }
+        OutATwoLoopifbody(node);
+    }
+    public virtual void InAThreeLoopifbody(AThreeLoopifbody node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAThreeLoopifbody(AThreeLoopifbody node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAThreeLoopifbody(AThreeLoopifbody node)
+    {
+        InAThreeLoopifbody(node);
+        if(node.GetBreak() != null)
+        {
+            node.GetBreak().Apply(this);
+        }
+        if(node.GetNl() != null)
+        {
+            node.GetNl().Apply(this);
+        }
+        OutAThreeLoopifbody(node);
+    }
     public virtual void InANonelseIfstmt(ANonelseIfstmt node)
     {
         DefaultIn(node);
@@ -2036,11 +2101,11 @@ public class DepthFirstAdapter : AnalysisAdapter
             node.GetRparen().Apply(this);
         }
         {
-            Object[] temp = new Object[node.GetLoopContBreak().Count];
-            node.GetLoopContBreak().CopyTo(temp, 0);
+            Object[] temp = new Object[node.GetLoopifbody().Count];
+            node.GetLoopifbody().CopyTo(temp, 0);
             for(int i = 0; i < temp.Length; i++)
             {
-                ((PLoopContBreak) temp[i]).Apply(this);
+                ((PLoopifbody) temp[i]).Apply(this);
             }
         }
         if(node.GetEndif() != null)
@@ -2083,7 +2148,7 @@ public class DepthFirstAdapter : AnalysisAdapter
             node.GetTrue().CopyTo(temp, 0);
             for(int i = 0; i < temp.Length; i++)
             {
-                ((PLoopContBreak) temp[i]).Apply(this);
+                ((PLoopifbody) temp[i]).Apply(this);
             }
         }
         if(node.GetElse() != null)
@@ -2095,7 +2160,7 @@ public class DepthFirstAdapter : AnalysisAdapter
             node.GetFalse().CopyTo(temp, 0);
             for(int i = 0; i < temp.Length; i++)
             {
-                ((PLoopContBreak) temp[i]).Apply(this);
+                ((PLoopifbody) temp[i]).Apply(this);
             }
         }
         if(node.GetEndif() != null)
@@ -2103,71 +2168,6 @@ public class DepthFirstAdapter : AnalysisAdapter
             node.GetEndif().Apply(this);
         }
         OutAWithelseLoopifstmt(node);
-    }
-    public virtual void InAOneLoopContBreak(AOneLoopContBreak node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAOneLoopContBreak(AOneLoopContBreak node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAOneLoopContBreak(AOneLoopContBreak node)
-    {
-        InAOneLoopContBreak(node);
-        if(node.GetLoopStmt() != null)
-        {
-            node.GetLoopStmt().Apply(this);
-        }
-        OutAOneLoopContBreak(node);
-    }
-    public virtual void InATwoLoopContBreak(ATwoLoopContBreak node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutATwoLoopContBreak(ATwoLoopContBreak node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseATwoLoopContBreak(ATwoLoopContBreak node)
-    {
-        InATwoLoopContBreak(node);
-        if(node.GetContinue() != null)
-        {
-            node.GetContinue().Apply(this);
-        }
-        if(node.GetNl() != null)
-        {
-            node.GetNl().Apply(this);
-        }
-        OutATwoLoopContBreak(node);
-    }
-    public virtual void InAThreeLoopContBreak(AThreeLoopContBreak node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAThreeLoopContBreak(AThreeLoopContBreak node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAThreeLoopContBreak(AThreeLoopContBreak node)
-    {
-        InAThreeLoopContBreak(node);
-        if(node.GetBreak() != null)
-        {
-            node.GetBreak().Apply(this);
-        }
-        if(node.GetNl() != null)
-        {
-            node.GetNl().Apply(this);
-        }
-        OutAThreeLoopContBreak(node);
     }
     public virtual void InAWhilestmt(AWhilestmt node)
     {
@@ -4230,29 +4230,6 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
         }
         OutAStmt(node);
     }
-    public virtual void InALoopStmt(ALoopStmt node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutALoopStmt(ALoopStmt node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseALoopStmt(ALoopStmt node)
-    {
-        InALoopStmt(node);
-        if(node.GetNl() != null)
-        {
-            node.GetNl().Apply(this);
-        }
-        if(node.GetLoopStmts() != null)
-        {
-            node.GetLoopStmts().Apply(this);
-        }
-        OutALoopStmt(node);
-    }
     public virtual void InAOneStmts(AOneStmts node)
     {
         DefaultIn(node);
@@ -4400,6 +4377,29 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
     {
         InAStmts(node);
         OutAStmts(node);
+    }
+    public virtual void InALoopStmt(ALoopStmt node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutALoopStmt(ALoopStmt node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseALoopStmt(ALoopStmt node)
+    {
+        InALoopStmt(node);
+        if(node.GetNl() != null)
+        {
+            node.GetNl().Apply(this);
+        }
+        if(node.GetLoopStmts() != null)
+        {
+            node.GetLoopStmts().Apply(this);
+        }
+        OutALoopStmt(node);
     }
     public virtual void InAOneLoopStmts(AOneLoopStmts node)
     {
@@ -4549,6 +4549,71 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
         InALoopStmts(node);
         OutALoopStmts(node);
     }
+    public virtual void InAOneLoopifbody(AOneLoopifbody node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAOneLoopifbody(AOneLoopifbody node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAOneLoopifbody(AOneLoopifbody node)
+    {
+        InAOneLoopifbody(node);
+        if(node.GetLoopStmt() != null)
+        {
+            node.GetLoopStmt().Apply(this);
+        }
+        OutAOneLoopifbody(node);
+    }
+    public virtual void InATwoLoopifbody(ATwoLoopifbody node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutATwoLoopifbody(ATwoLoopifbody node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseATwoLoopifbody(ATwoLoopifbody node)
+    {
+        InATwoLoopifbody(node);
+        if(node.GetNl() != null)
+        {
+            node.GetNl().Apply(this);
+        }
+        if(node.GetContinue() != null)
+        {
+            node.GetContinue().Apply(this);
+        }
+        OutATwoLoopifbody(node);
+    }
+    public virtual void InAThreeLoopifbody(AThreeLoopifbody node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAThreeLoopifbody(AThreeLoopifbody node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAThreeLoopifbody(AThreeLoopifbody node)
+    {
+        InAThreeLoopifbody(node);
+        if(node.GetNl() != null)
+        {
+            node.GetNl().Apply(this);
+        }
+        if(node.GetBreak() != null)
+        {
+            node.GetBreak().Apply(this);
+        }
+        OutAThreeLoopifbody(node);
+    }
     public virtual void InANonelseIfstmt(ANonelseIfstmt node)
     {
         DefaultIn(node);
@@ -4665,11 +4730,11 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
             node.GetEndif().Apply(this);
         }
         {
-            Object[] temp = new Object[node.GetLoopContBreak().Count];
-            node.GetLoopContBreak().CopyTo(temp, 0);
+            Object[] temp = new Object[node.GetLoopifbody().Count];
+            node.GetLoopifbody().CopyTo(temp, 0);
             for(int i = temp.Length - 1; i >= 0; i--)
             {
-                ((PLoopContBreak) temp[i]).Apply(this);
+                ((PLoopifbody) temp[i]).Apply(this);
             }
         }
         if(node.GetRparen() != null)
@@ -4712,7 +4777,7 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
             node.GetFalse().CopyTo(temp, 0);
             for(int i = temp.Length - 1; i >= 0; i--)
             {
-                ((PLoopContBreak) temp[i]).Apply(this);
+                ((PLoopifbody) temp[i]).Apply(this);
             }
         }
         if(node.GetElse() != null)
@@ -4724,7 +4789,7 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
             node.GetTrue().CopyTo(temp, 0);
             for(int i = temp.Length - 1; i >= 0; i--)
             {
-                ((PLoopContBreak) temp[i]).Apply(this);
+                ((PLoopifbody) temp[i]).Apply(this);
             }
         }
         if(node.GetRparen() != null)
@@ -4744,71 +4809,6 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
             node.GetIf().Apply(this);
         }
         OutAWithelseLoopifstmt(node);
-    }
-    public virtual void InAOneLoopContBreak(AOneLoopContBreak node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAOneLoopContBreak(AOneLoopContBreak node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAOneLoopContBreak(AOneLoopContBreak node)
-    {
-        InAOneLoopContBreak(node);
-        if(node.GetLoopStmt() != null)
-        {
-            node.GetLoopStmt().Apply(this);
-        }
-        OutAOneLoopContBreak(node);
-    }
-    public virtual void InATwoLoopContBreak(ATwoLoopContBreak node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutATwoLoopContBreak(ATwoLoopContBreak node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseATwoLoopContBreak(ATwoLoopContBreak node)
-    {
-        InATwoLoopContBreak(node);
-        if(node.GetNl() != null)
-        {
-            node.GetNl().Apply(this);
-        }
-        if(node.GetContinue() != null)
-        {
-            node.GetContinue().Apply(this);
-        }
-        OutATwoLoopContBreak(node);
-    }
-    public virtual void InAThreeLoopContBreak(AThreeLoopContBreak node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAThreeLoopContBreak(AThreeLoopContBreak node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAThreeLoopContBreak(AThreeLoopContBreak node)
-    {
-        InAThreeLoopContBreak(node);
-        if(node.GetNl() != null)
-        {
-            node.GetNl().Apply(this);
-        }
-        if(node.GetBreak() != null)
-        {
-            node.GetBreak().Apply(this);
-        }
-        OutAThreeLoopContBreak(node);
     }
     public virtual void InAWhilestmt(AWhilestmt node)
     {
