@@ -1,12 +1,26 @@
 setup
 	repeat while(true)
-	    if(foo)
+	    if(foo())
 	        bar()
 	        break
         end if
 	end while
+	boolean sarmiGay = false
+	if(kiss(sarmi, man))
+	    sarmiGay = true
+    end if
+    if(ass == 2)
+    end if
 end setup
 
 loop
     #continue
+    if((ass == penis) and (foo == bar))
+    end if
+    if(1+2)
+    end if
+    foo(a == 2, b == ass, (c and d))
+    boolean a = (b and d)
+    boolean b = a and c
+    boolean c = 20 > (a == b)
 end loop
