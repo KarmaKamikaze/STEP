@@ -122,10 +122,6 @@ Productions
   forstmt = repeatfor lparen for_iter_opt to [fst]:expr comma increase_decrease [snd]:expr rparen loop_stmt* endfor;
   for_iter_opt = {one} numdcl | {two} assstmt | {three} id arrindex?;
   increase_decrease = {one} increaseby | {two} decreaseby;
-  // switchstmt = switch lparen id arrindex? rparen [fst]:nl [snd]:nl* whencase* otherwisecase? endswitch;
-  // whencase = when numliteral do nl stmt* fallthrough_stmt?;
-  // fallthrough_stmt = fallthrough [fst]:nl [snd]:nl*;
-  // otherwisecase = otherwisedo nl stmt*;
   assstmt = id arrindex? assign logicexpr;
   funccall = id lparen params_options? rparen;
   params_options = logicexpr multi_expr*;
@@ -141,10 +137,6 @@ Productions
   constant = {one} minus? numliteral | {two} strliteral | {three} boolliteral;
   
   // Boolean expressions
-  // cond = {one} neg? comp | {two} neg? comp bop cond;
-  // comp = {one} expr | {two} [fst]:expr relop [snd]:expr | {three} lparen cond rparen;
-  // relop = {one} grthan | {two} grthaneq | {three} lthan | {four} lthaneq | {five} eq | {six} neq;
-  // bop = {one} and | {two} or;
   logicexpr = {one} logicexpr and logicequal | {two} logicexpr or logicequal | {three} logicequal;
   logicequal = {one} [fst]:logiccomp eq [snd]:logiccomp | {two} [fst]:logiccomp neq [snd]:logiccomp | {three} logiccomp;
   logiccomp = {one} [fst]:logicvalue logiccompop [snd]:logicvalue | {two} logicvalue;
