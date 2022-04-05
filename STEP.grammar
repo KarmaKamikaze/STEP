@@ -116,42 +116,39 @@ Productions
   loop_stmt = loop_stmts nl;
   loop_stmts = {one} loopifstmt | {two} whilestmt | {three} forstmt | {four} vardcl | {five} assstmt | {six} funccall | {seven} retstmt | ;
   loopifbody = {one} loop_stmt | {two} continue nl | {three} break nl;
-  ifstmt = {nonelse} if lparen cond rparen stmt* endif| {withelse} if lparen cond rparen [fst]:stmt* else [snd]:stmt* endif;
-  loopifstmt = {noelse} if lparen cond rparen loopifbody* endif | {withelse} if lparen cond rparen [true]:loopifbody* else [false]:loopifbody* endif;
-  whilestmt = repeatwhile lparen cond rparen loop_stmt* endwhile;
+  ifstmt = {nonelse} if lparen logicexpr rparen stmt* endif| {withelse} if lparen logicexpr rparen [fst]:stmt* else [snd]:stmt* endif;
+  loopifstmt = {noelse} if lparen logicexpr rparen loopifbody* endif | {withelse} if lparen logicexpr rparen [true]:loopifbody* else [false]:loopifbody* endif;
+  whilestmt = repeatwhile lparen logicexpr rparen loop_stmt* endwhile;
   forstmt = repeatfor lparen for_iter_opt to [fst]:expr comma increase_decrease [snd]:expr rparen loop_stmt* endfor;
   for_iter_opt = {one} numdcl | {two} assstmt | {three} id arrindex?;
   increase_decrease = {one} increaseby | {two} decreaseby;
-  // switchstmt = switch lparen id arrindex? rparen [fst]:nl [snd]:nl* whencase* otherwisecase? endswitch;
-  whencase = when numliteral do nl stmt* fallthrough_stmt?;
-  fallthrough_stmt = fallthrough [fst]:nl [snd]:nl*;
-  otherwisecase = otherwisedo nl stmt*;
-  assstmt = id arrindex? assign expr;
+  assstmt = id arrindex? assign logicexpr;
   funccall = id lparen params_options? rparen;
-  params_options = expr multi_expr*;
-  multi_expr = comma expr;
-  retstmt = {one} return cond | {two} return;
+  params_options = logicexpr multi_expr*;
+  multi_expr = comma logicexpr;
+  retstmt = {one} return logicexpr | {two} return;
   arrindex = lbrack expr rbrack;
   
   // Arithmetic expressions
   expr = {one} expr plus term | {two} expr minus term | {three} term;
   term = {one} term mult factor | {two} term divide factor | {three} factor;
   factor = {one} factor pow value | {two} value;
-  value = {one} P.constant | {two} id arrindex? | {three} lparen expr rparen | {four} funccall;
+  value = {one} P.constant | {two} id arrindex? | {three} lparen logicexpr rparen | {four} funccall;
   constant = {one} minus? numliteral | {two} strliteral | {three} boolliteral;
   
   // Boolean expressions
-  cond = {one} neg? comp | {two} neg? comp bop cond;
-  comp = {one} expr | {two} [fst]:expr relop [snd]:expr;
-  relop = {one} grthan | {two} grthaneq | {three} lthan | {four} lthaneq | {five} eq | {six} neq;
-  bop = {one} and | {two} or;
+  logicexpr = {one} logicexpr and logicequal | {two} logicexpr or logicequal | {three} logicequal;
+  logicequal = {one} [fst]:logiccomp eq [snd]:logiccomp | {two} [fst]:logiccomp neq [snd]:logiccomp | {three} logiccomp;
+  logiccomp = {one} [fst]:logicvalue logiccompop [snd]:logicvalue | {two} logicvalue;
+  logiccompop = {one} grthaneq | {two} grthan | {three} lthaneq | {four} lthan;
+  logicvalue = neg? expr;
   
   // Variable declarations
   vardcl = T.constant? var_options;
   var_options = {one} numdcl | {two} stringdcl | {three} booldcl | {four} arrdcl;
   numdcl = number id assign expr;
   stringdcl = string id assign expr;
-  booldcl = boolean id assign cond;
+  booldcl = boolean id assign logicexpr;
   arrdcl = type arrsizedcl id assign arr_id_or_expr;
   arr_id_or_expr = {one} id | {two} lbrack params_options? rbrack;
   arrsizedcl = lbrack numliteral rbrack;
