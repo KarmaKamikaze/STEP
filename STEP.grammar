@@ -147,9 +147,9 @@ Productions
   // bop = {one} and | {two} or;
   logicexpr = {one} logicexpr and logicequal | {two} logicexpr or logicequal | {three} logicequal;
   logicequal = {one} [fst]:logiccomp eq [snd]:logiccomp | {two} [fst]:logiccomp neq [snd]:logiccomp | {three} logiccomp;
-  logiccomp = {one} [fst]:logicnot logiccompop [snd]:logicnot | {two} logicnot;
+  logiccomp = {one} [fst]:logicvalue logiccompop [snd]:logicvalue | {two} logicvalue;
   logiccompop = {one} grthaneq | {two} grthan | {three} lthaneq | {four} lthan;
-  logicnot = neg? expr;
+  logicvalue = neg? expr;
   
   // Variable declarations
   vardcl = T.constant? var_options;
