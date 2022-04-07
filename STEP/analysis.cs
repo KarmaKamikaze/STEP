@@ -66,8 +66,6 @@ public interface Analysis : Switch
     void CaseAOneForIterOpt(AOneForIterOpt node);
     void CaseATwoForIterOpt(ATwoForIterOpt node);
     void CaseAThreeForIterOpt(AThreeForIterOpt node);
-    void CaseAOneIncreaseDecrease(AOneIncreaseDecrease node);
-    void CaseATwoIncreaseDecrease(ATwoIncreaseDecrease node);
     void CaseAAssstmt(AAssstmt node);
     void CaseAFunccall(AFunccall node);
     void CaseAParamsOptions(AParamsOptions node);
@@ -102,7 +100,7 @@ public interface Analysis : Switch
     void CaseATwoLogiccompop(ATwoLogiccompop node);
     void CaseAThreeLogiccompop(AThreeLogiccompop node);
     void CaseAFourLogiccompop(AFourLogiccompop node);
-    void CaseALogicnot(ALogicnot node);
+    void CaseALogicvalue(ALogicvalue node);
     void CaseAVardcl(AVardcl node);
     void CaseAOneVarOptions(AOneVarOptions node);
     void CaseATwoVarOptions(ATwoVarOptions node);
@@ -112,8 +110,8 @@ public interface Analysis : Switch
     void CaseAStringdcl(AStringdcl node);
     void CaseABooldcl(ABooldcl node);
     void CaseAArrdcl(AArrdcl node);
-    void CaseAOneArrIdOrExpr(AOneArrIdOrExpr node);
-    void CaseATwoArrIdOrExpr(ATwoArrIdOrExpr node);
+    void CaseAOneArrIdOrLit(AOneArrIdOrLit node);
+    void CaseATwoArrIdOrLit(ATwoArrIdOrLit node);
     void CaseAArrsizedcl(AArrsizedcl node);
 
     void CaseTEndOfLineComment(TEndOfLineComment node);
@@ -165,8 +163,7 @@ public interface Analysis : Switch
     void CaseTRepeatfor(TRepeatfor node);
     void CaseTEndfor(TEndfor node);
     void CaseTTo(TTo node);
-    void CaseTIncreaseby(TIncreaseby node);
-    void CaseTDecreaseby(TDecreaseby node);
+    void CaseTChangeby(TChangeby node);
     void CaseTSwitch(TSwitch node);
     void CaseTEndswitch(TEndswitch node);
     void CaseTWhen(TWhen node);
@@ -448,14 +445,6 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseAOneIncreaseDecrease(AOneIncreaseDecrease node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseATwoIncreaseDecrease(ATwoIncreaseDecrease node)
-    {
-        DefaultCase(node);
-    }
     public virtual void CaseAAssstmt(AAssstmt node)
     {
         DefaultCase(node);
@@ -592,7 +581,7 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseALogicnot(ALogicnot node)
+    public virtual void CaseALogicvalue(ALogicvalue node)
     {
         DefaultCase(node);
     }
@@ -632,11 +621,11 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseAOneArrIdOrExpr(AOneArrIdOrExpr node)
+    public virtual void CaseAOneArrIdOrLit(AOneArrIdOrLit node)
     {
         DefaultCase(node);
     }
-    public virtual void CaseATwoArrIdOrExpr(ATwoArrIdOrExpr node)
+    public virtual void CaseATwoArrIdOrLit(ATwoArrIdOrLit node)
     {
         DefaultCase(node);
     }
@@ -841,11 +830,7 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseTIncreaseby(TIncreaseby node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTDecreaseby(TDecreaseby node)
+    public virtual void CaseTChangeby(TChangeby node)
     {
         DefaultCase(node);
     }
@@ -2239,9 +2224,9 @@ public class DepthFirstAdapter : AnalysisAdapter
         {
             node.GetComma().Apply(this);
         }
-        if(node.GetIncreaseDecrease() != null)
+        if(node.GetChangeby() != null)
         {
-            node.GetIncreaseDecrease().Apply(this);
+            node.GetChangeby().Apply(this);
         }
         if(node.GetSnd() != null)
         {
@@ -2325,44 +2310,6 @@ public class DepthFirstAdapter : AnalysisAdapter
             node.GetArrindex().Apply(this);
         }
         OutAThreeForIterOpt(node);
-    }
-    public virtual void InAOneIncreaseDecrease(AOneIncreaseDecrease node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAOneIncreaseDecrease(AOneIncreaseDecrease node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAOneIncreaseDecrease(AOneIncreaseDecrease node)
-    {
-        InAOneIncreaseDecrease(node);
-        if(node.GetIncreaseby() != null)
-        {
-            node.GetIncreaseby().Apply(this);
-        }
-        OutAOneIncreaseDecrease(node);
-    }
-    public virtual void InATwoIncreaseDecrease(ATwoIncreaseDecrease node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutATwoIncreaseDecrease(ATwoIncreaseDecrease node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseATwoIncreaseDecrease(ATwoIncreaseDecrease node)
-    {
-        InATwoIncreaseDecrease(node);
-        if(node.GetDecreaseby() != null)
-        {
-            node.GetDecreaseby().Apply(this);
-        }
-        OutATwoIncreaseDecrease(node);
     }
     public virtual void InAAssstmt(AAssstmt node)
     {
@@ -3072,9 +3019,9 @@ public class DepthFirstAdapter : AnalysisAdapter
     public override void CaseATwoLogiccomp(ATwoLogiccomp node)
     {
         InATwoLogiccomp(node);
-        if(node.GetLogicnot() != null)
+        if(node.GetLogicvalue() != null)
         {
-            node.GetLogicnot().Apply(this);
+            node.GetLogicvalue().Apply(this);
         }
         OutATwoLogiccomp(node);
     }
@@ -3154,19 +3101,19 @@ public class DepthFirstAdapter : AnalysisAdapter
         }
         OutAFourLogiccompop(node);
     }
-    public virtual void InALogicnot(ALogicnot node)
+    public virtual void InALogicvalue(ALogicvalue node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutALogicnot(ALogicnot node)
+    public virtual void OutALogicvalue(ALogicvalue node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseALogicnot(ALogicnot node)
+    public override void CaseALogicvalue(ALogicvalue node)
     {
-        InALogicnot(node);
+        InALogicvalue(node);
         if(node.GetNeg() != null)
         {
             node.GetNeg().Apply(this);
@@ -3175,7 +3122,7 @@ public class DepthFirstAdapter : AnalysisAdapter
         {
             node.GetExpr().Apply(this);
         }
-        OutALogicnot(node);
+        OutALogicvalue(node);
     }
     public virtual void InAVardcl(AVardcl node)
     {
@@ -3398,44 +3345,44 @@ public class DepthFirstAdapter : AnalysisAdapter
         {
             node.GetAssign().Apply(this);
         }
-        if(node.GetArrIdOrExpr() != null)
+        if(node.GetArrIdOrLit() != null)
         {
-            node.GetArrIdOrExpr().Apply(this);
+            node.GetArrIdOrLit().Apply(this);
         }
         OutAArrdcl(node);
     }
-    public virtual void InAOneArrIdOrExpr(AOneArrIdOrExpr node)
+    public virtual void InAOneArrIdOrLit(AOneArrIdOrLit node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAOneArrIdOrExpr(AOneArrIdOrExpr node)
+    public virtual void OutAOneArrIdOrLit(AOneArrIdOrLit node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAOneArrIdOrExpr(AOneArrIdOrExpr node)
+    public override void CaseAOneArrIdOrLit(AOneArrIdOrLit node)
     {
-        InAOneArrIdOrExpr(node);
+        InAOneArrIdOrLit(node);
         if(node.GetId() != null)
         {
             node.GetId().Apply(this);
         }
-        OutAOneArrIdOrExpr(node);
+        OutAOneArrIdOrLit(node);
     }
-    public virtual void InATwoArrIdOrExpr(ATwoArrIdOrExpr node)
+    public virtual void InATwoArrIdOrLit(ATwoArrIdOrLit node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutATwoArrIdOrExpr(ATwoArrIdOrExpr node)
+    public virtual void OutATwoArrIdOrLit(ATwoArrIdOrLit node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseATwoArrIdOrExpr(ATwoArrIdOrExpr node)
+    public override void CaseATwoArrIdOrLit(ATwoArrIdOrLit node)
     {
-        InATwoArrIdOrExpr(node);
+        InATwoArrIdOrLit(node);
         if(node.GetLbrack() != null)
         {
             node.GetLbrack().Apply(this);
@@ -3448,7 +3395,7 @@ public class DepthFirstAdapter : AnalysisAdapter
         {
             node.GetRbrack().Apply(this);
         }
-        OutATwoArrIdOrExpr(node);
+        OutATwoArrIdOrLit(node);
     }
     public virtual void InAArrsizedcl(AArrsizedcl node)
     {
@@ -4810,9 +4757,9 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
         {
             node.GetSnd().Apply(this);
         }
-        if(node.GetIncreaseDecrease() != null)
+        if(node.GetChangeby() != null)
         {
-            node.GetIncreaseDecrease().Apply(this);
+            node.GetChangeby().Apply(this);
         }
         if(node.GetComma() != null)
         {
@@ -4900,44 +4847,6 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
             node.GetId().Apply(this);
         }
         OutAThreeForIterOpt(node);
-    }
-    public virtual void InAOneIncreaseDecrease(AOneIncreaseDecrease node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAOneIncreaseDecrease(AOneIncreaseDecrease node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAOneIncreaseDecrease(AOneIncreaseDecrease node)
-    {
-        InAOneIncreaseDecrease(node);
-        if(node.GetIncreaseby() != null)
-        {
-            node.GetIncreaseby().Apply(this);
-        }
-        OutAOneIncreaseDecrease(node);
-    }
-    public virtual void InATwoIncreaseDecrease(ATwoIncreaseDecrease node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutATwoIncreaseDecrease(ATwoIncreaseDecrease node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseATwoIncreaseDecrease(ATwoIncreaseDecrease node)
-    {
-        InATwoIncreaseDecrease(node);
-        if(node.GetDecreaseby() != null)
-        {
-            node.GetDecreaseby().Apply(this);
-        }
-        OutATwoIncreaseDecrease(node);
     }
     public virtual void InAAssstmt(AAssstmt node)
     {
@@ -5647,9 +5556,9 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
     public override void CaseATwoLogiccomp(ATwoLogiccomp node)
     {
         InATwoLogiccomp(node);
-        if(node.GetLogicnot() != null)
+        if(node.GetLogicvalue() != null)
         {
-            node.GetLogicnot().Apply(this);
+            node.GetLogicvalue().Apply(this);
         }
         OutATwoLogiccomp(node);
     }
@@ -5729,19 +5638,19 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
         }
         OutAFourLogiccompop(node);
     }
-    public virtual void InALogicnot(ALogicnot node)
+    public virtual void InALogicvalue(ALogicvalue node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutALogicnot(ALogicnot node)
+    public virtual void OutALogicvalue(ALogicvalue node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseALogicnot(ALogicnot node)
+    public override void CaseALogicvalue(ALogicvalue node)
     {
-        InALogicnot(node);
+        InALogicvalue(node);
         if(node.GetExpr() != null)
         {
             node.GetExpr().Apply(this);
@@ -5750,7 +5659,7 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
         {
             node.GetNeg().Apply(this);
         }
-        OutALogicnot(node);
+        OutALogicvalue(node);
     }
     public virtual void InAVardcl(AVardcl node)
     {
@@ -5957,9 +5866,9 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
     public override void CaseAArrdcl(AArrdcl node)
     {
         InAArrdcl(node);
-        if(node.GetArrIdOrExpr() != null)
+        if(node.GetArrIdOrLit() != null)
         {
-            node.GetArrIdOrExpr().Apply(this);
+            node.GetArrIdOrLit().Apply(this);
         }
         if(node.GetAssign() != null)
         {
@@ -5979,38 +5888,38 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
         }
         OutAArrdcl(node);
     }
-    public virtual void InAOneArrIdOrExpr(AOneArrIdOrExpr node)
+    public virtual void InAOneArrIdOrLit(AOneArrIdOrLit node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAOneArrIdOrExpr(AOneArrIdOrExpr node)
+    public virtual void OutAOneArrIdOrLit(AOneArrIdOrLit node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAOneArrIdOrExpr(AOneArrIdOrExpr node)
+    public override void CaseAOneArrIdOrLit(AOneArrIdOrLit node)
     {
-        InAOneArrIdOrExpr(node);
+        InAOneArrIdOrLit(node);
         if(node.GetId() != null)
         {
             node.GetId().Apply(this);
         }
-        OutAOneArrIdOrExpr(node);
+        OutAOneArrIdOrLit(node);
     }
-    public virtual void InATwoArrIdOrExpr(ATwoArrIdOrExpr node)
+    public virtual void InATwoArrIdOrLit(ATwoArrIdOrLit node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutATwoArrIdOrExpr(ATwoArrIdOrExpr node)
+    public virtual void OutATwoArrIdOrLit(ATwoArrIdOrLit node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseATwoArrIdOrExpr(ATwoArrIdOrExpr node)
+    public override void CaseATwoArrIdOrLit(ATwoArrIdOrLit node)
     {
-        InATwoArrIdOrExpr(node);
+        InATwoArrIdOrLit(node);
         if(node.GetRbrack() != null)
         {
             node.GetRbrack().Apply(this);
@@ -6023,7 +5932,7 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
         {
             node.GetLbrack().Apply(this);
         }
-        OutATwoArrIdOrExpr(node);
+        OutATwoArrIdOrLit(node);
     }
     public virtual void InAArrsizedcl(AArrsizedcl node)
     {

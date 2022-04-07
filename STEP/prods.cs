@@ -104,10 +104,6 @@ public abstract class PForIterOpt : Node
 {
 }
 
-public abstract class PIncreaseDecrease : Node
-{
-}
-
 public abstract class PAssstmt : Node
 {
 }
@@ -168,7 +164,7 @@ public abstract class PLogiccompop : Node
 {
 }
 
-public abstract class PLogicnot : Node
+public abstract class PLogicvalue : Node
 {
 }
 
@@ -196,7 +192,7 @@ public abstract class PArrdcl : Node
 {
 }
 
-public abstract class PArrIdOrExpr : Node
+public abstract class PArrIdOrLit : Node
 {
 }
 
@@ -7476,7 +7472,7 @@ public sealed class AForstmt : PForstmt
     private TTo _to_;
     private PExpr _fst_;
     private TComma _comma_;
-    private PIncreaseDecrease _increase_decrease_;
+    private TChangeby _changeby_;
     private PExpr _snd_;
     private TRparen _rparen_;
     private TypedList _loop_stmt_;
@@ -7494,7 +7490,7 @@ public sealed class AForstmt : PForstmt
             TTo _to_,
             PExpr _fst_,
             TComma _comma_,
-            PIncreaseDecrease _increase_decrease_,
+            TChangeby _changeby_,
             PExpr _snd_,
             TRparen _rparen_,
             IList _loop_stmt_,
@@ -7507,7 +7503,7 @@ public sealed class AForstmt : PForstmt
         SetTo (_to_);
         SetFst (_fst_);
         SetComma (_comma_);
-        SetIncreaseDecrease (_increase_decrease_);
+        SetChangeby (_changeby_);
         SetSnd (_snd_);
         SetRparen (_rparen_);
         this._loop_stmt_ = new TypedList(new LoopStmt_Cast(this));
@@ -7525,7 +7521,7 @@ public sealed class AForstmt : PForstmt
             (TTo)CloneNode (_to_),
             (PExpr)CloneNode (_fst_),
             (TComma)CloneNode (_comma_),
-            (PIncreaseDecrease)CloneNode (_increase_decrease_),
+            (TChangeby)CloneNode (_changeby_),
             (PExpr)CloneNode (_snd_),
             (TRparen)CloneNode (_rparen_),
             CloneList (_loop_stmt_),
@@ -7682,16 +7678,16 @@ public sealed class AForstmt : PForstmt
 
         _comma_ = node;
     }
-    public PIncreaseDecrease GetIncreaseDecrease ()
+    public TChangeby GetChangeby ()
     {
-        return _increase_decrease_;
+        return _changeby_;
     }
 
-    public void SetIncreaseDecrease (PIncreaseDecrease node)
+    public void SetChangeby (TChangeby node)
     {
-        if(_increase_decrease_ != null)
+        if(_changeby_ != null)
         {
-            _increase_decrease_.Parent(null);
+            _changeby_.Parent(null);
         }
 
         if(node != null)
@@ -7704,7 +7700,7 @@ public sealed class AForstmt : PForstmt
             node.Parent(this);
         }
 
-        _increase_decrease_ = node;
+        _changeby_ = node;
     }
     public PExpr GetSnd ()
     {
@@ -7798,7 +7794,7 @@ public sealed class AForstmt : PForstmt
             + ToString (_to_)
             + ToString (_fst_)
             + ToString (_comma_)
-            + ToString (_increase_decrease_)
+            + ToString (_changeby_)
             + ToString (_snd_)
             + ToString (_rparen_)
             + ToString (_loop_stmt_)
@@ -7838,9 +7834,9 @@ public sealed class AForstmt : PForstmt
             _comma_ = null;
             return;
         }
-        if ( _increase_decrease_ == child )
+        if ( _changeby_ == child )
         {
-            _increase_decrease_ = null;
+            _changeby_ = null;
             return;
         }
         if ( _snd_ == child )
@@ -7897,9 +7893,9 @@ public sealed class AForstmt : PForstmt
             SetComma ((TComma) newChild);
             return;
         }
-        if ( _increase_decrease_ == oldChild )
+        if ( _changeby_ == oldChild )
         {
-            SetIncreaseDecrease ((PIncreaseDecrease) newChild);
+            SetChangeby ((TChangeby) newChild);
             return;
         }
         if ( _snd_ == oldChild )
@@ -8240,162 +8236,6 @@ public sealed class AThreeForIterOpt : PForIterOpt
         if ( _arrindex_ == oldChild )
         {
             SetArrindex ((PArrindex) newChild);
-            return;
-        }
-    }
-
-}
-public sealed class AOneIncreaseDecrease : PIncreaseDecrease
-{
-    private TIncreaseby _increaseby_;
-
-    public AOneIncreaseDecrease ()
-    {
-    }
-
-    public AOneIncreaseDecrease (
-            TIncreaseby _increaseby_
-    )
-    {
-        SetIncreaseby (_increaseby_);
-    }
-
-    public override Object Clone()
-    {
-        return new AOneIncreaseDecrease (
-            (TIncreaseby)CloneNode (_increaseby_)
-        );
-    }
-
-    public override void Apply(Switch sw)
-    {
-        ((Analysis) sw).CaseAOneIncreaseDecrease(this);
-    }
-
-    public TIncreaseby GetIncreaseby ()
-    {
-        return _increaseby_;
-    }
-
-    public void SetIncreaseby (TIncreaseby node)
-    {
-        if(_increaseby_ != null)
-        {
-            _increaseby_.Parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.Parent() != null)
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            node.Parent(this);
-        }
-
-        _increaseby_ = node;
-    }
-
-    public override string ToString()
-    {
-        return ""
-            + ToString (_increaseby_)
-        ;
-    }
-
-    internal override void RemoveChild(Node child)
-    {
-        if ( _increaseby_ == child )
-        {
-            _increaseby_ = null;
-            return;
-        }
-    }
-
-    internal override void ReplaceChild(Node oldChild, Node newChild)
-    {
-        if ( _increaseby_ == oldChild )
-        {
-            SetIncreaseby ((TIncreaseby) newChild);
-            return;
-        }
-    }
-
-}
-public sealed class ATwoIncreaseDecrease : PIncreaseDecrease
-{
-    private TDecreaseby _decreaseby_;
-
-    public ATwoIncreaseDecrease ()
-    {
-    }
-
-    public ATwoIncreaseDecrease (
-            TDecreaseby _decreaseby_
-    )
-    {
-        SetDecreaseby (_decreaseby_);
-    }
-
-    public override Object Clone()
-    {
-        return new ATwoIncreaseDecrease (
-            (TDecreaseby)CloneNode (_decreaseby_)
-        );
-    }
-
-    public override void Apply(Switch sw)
-    {
-        ((Analysis) sw).CaseATwoIncreaseDecrease(this);
-    }
-
-    public TDecreaseby GetDecreaseby ()
-    {
-        return _decreaseby_;
-    }
-
-    public void SetDecreaseby (TDecreaseby node)
-    {
-        if(_decreaseby_ != null)
-        {
-            _decreaseby_.Parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.Parent() != null)
-            {
-                node.Parent().RemoveChild(node);
-            }
-
-            node.Parent(this);
-        }
-
-        _decreaseby_ = node;
-    }
-
-    public override string ToString()
-    {
-        return ""
-            + ToString (_decreaseby_)
-        ;
-    }
-
-    internal override void RemoveChild(Node child)
-    {
-        if ( _decreaseby_ == child )
-        {
-            _decreaseby_ = null;
-            return;
-        }
-    }
-
-    internal override void ReplaceChild(Node oldChild, Node newChild)
-    {
-        if ( _decreaseby_ == oldChild )
-        {
-            SetDecreaseby ((TDecreaseby) newChild);
             return;
         }
     }
@@ -11910,18 +11750,18 @@ public sealed class AThreeLogicequal : PLogicequal
 }
 public sealed class AOneLogiccomp : PLogiccomp
 {
-    private PLogicnot _fst_;
+    private PLogicvalue _fst_;
     private PLogiccompop _logiccompop_;
-    private PLogicnot _snd_;
+    private PLogicvalue _snd_;
 
     public AOneLogiccomp ()
     {
     }
 
     public AOneLogiccomp (
-            PLogicnot _fst_,
+            PLogicvalue _fst_,
             PLogiccompop _logiccompop_,
-            PLogicnot _snd_
+            PLogicvalue _snd_
     )
     {
         SetFst (_fst_);
@@ -11932,9 +11772,9 @@ public sealed class AOneLogiccomp : PLogiccomp
     public override Object Clone()
     {
         return new AOneLogiccomp (
-            (PLogicnot)CloneNode (_fst_),
+            (PLogicvalue)CloneNode (_fst_),
             (PLogiccompop)CloneNode (_logiccompop_),
-            (PLogicnot)CloneNode (_snd_)
+            (PLogicvalue)CloneNode (_snd_)
         );
     }
 
@@ -11943,12 +11783,12 @@ public sealed class AOneLogiccomp : PLogiccomp
         ((Analysis) sw).CaseAOneLogiccomp(this);
     }
 
-    public PLogicnot GetFst ()
+    public PLogicvalue GetFst ()
     {
         return _fst_;
     }
 
-    public void SetFst (PLogicnot node)
+    public void SetFst (PLogicvalue node)
     {
         if(_fst_ != null)
         {
@@ -11991,12 +11831,12 @@ public sealed class AOneLogiccomp : PLogiccomp
 
         _logiccompop_ = node;
     }
-    public PLogicnot GetSnd ()
+    public PLogicvalue GetSnd ()
     {
         return _snd_;
     }
 
-    public void SetSnd (PLogicnot node)
+    public void SetSnd (PLogicvalue node)
     {
         if(_snd_ != null)
         {
@@ -12048,7 +11888,7 @@ public sealed class AOneLogiccomp : PLogiccomp
     {
         if ( _fst_ == oldChild )
         {
-            SetFst ((PLogicnot) newChild);
+            SetFst ((PLogicvalue) newChild);
             return;
         }
         if ( _logiccompop_ == oldChild )
@@ -12058,7 +11898,7 @@ public sealed class AOneLogiccomp : PLogiccomp
         }
         if ( _snd_ == oldChild )
         {
-            SetSnd ((PLogicnot) newChild);
+            SetSnd ((PLogicvalue) newChild);
             return;
         }
     }
@@ -12066,23 +11906,23 @@ public sealed class AOneLogiccomp : PLogiccomp
 }
 public sealed class ATwoLogiccomp : PLogiccomp
 {
-    private PLogicnot _logicnot_;
+    private PLogicvalue _logicvalue_;
 
     public ATwoLogiccomp ()
     {
     }
 
     public ATwoLogiccomp (
-            PLogicnot _logicnot_
+            PLogicvalue _logicvalue_
     )
     {
-        SetLogicnot (_logicnot_);
+        SetLogicvalue (_logicvalue_);
     }
 
     public override Object Clone()
     {
         return new ATwoLogiccomp (
-            (PLogicnot)CloneNode (_logicnot_)
+            (PLogicvalue)CloneNode (_logicvalue_)
         );
     }
 
@@ -12091,16 +11931,16 @@ public sealed class ATwoLogiccomp : PLogiccomp
         ((Analysis) sw).CaseATwoLogiccomp(this);
     }
 
-    public PLogicnot GetLogicnot ()
+    public PLogicvalue GetLogicvalue ()
     {
-        return _logicnot_;
+        return _logicvalue_;
     }
 
-    public void SetLogicnot (PLogicnot node)
+    public void SetLogicvalue (PLogicvalue node)
     {
-        if(_logicnot_ != null)
+        if(_logicvalue_ != null)
         {
-            _logicnot_.Parent(null);
+            _logicvalue_.Parent(null);
         }
 
         if(node != null)
@@ -12113,30 +11953,30 @@ public sealed class ATwoLogiccomp : PLogiccomp
             node.Parent(this);
         }
 
-        _logicnot_ = node;
+        _logicvalue_ = node;
     }
 
     public override string ToString()
     {
         return ""
-            + ToString (_logicnot_)
+            + ToString (_logicvalue_)
         ;
     }
 
     internal override void RemoveChild(Node child)
     {
-        if ( _logicnot_ == child )
+        if ( _logicvalue_ == child )
         {
-            _logicnot_ = null;
+            _logicvalue_ = null;
             return;
         }
     }
 
     internal override void ReplaceChild(Node oldChild, Node newChild)
     {
-        if ( _logicnot_ == oldChild )
+        if ( _logicvalue_ == oldChild )
         {
-            SetLogicnot ((PLogicnot) newChild);
+            SetLogicvalue ((PLogicvalue) newChild);
             return;
         }
     }
@@ -12454,16 +12294,16 @@ public sealed class AFourLogiccompop : PLogiccompop
     }
 
 }
-public sealed class ALogicnot : PLogicnot
+public sealed class ALogicvalue : PLogicvalue
 {
     private TNeg _neg_;
     private PExpr _expr_;
 
-    public ALogicnot ()
+    public ALogicvalue ()
     {
     }
 
-    public ALogicnot (
+    public ALogicvalue (
             TNeg _neg_,
             PExpr _expr_
     )
@@ -12474,7 +12314,7 @@ public sealed class ALogicnot : PLogicnot
 
     public override Object Clone()
     {
-        return new ALogicnot (
+        return new ALogicvalue (
             (TNeg)CloneNode (_neg_),
             (PExpr)CloneNode (_expr_)
         );
@@ -12482,7 +12322,7 @@ public sealed class ALogicnot : PLogicnot
 
     public override void Apply(Switch sw)
     {
-        ((Analysis) sw).CaseALogicnot(this);
+        ((Analysis) sw).CaseALogicvalue(this);
     }
 
     public TNeg GetNeg ()
@@ -13591,7 +13431,7 @@ public sealed class AArrdcl : PArrdcl
     private PArrsizedcl _arrsizedcl_;
     private TId _id_;
     private TAssign _assign_;
-    private PArrIdOrExpr _arr_id_or_expr_;
+    private PArrIdOrLit _arr_id_or_lit_;
 
     public AArrdcl ()
     {
@@ -13602,14 +13442,14 @@ public sealed class AArrdcl : PArrdcl
             PArrsizedcl _arrsizedcl_,
             TId _id_,
             TAssign _assign_,
-            PArrIdOrExpr _arr_id_or_expr_
+            PArrIdOrLit _arr_id_or_lit_
     )
     {
         SetType (_type_);
         SetArrsizedcl (_arrsizedcl_);
         SetId (_id_);
         SetAssign (_assign_);
-        SetArrIdOrExpr (_arr_id_or_expr_);
+        SetArrIdOrLit (_arr_id_or_lit_);
     }
 
     public override Object Clone()
@@ -13619,7 +13459,7 @@ public sealed class AArrdcl : PArrdcl
             (PArrsizedcl)CloneNode (_arrsizedcl_),
             (TId)CloneNode (_id_),
             (TAssign)CloneNode (_assign_),
-            (PArrIdOrExpr)CloneNode (_arr_id_or_expr_)
+            (PArrIdOrLit)CloneNode (_arr_id_or_lit_)
         );
     }
 
@@ -13724,16 +13564,16 @@ public sealed class AArrdcl : PArrdcl
 
         _assign_ = node;
     }
-    public PArrIdOrExpr GetArrIdOrExpr ()
+    public PArrIdOrLit GetArrIdOrLit ()
     {
-        return _arr_id_or_expr_;
+        return _arr_id_or_lit_;
     }
 
-    public void SetArrIdOrExpr (PArrIdOrExpr node)
+    public void SetArrIdOrLit (PArrIdOrLit node)
     {
-        if(_arr_id_or_expr_ != null)
+        if(_arr_id_or_lit_ != null)
         {
-            _arr_id_or_expr_.Parent(null);
+            _arr_id_or_lit_.Parent(null);
         }
 
         if(node != null)
@@ -13746,7 +13586,7 @@ public sealed class AArrdcl : PArrdcl
             node.Parent(this);
         }
 
-        _arr_id_or_expr_ = node;
+        _arr_id_or_lit_ = node;
     }
 
     public override string ToString()
@@ -13756,7 +13596,7 @@ public sealed class AArrdcl : PArrdcl
             + ToString (_arrsizedcl_)
             + ToString (_id_)
             + ToString (_assign_)
-            + ToString (_arr_id_or_expr_)
+            + ToString (_arr_id_or_lit_)
         ;
     }
 
@@ -13782,9 +13622,9 @@ public sealed class AArrdcl : PArrdcl
             _assign_ = null;
             return;
         }
-        if ( _arr_id_or_expr_ == child )
+        if ( _arr_id_or_lit_ == child )
         {
-            _arr_id_or_expr_ = null;
+            _arr_id_or_lit_ = null;
             return;
         }
     }
@@ -13811,23 +13651,23 @@ public sealed class AArrdcl : PArrdcl
             SetAssign ((TAssign) newChild);
             return;
         }
-        if ( _arr_id_or_expr_ == oldChild )
+        if ( _arr_id_or_lit_ == oldChild )
         {
-            SetArrIdOrExpr ((PArrIdOrExpr) newChild);
+            SetArrIdOrLit ((PArrIdOrLit) newChild);
             return;
         }
     }
 
 }
-public sealed class AOneArrIdOrExpr : PArrIdOrExpr
+public sealed class AOneArrIdOrLit : PArrIdOrLit
 {
     private TId _id_;
 
-    public AOneArrIdOrExpr ()
+    public AOneArrIdOrLit ()
     {
     }
 
-    public AOneArrIdOrExpr (
+    public AOneArrIdOrLit (
             TId _id_
     )
     {
@@ -13836,14 +13676,14 @@ public sealed class AOneArrIdOrExpr : PArrIdOrExpr
 
     public override Object Clone()
     {
-        return new AOneArrIdOrExpr (
+        return new AOneArrIdOrLit (
             (TId)CloneNode (_id_)
         );
     }
 
     public override void Apply(Switch sw)
     {
-        ((Analysis) sw).CaseAOneArrIdOrExpr(this);
+        ((Analysis) sw).CaseAOneArrIdOrLit(this);
     }
 
     public TId GetId ()
@@ -13897,17 +13737,17 @@ public sealed class AOneArrIdOrExpr : PArrIdOrExpr
     }
 
 }
-public sealed class ATwoArrIdOrExpr : PArrIdOrExpr
+public sealed class ATwoArrIdOrLit : PArrIdOrLit
 {
     private TLbrack _lbrack_;
     private PParamsOptions _params_options_;
     private TRbrack _rbrack_;
 
-    public ATwoArrIdOrExpr ()
+    public ATwoArrIdOrLit ()
     {
     }
 
-    public ATwoArrIdOrExpr (
+    public ATwoArrIdOrLit (
             TLbrack _lbrack_,
             PParamsOptions _params_options_,
             TRbrack _rbrack_
@@ -13920,7 +13760,7 @@ public sealed class ATwoArrIdOrExpr : PArrIdOrExpr
 
     public override Object Clone()
     {
-        return new ATwoArrIdOrExpr (
+        return new ATwoArrIdOrLit (
             (TLbrack)CloneNode (_lbrack_),
             (PParamsOptions)CloneNode (_params_options_),
             (TRbrack)CloneNode (_rbrack_)
@@ -13929,7 +13769,7 @@ public sealed class ATwoArrIdOrExpr : PArrIdOrExpr
 
     public override void Apply(Switch sw)
     {
-        ((Analysis) sw).CaseATwoArrIdOrExpr(this);
+        ((Analysis) sw).CaseATwoArrIdOrLit(this);
     }
 
     public TLbrack GetLbrack ()

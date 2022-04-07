@@ -1234,14 +1234,14 @@ public sealed class TTo : Token
     }
 }
 
-public sealed class TIncreaseby : Token
+public sealed class TChangeby : Token
 {
-    public TIncreaseby(string text)
+    public TChangeby(string text)
     {
         Text = text;
     }
 
-    public TIncreaseby(string text, int line, int pos)
+    public TChangeby(string text, int line, int pos)
     {
         Text = text;
         Line = line;
@@ -1250,37 +1250,12 @@ public sealed class TIncreaseby : Token
 
     public override Object Clone()
     {
-      return new TIncreaseby(Text, Line, Pos);
+      return new TChangeby(Text, Line, Pos);
     }
 
     public override void Apply(Switch sw)
     {
-        ((Analysis) sw).CaseTIncreaseby(this);
-    }
-}
-
-public sealed class TDecreaseby : Token
-{
-    public TDecreaseby(string text)
-    {
-        Text = text;
-    }
-
-    public TDecreaseby(string text, int line, int pos)
-    {
-        Text = text;
-        Line = line;
-        Pos = pos;
-    }
-
-    public override Object Clone()
-    {
-      return new TDecreaseby(Text, Line, Pos);
-    }
-
-    public override void Apply(Switch sw)
-    {
-        ((Analysis) sw).CaseTDecreaseby(this);
+        ((Analysis) sw).CaseTChangeby(this);
     }
 }
 
