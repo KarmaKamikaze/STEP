@@ -69,8 +69,7 @@ Tokens
   repeatfor = 'repeat for';
   endfor = 'end for';
   to = 'to';
-  increaseby = 'increase by';
-  decreaseby = 'decrease by';
+  changeby = 'change by';
   switch = 'switch';
   endswitch = 'end switch';
   when = 'when';
@@ -119,9 +118,8 @@ Productions
   ifstmt = {nonelse} if lparen logicexpr rparen stmt* endif| {withelse} if lparen logicexpr rparen [fst]:stmt* else [snd]:stmt* endif;
   loopifstmt = {noelse} if lparen logicexpr rparen loopifbody* endif | {withelse} if lparen logicexpr rparen [true]:loopifbody* else [false]:loopifbody* endif;
   whilestmt = repeatwhile lparen logicexpr rparen loop_stmt* endwhile;
-  forstmt = repeatfor lparen for_iter_opt to [fst]:expr comma increase_decrease [snd]:expr rparen loop_stmt* endfor;
+  forstmt = repeatfor lparen for_iter_opt to [fst]:expr comma changeby [snd]:expr rparen loop_stmt* endfor;
   for_iter_opt = {one} numdcl | {two} assstmt | {three} id arrindex?;
-  increase_decrease = {one} increaseby | {two} decreaseby;
   assstmt = id arrindex? assign logicexpr;
   funccall = id lparen params_options? rparen;
   params_options = logicexpr multi_expr*;
@@ -149,6 +147,6 @@ Productions
   numdcl = number id assign expr;
   stringdcl = string id assign expr;
   booldcl = boolean id assign logicexpr;
-  arrdcl = type arrsizedcl id assign arr_id_or_expr;
-  arr_id_or_expr = {one} id | {two} lbrack params_options? rbrack;
+  arrdcl = type arrsizedcl id assign arr_id_or_lit;
+  arr_id_or_lit = {one} id | {two} lbrack params_options? rbrack;
   arrsizedcl = lbrack numliteral rbrack;

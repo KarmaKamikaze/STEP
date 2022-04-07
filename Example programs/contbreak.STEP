@@ -11,6 +11,10 @@ setup
     end if
     if(ass == 2)
     end if
+    repeat for(a = 2 to 5, change by 1)
+        print("ass")
+    end for
+    number[10] a = [1, 2, 5]
 end setup
 
 loop
