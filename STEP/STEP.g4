@@ -1,6 +1,6 @@
-Package STEP;
+grammar STEP;
 
-Helpers
+tokens{
   tab = 9;
   cr = 13;
   lf = 10;
@@ -17,7 +17,7 @@ Helpers
   ml_comment_content = [all_chars - hashtag];
   eol_comment_content = [all_chars - [cr + [lf + hashtag]]];
 
-Tokens
+//Tokens
   end_of_line_comment = '#' eol_comment_content* line_terminator?;
   multiline_comment = '##' ml_comment_content* '##';
   lparen = '(';
@@ -81,6 +81,7 @@ Tokens
   or = 'or';
   constant = 'constant';
   id = letter id_body*;
+  }
 
 Ignored Tokens
   whitespace,
