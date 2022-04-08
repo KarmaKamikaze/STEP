@@ -32,7 +32,7 @@ class Program
             if (args.Length > 1 && args.Contains("-pp"))
             {
                 // Print AST
-                STEPBaseListener listener = new STEPBaseListener();
+                FormattedSTEPListener listener = new FormattedSTEPListener();
                 ParseTreeWalker treeWalker = new ParseTreeWalker();
                 treeWalker.Walk(listener, ast);
             
