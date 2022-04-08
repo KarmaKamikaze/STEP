@@ -1,153 +1,329 @@
 grammar STEP;
 
-tokens{
-  tab = 9;
-  cr = 13;
-  lf = 10;
-  line_terminator = lf | cr | cr lf;
-  dblquote = 34;
-  hashtag = 35;
-  lowercase = ['a' .. 'z'];
-  uppercase = ['A' .. 'Z'];
-  letter = lowercase | uppercase;
-  digit = ['0' .. '9'];
-  id_body = letter | digit | '_';
-  all_chars = [0 .. 65535];
-  string_content = [all_chars - dblquote];
-  ml_comment_content = [all_chars - hashtag];
-  eol_comment_content = [all_chars - [cr + [lf + hashtag]]];
+// Parser Rules
 
-//Tokens
-  end_of_line_comment = '#' eol_comment_content* line_terminator?;
-  multiline_comment = '##' ml_comment_content* '##';
-  lparen = '(';
-  rparen = ')';
-  lbrack = '[';
-  rbrack = ']';
-  assign = '=';
-  plus = '+';
-  minus = '-';
-  divide = '/';
-  mult = '*';
-  pow = '^';
-  grthan = '>';
-  grthaneq = '>=';
-  lthan = '<';
-  lthaneq = '<=';
-  eq = '==';
-  neq = '!=';
-  neg = '!';
-  whitespace = (' ' | tab)+;
-  nl = line_terminator;
-  comma = ',';
-  numliteral = digit+ | digit+ '.' digit*;
-  strliteral = dblquote string_content* dblquote;
-  boolliteral = '!'? 'true'| '!'? 'false';
-
-// Keywords
-  setup = 'setup';
-  endsetup = 'end setup';
-  loop = 'loop';
-  endloop = 'end loop';
-  functions = 'functions';
-  endfunctions = 'end functions';
-  function = 'function';
-  endfunction = 'end function';
-  variables = 'variables';
-  endvariables = 'end variables';
-  blank = 'blank';
-  number = 'number';
-  string = 'string';
-  boolean = 'boolean';
-  if = 'if';
-  endif = 'end if';
-  else = 'else';
-  continue = 'continue';
-  break = 'break';
-  repeatwhile = 'repeat while';
-  endwhile = 'end while';
-  repeatfor = 'repeat for';
-  endfor = 'end for';
-  to = 'to';
-  changeby = 'change by';
-  switch = 'switch';
-  endswitch = 'end switch';
-  when = 'when';
-  do = 'do';
-  fallthrough = 'fallthrough';
-  otherwisedo = 'otherwise do';
-  return = 'return';
-  and = 'and';
-  or = 'or';
-  constant = 'constant';
-  id = letter id_body*;
-  }
-
-Ignored Tokens
-  whitespace,
-  end_of_line_comment,
-  multiline_comment;
-
-Productions
   // Program
-  program = nl* P.variables? setuploop P.functions?;
-  setuploop = {one} P.setup nl* | {two} P.loop nl* | {three} P.setup [fst]:nl* P.loop [snd]:nl*;
-  setup = T.setup stmt* endsetup;
-  loop = T.loop stmt* endloop;
+  program 
+        : NL* variables? setuploop functions?
+        ;
+        
+  setuploop 
+        : setup NL* 
+        | loop NL* 
+        | setup NL* loop NL*
+        ;
+        
+  setup 
+        : SETUP stmt* ENDSETUP
+        ;
+        
+  loop 
+        : LOOP stmt* ENDLOOP
+        ;
   
   // Global variable declarations
-  variables = T.variables var_or_nl* endvariables nl*;
-  var_or_nl = {one} vardcl | {two} nl;
+  variables 
+        : VARIABLES var_or_nl* ENDVARIABLES NL*
+        ;
+        
+  var_or_nl 
+        : vardcl 
+        | NL
+        ;
   
   // Function declarations
-  functions = T.functions funcdcl_or_nl* endfunctions nl*;
-  funcdcl = {one} type brackets? T.function id params stmt* retstmt [fst]:nl endfunction [snd]:nl | {two} blank T.function id params stmt* endfunction nl;
-  funcdcl_or_nl = {one} funcdcl | {two} nl;
+  functions 
+        : FUNCTIONS funcdcl_or_nl* ENDFUNCTIONS NL*
+        ;
+        
+  funcdcl 
+        : type brackets? FUNCTION ID params stmt* retstmt NL ENDFUNCTION NL 
+        | BLANK FUNCTION ID params stmt* ENDFUNCTION NL
+        ;
+        
+  funcdcl_or_nl 
+        : funcdcl 
+        | NL
+        ;
   
-  brackets = lbrack rbrack;
-  params = lparen params_content? rparen;
-  params_content = type brackets? id params_multi*;
-  params_multi = comma type brackets? id;
-  type = {one} number | {two} string | {three} boolean;
+  brackets 
+        : LBRACK RBRACK
+        ;
+        
+  params 
+        : LPAREN params_content? RPAREN
+        ;
+        
+  params_content 
+        : type brackets? ID params_multi*
+        ;
+        
+  params_multi 
+        : COMMA type brackets? ID
+        ;
+        
+  type 
+        : NUMBER 
+        | STRING 
+        | BOOLEAN
+        ;
   
   // Statements
-  stmt = stmts nl;
-  stmts = {one} ifstmt | {two} whilestmt | {three} forstmt | {four} vardcl | {five} assstmt | {six} funccall | {seven} retstmt | ;
-  loop_stmt = loop_stmts nl;
-  loop_stmts = {one} loopifstmt | {two} whilestmt | {three} forstmt | {four} vardcl | {five} assstmt | {six} funccall | {seven} retstmt | ;
-  loopifbody = {one} loop_stmt | {two} continue nl | {three} break nl;
-  ifstmt = {nonelse} if lparen logicexpr rparen stmt* endif| {withelse} if lparen logicexpr rparen [fst]:stmt* else [snd]:stmt* endif;
-  loopifstmt = {noelse} if lparen logicexpr rparen loopifbody* endif | {withelse} if lparen logicexpr rparen [true]:loopifbody* else [false]:loopifbody* endif;
-  whilestmt = repeatwhile lparen logicexpr rparen loop_stmt* endwhile;
-  forstmt = repeatfor lparen for_iter_opt to [fst]:expr comma changeby [snd]:expr rparen loop_stmt* endfor;
-  for_iter_opt = {one} numdcl | {two} assstmt | {three} id arrindex?;
-  assstmt = id arrindex? assign logicexpr;
-  funccall = id lparen params_options? rparen;
-  params_options = logicexpr multi_expr*;
-  multi_expr = comma logicexpr;
-  retstmt = {one} return logicexpr | {two} return;
-  arrindex = lbrack expr rbrack;
+  stmt 
+        : stmts? NL
+        ;
+        
+  stmts 
+        : ifstmt 
+        | whilestmt 
+        | forstmt 
+        | vardcl 
+        | assstmt 
+        | funccall 
+        | retstmt
+        ;
+  
+  loop_stmt 
+        : loop_stmts? NL
+        ;
+        
+  loop_stmts 
+        : loopifstmt 
+        | whilestmt 
+        | forstmt 
+        | vardcl 
+        | assstmt 
+        | funccall 
+        | retstmt
+        ;
+  
+  loopifbody 
+        : loop_stmt 
+        | CONTINUE NL 
+        | BREAK NL
+        ;
+  
+  ifstmt 
+        : IF LPAREN logicexpr RPAREN stmt* ENDIF
+        | IF LPAREN logicexpr RPAREN stmt* ELSE stmt* ENDIF
+        ;
+  
+  loopifstmt 
+        : IF LPAREN logicexpr RPAREN loopifbody* ENDIF 
+        | IF LPAREN logicexpr RPAREN loopifbody* ELSE loopifbody* ENDIF
+        ;
+  
+  whilestmt 
+        : REPEATWHILE LPAREN logicexpr RPAREN loop_stmt* ENDWHILE
+        ;
+  
+  forstmt 
+        :  REPEATFOR LPAREN for_iter_opt TO expr COMMA CHANGEBY expr RPAREN loop_stmt* ENDFOR
+        ;
+  
+  for_iter_opt 
+        : numdcl 
+        | assstmt 
+        | ID arrindex?
+        ;
+  
+  assstmt 
+        : ID arrindex? ASSIGN logicexpr
+        ;
+  
+  funccall 
+        : ID LPAREN params_options? RPAREN
+        ;
+  
+  params_options 
+        : logicexpr multi_expr*
+        ;
+  
+  multi_expr 
+        : COMMA logicexpr
+        ;
+  
+  retstmt 
+        : RETURN logicexpr?
+        ;
+  
+  arrindex 
+        : LBRACK expr RBRACK
+        ;
   
   // Arithmetic expressions
-  expr = {one} expr plus term | {two} expr minus term | {three} term;
-  term = {one} term mult factor | {two} term divide factor | {three} factor;
-  factor = {one} factor pow value | {two} value;
-  value = {one} P.constant | {two} id arrindex? | {three} lparen logicexpr rparen | {four} funccall;
-  constant = {one} minus? numliteral | {two} strliteral | {three} boolliteral;
+  expr 
+        : expr PLUS term 
+        | expr MINUS term 
+        | term
+        ;
+  
+  term 
+        : term MULT factor 
+        | term DIVIDE factor 
+        | factor
+        ;
+  
+  factor 
+        : factor POW value 
+        | value
+        ;
+  
+  value 
+        : constant 
+        | ID arrindex? 
+        | LPAREN logicexpr RPAREN 
+        | funccall
+        ;
+  
+  constant 
+        : MINUS? NUMLITERAL 
+        | STRLITERAL 
+        | BOOLLITERAL
+        ;
   
   // Boolean expressions
-  logicexpr = {one} logicexpr and logicequal | {two} logicexpr or logicequal | {three} logicequal;
-  logicequal = {one} [fst]:logiccomp eq [snd]:logiccomp | {two} [fst]:logiccomp neq [snd]:logiccomp | {three} logiccomp;
-  logiccomp = {one} [fst]:logicvalue logiccompop [snd]:logicvalue | {two} logicvalue;
-  logiccompop = {one} grthaneq | {two} grthan | {three} lthaneq | {four} lthan;
-  logicvalue = neg? expr;
+  logicexpr 
+        : logicexpr AND logicequal 
+        | logicexpr OR logicequal 
+        | logicequal
+        ;
+  
+  logicequal 
+        : logiccomp EQ logiccomp 
+        | logiccomp NEQ logiccomp 
+        | logiccomp
+        ;
+  
+  logiccomp 
+        : logicvalue logiccompop logicvalue 
+        | logicvalue
+        ;
+  
+  logiccompop 
+        : GRTHANEQ 
+        | GRTHAN 
+        | LTHANEQ 
+        | LTHAN
+        ;
+  
+  logicvalue 
+        : NEG? expr
+        ;
+  
   
   // Variable declarations
-  vardcl = T.constant? var_options;
-  var_options = {one} numdcl | {two} stringdcl | {three} booldcl | {four} arrdcl;
-  numdcl = number id assign expr;
-  stringdcl = string id assign expr;
-  booldcl = boolean id assign logicexpr;
-  arrdcl = type arrsizedcl id assign arr_id_or_lit;
-  arr_id_or_lit = {one} id | {two} lbrack params_options? rbrack;
-  arrsizedcl = lbrack numliteral rbrack;
+  vardcl 
+        : CONSTANT? var_options
+        ;
+  
+  var_options 
+        : numdcl 
+        | stringdcl 
+        | booldcl 
+        | arrdcl
+        ;
+  
+  numdcl 
+        : NUMBER ID ASSIGN expr
+        ;
+  
+  stringdcl 
+        : STRING ID ASSIGN expr
+        ;
+  
+  booldcl 
+        : BOOLEAN ID ASSIGN logicexpr
+        ;
+  
+  arrdcl 
+        : type arrsizedcl ID ASSIGN arr_id_or_lit
+        ;
+  
+  arr_id_or_lit 
+        : ID 
+        | LBRACK params_options? RBRACK
+        ;
+  
+  arrsizedcl 
+        : LBRACK NUMLITERAL RBRACK
+        ;
+
+// Fragments
+
+  fragment LINE_TERMINATOR      : ('\r'? '\n' | '\r');
+  fragment DBLQUOTE             : '"';
+  fragment HASHTAG              : '#';
+  fragment LOWERCASE            : [a-z];
+  fragment UPPERCASE            : [A-Z];
+  fragment LETTER               : (LOWERCASE | UPPERCASE);
+  fragment DIGIT                : [0-9];
+  fragment ID_BODY              : LETTER | DIGIT | '_';
+  fragment STRING_CONTENT       : ~["];
+  fragment ML_COMMENT_CONTENT   : ~[#];
+  fragment EOL_COMMENT_CONTENT  : ~[\r\n#];
+
+// Lexer Rules (Tokens)
+  WHITESPACE                    : (' ' | '\t') -> skip;
+  END_OF_LINE_COMMENT           : '#' EOL_COMMENT_CONTENT* LINE_TERMINATOR? -> skip;
+  MULTILINE_COMMENT             : '##' ML_COMMENT_CONTENT* '##' -> skip;
+  LPAREN                        : '(';
+  RPAREN                        : ')';
+  LBRACK                        : '[';
+  RBRACK                        : ']';
+  ASSIGN                        : '=';
+  PLUS                          : '+';
+  MINUS                         : '-';
+  DIVIDE                        : '/';
+  MULT                          : '*';
+  POW                           : '^';
+  GRTHAN                        : '>';
+  GRTHANEQ                      : '>=';
+  LTHAN                         : '<';
+  LTHANEQ                       : '<=';
+  EQ                            : '==';
+  NEQ                           : '!:';
+  NEG                           : '!';
+  NL                            : LINE_TERMINATOR;
+  COMMA                         : ',';
+  NUMLITERAL                    : DIGIT+ ('.' DIGIT*)?;
+  STRLITERAL                    : DBLQUOTE STRING_CONTENT* DBLQUOTE;
+  BOOLLITERAL                   : NEG? ('true' | 'false');
+
+// Keywords
+  SETUP                         : 'setup';
+  ENDSETUP                      : 'end setup';
+  LOOP                          : 'loop';
+  ENDLOOP                       : 'end loop';
+  FUNCTIONS                     : 'functions';
+  ENDFUNCTIONS                  : 'end functions';
+  FUNCTION                      : 'function';
+  ENDFUNCTION                   : 'end function';
+  VARIABLES                     : 'variables';
+  ENDVARIABLES                  : 'end variables';
+  BLANK                         : 'blank';
+  NUMBER                        : 'number';
+  STRING                        : 'string';
+  BOOLEAN                       : 'boolean';
+  IF                            : 'if';
+  ENDIF                         : 'end if';
+  ELSE                          : 'else';
+  CONTINUE                      : 'continue';
+  BREAK                         : 'break';
+  REPEATWHILE                   : 'repeat while';
+  ENDWHILE                      : 'end while';
+  REPEATFOR                     : 'repeat for';
+  ENDFOR                        : 'end for';
+  TO                            : 'to';
+  CHANGEBY                      : 'change by';
+  SWITCH                        : 'switch';
+  ENDSWITCH                     : 'end switch';
+  WHEN                          : 'when';
+  DO                            : 'do';
+  FALLTHROUGH                   : 'fallthrough';
+  OTHERWISEDO                   : 'otherwise do';
+  RETURN                        : 'return';
+  AND                           : 'and';
+  OR                            : 'or';
+  CONSTANT                      : 'constant';
+  ID                            : LETTER ID_BODY*;

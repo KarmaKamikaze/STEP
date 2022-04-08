@@ -6,7 +6,7 @@ end variables
 setup
     print("Centimeter to inch converter\n")
     print("  CM  |  INCH  \n")
-    repeat for(number i = 1 to 100, increase by 1) # 100 steps, 1 to 100
+    repeat for(number i = 1 to 100, change by 1) # 100 steps, 1 to 100
         printLine(i + "     " + cmToInch(i))
     end for
 
