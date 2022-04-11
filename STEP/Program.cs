@@ -1,6 +1,5 @@
-﻿using STEP.lexer;
-using STEP.node;
-using STEP.parser;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 
 namespace STEP;
 
@@ -14,32 +13,35 @@ class Program
         if (args.Length < 1)
             Exit("Usage: STEP.exe filename [Optional: -pp]");
 
-        using (StreamReader streamReader = new StreamReader(File.Open(args[0], FileMode.Open)))
-        {
-            // Read the source code file
-            Lexer lexer = new Lexer(streamReader);
+        // Stream reader opens source file
+        AntlrFileStream streamReader = new AntlrFileStream(args[0]);
+
+        // Read the source code file
+        STEPLexer lexer = new STEPLexer(streamReader);
             
-            // Parse the source code
-            Parser parser = new Parser(lexer);
-            Start ast = null;
-
-            try
-            {
-                ast = parser.Parse();
-            }
-            catch (Exception e)
-            {
-                Exit(e.ToString());
-            }
-
+        // Get token stream
+        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+            
+        // Parse the source code
+        STEPParser parser = new STEPParser(tokenStream);
+        
+        try
+        {
+            STEPParser.ProgramContext ast = parser.program(); // Parse the input starting at the "program" rule.
+            
             if (args.Length > 1 && args.Contains("-pp"))
             {
                 // Print AST
-                AstPrinter printer = new AstPrinter();
-                if (ast != null) ast.Apply(printer);
+                PrettyPrinter listener = new PrettyPrinter();
+                ParseTreeWalker treeWalker = new ParseTreeWalker();
+                treeWalker.Walk(listener, ast);
             }
         }
-        
+        catch (Exception e)
+        {
+            Exit(e.ToString());
+        }
+
         Exit("Finished!");
     }
 
