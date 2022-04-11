@@ -24,17 +24,17 @@ class Program
             
         // Parse the source code
         STEPParser parser = new STEPParser(tokenStream);
-        
+
         try
         {
-            STEPParser.ProgramContext ast = parser.program(); // Parse the input starting at the "program" rule.
+            STEPParser.ProgramContext tree = parser.program(); // Parse the input starting at the "program" rule.
             
             if (args.Length > 1 && args.Contains("-pp"))
             {
-                // Print AST
+                // Print parse tree
                 PrettyPrinter listener = new PrettyPrinter();
                 ParseTreeWalker treeWalker = new ParseTreeWalker();
-                treeWalker.Walk(listener, ast);
+                treeWalker.Walk(listener, tree);
             }
         }
         catch (Exception e)
