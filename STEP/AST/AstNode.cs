@@ -1,6 +1,6 @@
 using Antlr4.Runtime.Misc;
 
-namespace STEP;
+namespace STEP.AST;
 
 public abstract class AstNode
 {
@@ -50,4 +50,13 @@ public abstract class AstNode
 
         return node;
     }
+
+    public static AstNode MakeFamily()
+    {
+        // Page 254 in Crafting a Compiler
+        throw new NotImplementedException();
+    }
+
+    // Factory method
+    public abstract void MakeNode(int type);
 }
