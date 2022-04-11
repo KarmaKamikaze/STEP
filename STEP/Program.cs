@@ -32,10 +32,9 @@ class Program
             if (args.Length > 1 && args.Contains("-pp"))
             {
                 // Print AST
-                FormattedSTEPListener listener = new FormattedSTEPListener();
+                PrettyPrinter listener = new PrettyPrinter();
                 ParseTreeWalker treeWalker = new ParseTreeWalker();
                 treeWalker.Walk(listener, ast);
-            
             }
         }
         catch (Exception e)
