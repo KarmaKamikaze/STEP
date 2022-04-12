@@ -52,9 +52,8 @@ public abstract class AstNode
         return node;
     }
 
-    public static AstNode MakeFamily(AstNodeType opType)
+    public static AstNode MakeFamily(AstNodeType opType, AstNode firstChild, AstNode secondChild)
     {
-        // Page 254 in Crafting a Compiler
-        throw new NotImplementedException();
+        return NodeFactory.MakeNode(opType).AdoptChildren(firstChild.MakeSiblings(secondChild));
     }
 }
