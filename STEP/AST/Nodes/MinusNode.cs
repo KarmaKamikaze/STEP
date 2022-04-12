@@ -1,3 +1,5 @@
-﻿namespace STEP.AST.Nodes; 
+﻿namespace STEP.AST.Nodes;
 
-public class MinusNode : ExprNode { }
+public class MinusNode : ExprNode {
+    public new TypeVal ExprType => TypeVal.Number;
+}
