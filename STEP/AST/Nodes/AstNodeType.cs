@@ -2,6 +2,7 @@
 
 public enum AstNodeType
 {
+    NullNode,
     // Expressions
     IdNode,
     PlusNode,
