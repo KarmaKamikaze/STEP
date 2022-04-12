@@ -1,4 +1,4 @@
-﻿namespace STEP.AST;
+﻿namespace STEP.AST.Nodes;
 
 public class NodeFactory
 {

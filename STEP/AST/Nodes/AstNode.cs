@@ -1,6 +1,6 @@
 using Antlr4.Runtime.Misc;
 
-namespace STEP.AST;
+namespace STEP.AST.Nodes;
 
 public abstract class AstNode
 {
