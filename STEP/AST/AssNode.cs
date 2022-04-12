@@ -4,7 +4,7 @@ public class AssNode : AstNode
 {
     public AstNodeType Type { get; } = AstNodeType.AssNode;
     public IdNode Id { get; set; }
-    public LogicExprNode LogicExpr { get; set; }
+    public ExprNode Expr { get; set; }
 }
 
 public class IdNode : AstNode
