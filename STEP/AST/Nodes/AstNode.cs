@@ -4,6 +4,7 @@ namespace STEP.AST.Nodes;
 
 public abstract class AstNode
 {
+    public AstNodeType NodeType { get; set; }
     public AstNode Parent { get; set; }
     public AstNode RightSibling { get; set; }
     public AstNode LeftmostSibling { get; set; }
@@ -51,7 +52,7 @@ public abstract class AstNode
         return node;
     }
 
-    public static AstNode MakeFamily()
+    public static AstNode MakeFamily(AstNodeType opType)
     {
         // Page 254 in Crafting a Compiler
         throw new NotImplementedException();
