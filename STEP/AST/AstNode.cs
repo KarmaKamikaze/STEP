@@ -56,7 +56,4 @@ public abstract class AstNode
         // Page 254 in Crafting a Compiler
         throw new NotImplementedException();
     }
-
-    // Factory method
-    public abstract void MakeNode(int type);
 }
