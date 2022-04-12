@@ -23,7 +23,7 @@ public enum AstNodeType
     ParenNode,
     NumberNode,
     StringNode,
-    BooleanNode,
+    BoolNode,
     FuncExprNode,
     // Variable Declarations
     ArrDclNode,

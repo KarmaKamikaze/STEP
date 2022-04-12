@@ -45,8 +45,8 @@ public static class NodeFactory
                 return new NumberNode() {NodeType = AstNodeType.NumberNode};;
             case AstNodeType.StringNode:
                 return new StringNode() {NodeType = AstNodeType.StringNode};;
-            case AstNodeType.BooleanNode:
-                return new BooleanNode() {NodeType = AstNodeType.BooleanNode};;
+            case AstNodeType.BoolNode:
+                return new BoolNode() {NodeType = AstNodeType.BoolNode};;
             case AstNodeType.FuncExprNode:
                 return new FuncExprNode() {NodeType = AstNodeType.FuncExprNode};;
             // Variable Declarations
