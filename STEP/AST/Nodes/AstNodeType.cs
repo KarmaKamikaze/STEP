@@ -25,6 +25,7 @@ public enum AstNodeType
     StringNode,
     BoolNode,
     FuncExprNode,
+    ArrayAccessNode,
     // Variable Declarations
     ArrDclNode,
     VarDclNode,

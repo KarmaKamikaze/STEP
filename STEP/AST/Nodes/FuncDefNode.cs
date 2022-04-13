@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace STEP.AST.Nodes;
+﻿namespace STEP.AST.Nodes;
 
 public class FuncDefNode : AstNode
 {
