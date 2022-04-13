@@ -1,5 +1,3 @@
 ﻿namespace STEP.AST.Nodes;
 
-public class LThanNode : ExprNode {
-    public new TypeVal ExprType => TypeVal.Boolean;
-}
+public class LThanNode : ExprNode {}
