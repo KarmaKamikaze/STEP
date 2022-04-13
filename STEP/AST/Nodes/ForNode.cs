@@ -1,4 +1,6 @@
-﻿namespace STEP.AST.Nodes;
+﻿using System.Collections.Generic;
+
+namespace STEP.AST.Nodes;
 
 public class ForNode : StmtNode
 {

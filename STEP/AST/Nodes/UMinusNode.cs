@@ -1,3 +1,3 @@
 ﻿namespace STEP.AST.Nodes;
 
-public class UMinusNode : ExprNode { }
+public class UMinusNode : ExprNode{}

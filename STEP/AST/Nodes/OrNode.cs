@@ -1,3 +1,3 @@
 ﻿namespace STEP.AST.Nodes;
 
-public class OrNode : ExprNode { }
+public class OrNode : ExprNode{}

@@ -1,8 +1,11 @@
-﻿namespace STEP.AST.Nodes; 
+﻿using System.Collections.Generic;
 
-public class FuncDefNode : AstNode {
+namespace STEP.AST.Nodes;
+
+public class FuncDefNode : AstNode
+{
     public IdNode Name { get; set; }
     public IdNode ReturnType { get; set; }
-    public List<ExprNode> FormalParams { get; set; } // Help - do we need a special type of node here?
+    public Dictionary<IdNode, (TypeVal, bool)> FormalParams { get; set; } // Tuple boolean is true when param is array
     public List<StmtNode> Stmts { get; set; }
 }
