@@ -88,7 +88,7 @@ public static class NodeFactory
             case AstNodeType.FuncsNode:
                 return new FuncsNode() {NodeType = AstNodeType.FuncsNode};
             default:
-                return null;
+                return new NullNode();
         }
     }
 }

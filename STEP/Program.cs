@@ -1,5 +1,8 @@
-﻿using Antlr4.Runtime;
+﻿using System.Threading.Channels;
+using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using STEP.AST;
+using STEP.AST.Nodes;
 
 namespace STEP;
 
@@ -36,6 +39,12 @@ class Program
                 ParseTreeWalker treeWalker = new ParseTreeWalker();
                 treeWalker.Walk(listener, tree);
             }
+
+            // Build AST
+            AstBuilderVisitor astBuilder = new AstBuilderVisitor();
+            AstNode root = astBuilder.Build(tree);
+
+            Printer(root);
         }
         catch (Exception e)
         {
@@ -55,5 +64,21 @@ class Program
         Console.WriteLine("Press any key to exit...");
         Console.ReadKey();
         Environment.Exit(0);
+    }
+
+    public static void Printer(AstNode node)
+    {
+        if (node == null)
+            return;
+        Console.WriteLine($"Parent: {node.Parent}");
+        Console.WriteLine($"Type: {node.GetType()}");
+        Console.WriteLine($"Node: {node.NodeType}");
+        Console.WriteLine($"Left child: {node.LeftmostChild}");
+        Console.WriteLine($"Leftmost sibling: {node.LeftmostSibling}");
+        Console.WriteLine($"Right sibling: {node.RightSibling}");
+        Console.WriteLine();
+
+        Printer(node.LeftmostChild);
+
     }
 }

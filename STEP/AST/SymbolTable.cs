@@ -1,4 +1,6 @@
-namespace STEP.AST.Nodes;
+using STEP.AST.Nodes;
+
+namespace STEP.AST;
 //THe Symbol Table for the AST
 
 class SymTableEntry
