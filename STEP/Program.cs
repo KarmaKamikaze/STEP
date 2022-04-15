@@ -79,6 +79,8 @@ class Program
         Console.WriteLine();
 
         Printer(node.LeftmostChild);
+        if (node.RightSibling != null)
+            Printer(node.RightSibling);
 
     }
 }

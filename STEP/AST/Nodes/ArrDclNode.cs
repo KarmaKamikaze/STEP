@@ -1,6 +1,6 @@
 ﻿namespace STEP.AST.Nodes;
 
-public class ArrDclNode : AstNode
+public class ArrDclNode : StmtNode
 {
     // TODO: Should maybe be a NumberNode
     public bool IsConstant { get; set; }
