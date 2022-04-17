@@ -1,95 +1,82 @@
 using STEP.AST.Nodes;
 
 namespace STEP.AST;
-//THe Symbol Table for the AST
 
-class SymTableEntry
+/// <summary>
+/// A stack-based implementation of a Symbol Table for contextual analysis.
+/// </summary>
+public class SymbolTable : ISymbolTable
 {
-    public string symbol_name { get; set; }
-    public TypeVal Type { get; set; }
-}
+    private Stack<Dictionary<string, SymTableEntry>> _scopeStack = new();
+    private int _depth = 0;
 
-public interface ISymbolTable {
-    void OpenScope();
-    void CloseScope();
-    SymTableEntry RetriveSymbol(string id);
-    void EnterSymbol(SymTableEntry sym);
-    bool IsDeclaredLocally(string id);
-}
-
-public class SymbolTable
-{
-    private Dictionary<string, List<SymTableEntry>> symbolDict = new();
-    private Stack<Dictionary<string, SymTableEntry>> scopeStack = new();
-    private int depth = 0;
-
-    public void OpenScope()
+    public SymbolTable() 
     {
-        this.depth++;
-        scopeStack.Push(new SymbolTable());
-    }
-
-    public void CloseScope()
-    {
-        var prevSymTable = scopeStack.Pop();
-        foreach(var sym in prevSymTable) 
-        {
-            
-        }
-        
-        SymTableEntry previousSymbol;
-        foreach(var symbol in scopeDisplay[depth])
-        {
-            previousSymbol = symbol.var;
-            Delete(symbol);
-            if (previousSymbol != null)
-            {
-                Add(previousSymbol);
-            }
-        }
-        this.depth--;
+        // Push the global scope onto the stack 
+        _scopeStack.Push(new Dictionary<string, SymTableEntry>());
     }
     
-    private void Add(SymTableEntry sym) 
+    public void OpenScope()
     {
-        if (tableDict.GetValueOrDefault(sym.var) is List<SymTableEntry> collisionChain)
+        this._depth++;
+        _scopeStack.Push(new Dictionary<string, SymTableEntry>());
+    }
+    
+    public void CloseScope()
+    {
+        if(this._depth == 0) 
         {
-            collisionChain.Add(sym);
+            throw new CloseGlobalScopeException("Cannot close the global scope (at depth 0)");
         }
+        this._depth--;
+        _scopeStack.Pop();
     }
-
-    private void Delete(SymTableEntry sym)
+    
+    /// <remarks>In order to search all scopes in the stack, each one is popped and added to a temporary local list.
+    /// Afterwards, each scope in this list is pushed back onto the stack to restore the scopes.</remarks>
+    public SymTableEntry RetrieveSymbol(string id)
     {
-        if (tableDict.GetValueOrDefault(sym.var) is List<SymTableEntry> collisionChain)
-        {
-            collisionChain.Remove(sym);
-        }
-    }
-    public SymTableEntry RetriveSymbol(string id)
-    {
-        //symbol = HashTable.get(name)
-        //while sumbol not null do
-            //if symbol.name == name
-                //then return symbol
-                //symbol = symbol.hash
-        return null;
-    }
-
-    public void EnterSymbol(SymTableEntry sym)
-    {
-        // Ét symbol table: 
-        // - Level som attribute på SymTableEntry
-        // - Values i vores Dictionary er en liste af SymTableEntries med forskellige scopes (og samme id)
+        List<Dictionary<string, SymTableEntry>> scopes = new();
+        SymTableEntry output = null;
         
-        // ét symbol table pr. level:
-        // - 
+        // Search for the id in each scope, from innermost to outermost
+        while(_scopeStack.Count > 0) 
+        {
+            var scope = _scopeStack.Pop();
+            // Save the scope so we can add it back onto the stack
+            scopes.Add(scope);
+            if(scope.TryGetValue(id, out SymTableEntry value)) 
+            {
+                output = value;
+                break;
+            }
+        }
+        // adds the scope from scopes list back in to the scope stack
+        foreach(var scope in scopes) 
+        {
+            _scopeStack.Push(scope);
+        }
+        return output;
     }
-
-    public IsDeclaredLocally(string id)
+    
+    public void EnterSymbol(string name, TypeVal type)
     {
-        //if declaredlocally
-            //return true
-        //elif
-            //return false
+        //exception to check if a symbol is declared locally more than once
+        if(IsDeclaredLocally(name))
+        {
+            throw new DuplicateDeclarationException("An id of this name have allready been declared", name);
+        }
+        var symbolEntry = new SymTableEntry 
+        {
+            Name = name,
+            Type = type
+        };
+        // Add the symbol to the innermost scope (top of the scopeStack)
+        _scopeStack.Peek().Add(name, symbolEntry);
+    }
+    
+    public bool IsDeclaredLocally(string id)
+    {
+        return _scopeStack.Peek().ContainsKey(id);
     }
 }
