@@ -8,120 +8,130 @@ public class TypeVisitor : IVisitor {
         _symbolTable = new SymbolTable();
     }
 
-    private readonly SymbolTable _symbolTable;
+    public TypeVisitor(ISymbolTable symbolTable) {
+        _symbolTable = symbolTable;
+    }
+
+    private readonly ISymbolTable _symbolTable;
     
     // Logic nodes
     
     public void Visit(AndNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.ExprType == TypeVal.Boolean && n.Right.ExprType == TypeVal.Boolean) {
-            n.ExprType = TypeVal.Boolean;
+        if (n.Left.Type == TypeVal.Boolean && n.Right.Type == TypeVal.Boolean) {
+            n.Type = TypeVal.Boolean;
         }
         else {
-            n.ExprType = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(OrNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.ExprType == TypeVal.Boolean && n.Right.ExprType == TypeVal.Boolean) {
-                n.ExprType = TypeVal.Boolean;
+        if (n.Left.Type == TypeVal.Boolean && n.Right.Type == TypeVal.Boolean) {
+                n.Type = TypeVal.Boolean;
         } else {
-            n.ExprType = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(EqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.ExprType == n.Right.ExprType && n.Left.ExprType != TypeVal.String) {
-            n.ExprType = TypeVal.Boolean;
+        if (n.Left.Type == n.Right.Type && n.Left.Type != TypeVal.String) {
+            n.Type = TypeVal.Boolean;
         }
         else {
-            n.ExprType = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(NeqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.ExprType == n.Right.ExprType && n.Left.ExprType != TypeVal.String) {
-            n.ExprType = TypeVal.Boolean;
+        if (n.Left.Type == n.Right.Type && n.Left.Type != TypeVal.String) {
+            n.Type = TypeVal.Boolean;
         }
         else {
-            n.ExprType = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(GThanNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.ExprType == TypeVal.Number && n.Right.ExprType == TypeVal.Number) {
-            n.ExprType = TypeVal.Boolean;
+        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
+            n.Type = TypeVal.Boolean;
         }
         else {
-            n.ExprType = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(GThanEqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.ExprType == TypeVal.Number && n.Right.ExprType == TypeVal.Number) {
-            n.ExprType = TypeVal.Boolean;
+        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
+            n.Type = TypeVal.Boolean;
         }
         else {
-            n.ExprType = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(LThanNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.ExprType == TypeVal.Number && n.Right.ExprType == TypeVal.Number) {
-            n.ExprType = TypeVal.Boolean;
+        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
+            n.Type = TypeVal.Boolean;
         }
         else {
-            n.ExprType = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(LThanEqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.ExprType == TypeVal.Number && n.Right.ExprType == TypeVal.Number) {
-            n.ExprType = TypeVal.Boolean;
+        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
+            n.Type = TypeVal.Boolean;
         }
         else {
-            n.ExprType = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(NegNode n) {
         n.Left.Accept(this);
-        if (n.Left.ExprType == TypeVal.Boolean) {
-            n.ExprType = TypeVal.Boolean;
+        if (n.Left.Type == TypeVal.Boolean) {
+            n.Type = TypeVal.Boolean;
         }
         else {
-            n.ExprType = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
     
     // Expression nodes
 
-    public void Visit(NumberNode n) { }
+    public void Visit(NumberNode n) {
+        n.Type = TypeVal.Number;
+    }
 
-    public void Visit(StringNode n) { }
+    public void Visit(StringNode n) {
+        n.Type = TypeVal.String;
+    }
 
-    public void Visit(BoolNode n) { }
+    public void Visit(BoolNode n) {
+        n.Type = TypeVal.Boolean;
+    }
 
     public void Visit(ArrDclNode n) {
         n.Left.Accept(this);
         foreach (var node in n.ArrLitRight) {
             node.Accept(this);
-            if (node.ExprType != n.Left.Type) {
+            if (node.Type != n.Left.Type) {
                 n.Type = TypeVal.Error;
             }
         }
@@ -131,13 +141,13 @@ public class TypeVisitor : IVisitor {
         n.Array.Accept(this);
         // Index is expression node, should we "calculate" the expression if possible to check if
         // index is >= 0 and < ArrSize?
-        n.TypeVal = n.Array.Type;
+        n.Type = n.Array.Type;
     }
 
     public void Visit(VarDclNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == n.Right.ExprType) {
+        if (n.Left.Type == n.Right.Type) {
             n.Type = TypeVal.Ok;
             _symbolTable.EnterSymbol(n.Left.Id, n.Left.Type);
         }
@@ -146,93 +156,93 @@ public class TypeVisitor : IVisitor {
         }
     }
 
-    public void Visit(AssNode n) {
-        n.Expr.Left.Accept(this);
-        n.Expr.Right.Accept(this);
-        if (n.Id.Type == n.Expr.ExprType) {
-            n.TypeVal = TypeVal.Ok;
+    public void Visit(AssNode n) { // Add constant check, needs to be in ST (i think)
+        n.Expr.Accept(this);
+        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id);
+        if (symbol?.Type == n.Expr.Type) {
+            n.Type = TypeVal.Ok;
         }
         else {
-            n.TypeVal = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(IdNode n) {
         var symbol = _symbolTable.RetrieveSymbol(n.Id);
-        n.ExprType = symbol?.Type ?? TypeVal.Error;
+        n.Type = symbol?.Type ?? TypeVal.Error;
     }
 
     public void Visit(PlusNode n) {
          n.Left.Accept(this);
          n.Right.Accept(this);
-         if (n.Left.ExprType == TypeVal.Number && n.Right.ExprType == TypeVal.Number)
+         if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number)
          {
-             n.ExprType = TypeVal.Number;
+             n.Type = TypeVal.Number;
          }
-         else if (n.Left.ExprType == TypeVal.String || n.Right.ExprType == TypeVal.String) {
-             n.ExprType = TypeVal.String;
+         else if (n.Left.Type == TypeVal.String || n.Right.Type == TypeVal.String) {
+             n.Type = TypeVal.String;
          }
          else {
-             n.ExprType = TypeVal.Error;
+             n.Type = TypeVal.Error;
          }
     }
 
     public void Visit(MinusNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.ExprType == TypeVal.Number && n.Right.ExprType == TypeVal.Number) {
-            n.ExprType = TypeVal.Number;
+        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
+            n.Type = TypeVal.Number;
         }
         else {
-            n.ExprType = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(MultNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.ExprType == TypeVal.Number && n.Right.ExprType == TypeVal.Number) {
-            n.ExprType = TypeVal.Number;
+        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
+            n.Type = TypeVal.Number;
         }
         else {
-            n.ExprType = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(DivNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.ExprType == TypeVal.Number && n.Right.ExprType == TypeVal.Number) {
-            n.ExprType = TypeVal.Number;
+        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
+            n.Type = TypeVal.Number;
         }
         else {
-            n.ExprType = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(PowNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.ExprType == TypeVal.Number && n.Right.ExprType == TypeVal.Number) {
-            n.ExprType = TypeVal.Number;
+        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
+            n.Type = TypeVal.Number;
         }
         else {
-            n.ExprType = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(ParenNode n) {
         n.Left.Accept(this);
-        n.ExprType = n.Left.ExprType;
+        n.Type = n.Left.Type;
     }
 
     public void Visit(UMinusNode n) {
         n.Left.Accept(this);
-        if (n.Left.TypeVal == TypeVal.Number) {
-            n.TypeVal = TypeVal.Number;
+        if (n.Left.Type == TypeVal.Number) {
+            n.Type = TypeVal.Number;
         }
         else {
-            n.TypeVal = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
     
@@ -241,11 +251,11 @@ public class TypeVisitor : IVisitor {
     public void Visit(WhileNode n) {
         _symbolTable.OpenScope();
         n.Condition.Accept(this);
-        if (n.Condition.TypeVal == TypeVal.Boolean) {
-            n.TypeVal = TypeVal.Ok;
+        if (n.Condition.Type == TypeVal.Boolean) {
+            n.Type = TypeVal.Ok;
         }
         else {
-            n.TypeVal = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
         foreach (var stmtNode in n.Body) {
             stmtNode.Accept(this); // i sure hope dynamic dispatch works monkaW
@@ -262,11 +272,11 @@ public class TypeVisitor : IVisitor {
         n.Initializer.Accept(this);
         n.Limit.Accept(this);
         n.Update.Accept(this);
-        if (n.Initializer.TypeVal == TypeVal.Number && n.Limit.TypeVal == TypeVal.Number && n.Update.TypeVal == TypeVal.Number) { // If it's a constant, it's number.. If it's vardcl, it's Ok??? 
-            n.TypeVal = TypeVal.Ok;
+        if (n.Initializer.Type == TypeVal.Number && n.Limit.Type == TypeVal.Number && n.Update.Type == TypeVal.Number) { // If it's a constant, it's number.. If it's vardcl, it's Ok??? 
+            n.Type = TypeVal.Ok;
         }
         else {
-            n.TypeVal = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
         _symbolTable.CloseScope();
     }
@@ -290,22 +300,22 @@ public class TypeVisitor : IVisitor {
             stmtNode.Accept(this);
         }
         n.ReturnType.Accept(this);
-        _symbolTable.EnterSymbol(n.Name.Id, n.TypeVal);
-        n.TypeVal = n.ReturnType.TypeVal; // ?
+        _symbolTable.EnterSymbol(n.Name.Id, n.Type);
+        n.Type = ((AstNode) n.ReturnType).Type; // ?
     }
 
     public void Visit(FuncExprNode n) {
         var symbol = _symbolTable.RetrieveSymbol(n.Id.Id);
-        n.ExprType = symbol?.Type ?? TypeVal.Error;
+        n.Type = symbol?.Type ?? TypeVal.Error;
     }
 
     public void Visit(FuncStmtNode n) {
         var symbol = _symbolTable.RetrieveSymbol(n.Id.Id);
-        n.TypeVal = symbol?.Type ?? TypeVal.Error;
+        n.Type = symbol?.Type ?? TypeVal.Error;
         foreach (var param in n.Params) {
             param.Accept(this);
-            if (param.ExprType == TypeVal.Error) { // Add param and formal param type comparison later 
-                n.TypeVal = TypeVal.Error;
+            if (param.Type == TypeVal.Error) { // Add param and formal param type comparison later 
+                n.Type = TypeVal.Error;
             }
         }
     }
@@ -313,7 +323,7 @@ public class TypeVisitor : IVisitor {
     public void Visit(FuncsNode n) {
         foreach (var funcdcl in n.FuncDcls) {
             funcdcl.Accept(this);
-            _symbolTable.EnterSymbol(funcdcl.Name.Id, funcdcl.TypeVal);
+            _symbolTable.EnterSymbol(funcdcl.Name.Id, funcdcl.Type);
         }
     }
 
@@ -324,16 +334,22 @@ public class TypeVisitor : IVisitor {
             parentFunc = parentFunc.Parent;
         }
 
-        if (parentFunc.TypeVal == n.RetVal.TypeVal) {
-            n.TypeVal = TypeVal.Ok;
+        if (parentFunc.Type == n.RetVal.Type) {
+            n.Type = TypeVal.Ok;
         }
         else {
-            n.TypeVal = TypeVal.Error;
+            n.Type = TypeVal.Error;
         }
     }
 
     public void Visit(IfNode n) {
         n.Condition.Accept(this);
+        if (n.Condition.Type == TypeVal.Boolean) {
+            n.Type = TypeVal.Ok;
+        }
+        else {
+            n.Type = TypeVal.Error;
+        }
         _symbolTable.OpenScope();
         foreach (var node in n.ThenClause) {
             node.Accept(this);

@@ -218,7 +218,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
 
-        ArrDclNode node;
+        ArrDclNode node = new ArrDclNode();
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
 
         switch (context.type().GetText())

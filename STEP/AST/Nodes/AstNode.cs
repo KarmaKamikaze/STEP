@@ -11,7 +11,7 @@ public abstract class AstNode
     }
     
     public AstNodeType NodeType { get; set; }
-    public TypeVal TypeVal { get; set; }
+    public TypeVal Type { get; set; }
     public AstNode Parent { get; set; }
     public AstNode RightSibling { get; set; }
     public AstNode LeftmostSibling { get; set; } 
