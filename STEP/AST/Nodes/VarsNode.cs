@@ -8,4 +8,5 @@ public class VarsNode : AstNode
     public override void Accept(IVisitor v) {
         v.Visit(this);
     }
+    public List<AstNode> Dcls { get; set; }
 }
