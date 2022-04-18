@@ -40,7 +40,7 @@ public class TypeVisitor : IVisitor {
     public void Visit(EqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == n.Right.Type && n.Left.Type != TypeVal.String) {
+        if (n.Left.Type == n.Right.Type) {
             n.Type = TypeVal.Boolean;
         }
         else {
@@ -51,7 +51,7 @@ public class TypeVisitor : IVisitor {
     public void Visit(NeqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == n.Right.Type && n.Left.Type != TypeVal.String) {
+        if (n.Left.Type == n.Right.Type) {
             n.Type = TypeVal.Boolean;
         }
         else {
