@@ -4,5 +4,7 @@ public enum TypeVal
 {
     Number,
     String,
-    Boolean
+    Boolean,
+    Ok,
+    Error
 }

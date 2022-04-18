@@ -3,5 +3,8 @@
 public class NumberNode : AstNode
 {
     public float Value { get; set; }
-    public TypeVal Type => TypeVal.Number;
+    public TypeVal Type = TypeVal.Number;
+    public override void Accept(IVisitor v) {
+        v.Visit(this);
+    }
 }

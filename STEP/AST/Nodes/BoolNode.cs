@@ -3,5 +3,8 @@
 public class BoolNode : AstNode
 {
     public bool Value { get; set; }
-	public TypeVal Type => TypeVal.Boolean;
+    public TypeVal Type = TypeVal.Boolean;
+    public override void Accept(IVisitor v) {
+	    v.Visit(this);
+    }
 }

@@ -3,5 +3,8 @@
 public class StringNode : AstNode
 {
     public string Value { get; set; }
-    public TypeVal Type => TypeVal.String;
+    public TypeVal Type = TypeVal.String;
+    public override void Accept(IVisitor v) {
+        v.Visit(this);
+    }
 }

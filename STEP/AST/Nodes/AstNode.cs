@@ -5,6 +5,7 @@ namespace STEP.AST.Nodes;
 public abstract class AstNode
 {
     public AstNodeType NodeType { get; set; }
+    public TypeVal TypeVal { get; set; }
     public AstNode Parent { get; set; }
     public AstNode RightSibling { get; set; }
     public AstNode LeftmostSibling { get; set; }
@@ -56,4 +57,6 @@ public abstract class AstNode
     {
         return NodeFactory.MakeNode(opType).AdoptChildren(firstChild.MakeSiblings(secondChild));
     }
+
+    public abstract void Accept(IVisitor v);
 }
