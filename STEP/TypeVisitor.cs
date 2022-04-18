@@ -8,7 +8,12 @@ public class TypeVisitor : IVisitor {
         _symbolTable = new SymbolTable();
     }
 
-    private readonly SymbolTable _symbolTable;
+    public TypeVisitor(ISymbolTable symbolTable)
+    {
+        _symbolTable = symbolTable;
+    }
+
+    private readonly ISymbolTable _symbolTable;
     
     // Logic nodes
     

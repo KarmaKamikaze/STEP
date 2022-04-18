@@ -1,6 +1,6 @@
 ﻿namespace STEP.AST.Nodes;
 
-public class StringNode : AstNode
+public class StringNode : ExprNode
 {
     public string Value { get; set; }
     public readonly TypeVal Type = TypeVal.String;
