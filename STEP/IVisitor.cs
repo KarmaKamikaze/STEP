@@ -19,6 +19,7 @@ public interface IVisitor {
     public void Visit(StringNode n);
     public void Visit(BoolNode n);
     public void Visit(ArrDclNode n);
+    public void Visit(ArrayAccessNode n);
     public void Visit(VarDclNode n);
     public void Visit(AssNode n);
     public void Visit(IdNode n);
@@ -35,12 +36,17 @@ public interface IVisitor {
     public void Visit(ForNode n);
     public void Visit(ContNode n);
     public void Visit(BreakNode n);
+    public void Visit(LoopNode n);
     
     // General nodes
     public void Visit(FuncDefNode n);
     public void Visit(FuncExprNode n);
     public void Visit(FuncStmtNode n);
-    public void Visit(StmtNode n);
+    public void Visit(FuncsNode n);
     public void Visit(RetNode n);
+    public void Visit(IfNode n);
     public void Visit(VarsNode n);
+    public void Visit(NullNode n);
+    public void Visit(ProgNode n);
+    public void Visit(SetupNode n);
 }

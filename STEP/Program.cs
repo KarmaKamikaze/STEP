@@ -1,4 +1,5 @@
-﻿using System.Threading.Channels;
+﻿using System.Reflection.Metadata.Ecma335;
+using System.Threading.Channels;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using STEP.AST;
@@ -43,6 +44,8 @@ class Program
             // Build AST
             AstBuilderVisitor astBuilder = new AstBuilderVisitor();
             AstNode root = astBuilder.Build(tree);
+            TypeVisitor typeVisitor = new();
+            root.Accept(typeVisitor);
 
             Printer(root);
         }
