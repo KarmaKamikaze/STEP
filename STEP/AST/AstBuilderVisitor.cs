@@ -230,6 +230,4 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     {
         return (ExprNode) NodeFactory.MakeNode(AstNodeType.FuncExprNode);
     }
-
-    
 }
