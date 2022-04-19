@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Tree;
+﻿using Antlr4.Runtime.Misc;
 using STEP.AST.Nodes;
 
 namespace STEP.AST;
@@ -21,15 +19,15 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         ProgNode parentNode = (ProgNode) children.Single(child => child is ProgNode);
         List<AstNode> otherChildren = children.Where(child => child is not ProgNode).ToList();
-        if (otherChildren.Count > 0)
+        
+        if (otherChildren.Any(child => child is VarsNode))
         {
-            AstNode firstChild = otherChildren[0];
-            for (int i = 1; i < otherChildren.Count; i++)
-            {
-                firstChild.MakeSiblings(otherChildren[i]);
-            }
-
-            return (ProgNode) parentNode.AdoptChildren(firstChild);
+            parentNode.VarsBlock = (VarsNode)otherChildren.First(child => child is VarsNode);
+        }
+        
+        if (otherChildren.Any(child => child is FuncsNode))
+        {
+            parentNode.FuncsBlock = (FuncsNode)otherChildren.First(child => child is FuncsNode);
         }
 
         return parentNode;
@@ -37,107 +35,65 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
     public override ProgNode VisitSetuploop([NotNull] STEPParser.SetuploopContext context)
     {
+        ProgNode node = (ProgNode)NodeFactory.MakeNode(AstNodeType.ProgNode);
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
-
-        if (children.Any(child => child is SetupNode) && children.Any(child => child is LoopNode))
-        {
-            AstNode setupNode = children.First(child => child is SetupNode);
-            AstNode loopNode = children.First(child => child is LoopNode);
-
-            List<AstNode> progChildren = new List<AstNode> {setupNode, loopNode};
-
-            return (ProgNode) AstNode.MakeFamily(AstNodeType.ProgNode, progChildren);
-        }
 
         if (children.Any(child => child is SetupNode))
         {
-            AstNode setupNode = children.First(child => child is SetupNode);
-            return (ProgNode) NodeFactory.MakeNode(AstNodeType.ProgNode).AdoptChildren(setupNode);
+            node.SetupBlock = (SetupNode)children.First(child => child is SetupNode);
         }
 
         if (children.Any(child => child is LoopNode))
         {
-            AstNode loopNode = children.First(child => child is LoopNode);
-            return (ProgNode) NodeFactory.MakeNode(AstNodeType.ProgNode).AdoptChildren(loopNode);
+            node.LoopBlock = (LoopNode)children.First(child => child is LoopNode);
         }
-
-        return (ProgNode) AstNode.MakeFamily(AstNodeType.ProgNode, children);
+        
+        return node;
     }
 
 
     public override SetupNode VisitSetup([NotNull] STEPParser.SetupContext context)
     {
-        SetupNode node;
-        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this))
-            .Where(child => child is StmtNode).ToList();
-
-        if (children.Count >= 1)
-        {
-            node = (SetupNode) AstNode.MakeFamily(AstNodeType.SetupNode, children);
-        }
-        else
-        {
-            node = (SetupNode) NodeFactory.MakeNode(AstNodeType.SetupNode);
-            node.AdoptChildren(NodeFactory.MakeNode(null));
-        }
-
+        List<StmtNode> children = context.children.Select(kiddies => kiddies.Accept(this))
+            .OfType<StmtNode>().ToList();
+        
+        SetupNode node = (SetupNode)NodeFactory.MakeNode(AstNodeType.SetupNode);
+        node.Stmts = children;
+        
         return node;
     }
 
     public override LoopNode VisitLoop([NotNull] STEPParser.LoopContext context)
     {
-        LoopNode node;
-        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this))
-            .Where(child => child is StmtNode).ToList();
-
-        if (children.Count >= 1)
-            node = (LoopNode) AstNode.MakeFamily(AstNodeType.LoopNode, children);
-        else
-        {
-            node = (LoopNode) NodeFactory.MakeNode(AstNodeType.LoopNode);
-            node.AdoptChildren(NodeFactory.MakeNode(null));
-        }
-
+        List<StmtNode> children = context.children
+            .Select( kiddies => kiddies.Accept(this)).OfType<StmtNode>().ToList();
+        
+        LoopNode node = (LoopNode)NodeFactory.MakeNode(AstNodeType.LoopNode);
+        node.Stmts = children;
+        
         return node;
     }
 
     public override VarsNode VisitVariables([NotNull] STEPParser.VariablesContext context)
     {
-        VarsNode node = (VarsNode)NodeFactory.MakeNode(AstNodeType.VarsNode);
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this))
             .Where(child => child != null).ToList(); // Terminals are null
-
-        if (children != null)
-        {
-            node.Dcls = children;
-        }
-        /*
-        if (children.Count >= 1)
-            node = (VarsNode) AstNode.MakeFamily(AstNodeType.VarsNode, children);
-        else
-        {
-            node = (VarsNode) NodeFactory.MakeNode(AstNodeType.VarsNode);
-            node.AdoptChildren(NodeFactory.MakeNode(null));
-        }
-        */
+        
+        VarsNode node = (VarsNode)NodeFactory.MakeNode(AstNodeType.VarsNode);
+        node.Dcls = children;
+        
         return node;
     }
 
 
     public override FuncsNode VisitFunctions([NotNull] STEPParser.FunctionsContext context)
-    {
-        FuncsNode node;
-        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this))
-            .Where(child => child is FuncDefNode).ToList();
+    {    
+        List<FuncDefNode> children = context.children.Select(kiddies => kiddies.Accept(this))
+            .OfType<FuncDefNode>().ToList();
 
-        if (children.Count >= 1)
-            node = (FuncsNode) AstNode.MakeFamily(AstNodeType.FuncsNode, children);
-        else
-        {
-            node = (FuncsNode) NodeFactory.MakeNode(AstNodeType.FuncsNode);
-            node.AdoptChildren(NodeFactory.MakeNode(null));
-        }
-
+        FuncsNode node = (FuncsNode)NodeFactory.MakeNode(AstNodeType.FuncsNode);
+        node.FuncDcls = children;
+        
         return node;
     }
 
@@ -166,8 +122,10 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
     public override VarDclNode VisitNumdcl([NotNull] STEPParser.NumdclContext context)
     {
+        VarDclNode node = (VarDclNode) NodeFactory.MakeNode(AstNodeType.VarDclNode);
         ExprNode exprChild = (ExprNode) context.children.Select(kiddies => kiddies.Accept(this))
             .First(child => child is ExprNode);
+        node.Right = exprChild;
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Type =
@@ -175,17 +133,17 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         idNode.Id = context.ID().GetText();
 
-        List<AstNode> children = new List<AstNode>() {idNode, exprChild};
-        VarDclNode node = (VarDclNode) AstNode.MakeFamily(AstNodeType.VarDclNode, children);
-        node.Type = TypeVal.Number;
+        node.Left = idNode;
 
         return node;
     }
 
     public override VarDclNode VisitStringdcl([NotNull] STEPParser.StringdclContext context)
     {
+        VarDclNode node = (VarDclNode) NodeFactory.MakeNode(AstNodeType.VarDclNode);
         ExprNode exprChild = (ExprNode) context.children.Select(kiddies => kiddies.Accept(this))
             .First(child => child is ExprNode);
+        node.Right = exprChild;
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Type =
@@ -193,9 +151,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         idNode.Id = context.ID().GetText();
 
-        List<AstNode> children = new List<AstNode>() {idNode, exprChild};
-        VarDclNode node = (VarDclNode) AstNode.MakeFamily(AstNodeType.VarDclNode, children);
-        node.Type = TypeVal.String;
+        node.Left = idNode;
 
         return node;
     }
@@ -203,8 +159,10 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
     public override VarDclNode VisitBooldcl([NotNull] STEPParser.BooldclContext context)
     {
+        VarDclNode node = (VarDclNode) NodeFactory.MakeNode(AstNodeType.VarDclNode);
         ExprNode exprChild = (ExprNode) context.children.Select(kiddies => kiddies.Accept(this))
             .First(child => child is ExprNode);
+        node.Right = exprChild;
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Type =
@@ -212,18 +170,16 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         idNode.Id = context.ID().GetText();
 
-        List<AstNode> children = new List<AstNode>() {idNode, exprChild};
-        VarDclNode node = (VarDclNode) AstNode.MakeFamily(AstNodeType.VarDclNode, children);
-        node.Type = TypeVal.Boolean;
+        node.Left = idNode;
 
         return node;
     }
 
     public override ArrDclNode VisitArrdcl([NotNull] STEPParser.ArrdclContext context)
     {
+        ArrDclNode node = (ArrDclNode)NodeFactory.MakeNode(AstNodeType.ArrDclNode);
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
 
-        ArrDclNode node = new ArrDclNode();
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
 
         switch (context.type().GetText())
@@ -243,28 +199,13 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
                 break;
             default:
-                // node.Type = TypeVal.Error;
+                node.Type = TypeVal.Error;
                 break;
         }
 
         idNode.Id = context.ID().GetText();
-
-        
-        switch (context.type().GetText())
-        {
-            case "number":
-                node.Type = TypeVal.Number;
-                break;
-            case "string":
-                node.Type = TypeVal.String;
-                break;
-            case "boolean":
-                node.Type = TypeVal.Boolean;
-                break;
-            default:
-                // node.Type = TypeVal.Error;
-                break;
-        }
+        idNode.IsArray = true;
+        node.Left = idNode;
 
         node.Size = Int32.Parse(context.arrsizedcl().GetText().Trim('[', ']'));
 

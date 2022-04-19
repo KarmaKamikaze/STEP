@@ -372,8 +372,8 @@ public class TypeVisitor : IVisitor {
     public void Visit(NullNode n) { }
 
     public void Visit(ProgNode n) {
-        n.VarBlock?.Accept(this);
-        n.FuncBlock?.Accept(this);
+        n.VarsBlock?.Accept(this);
+        n.FuncsBlock?.Accept(this);
         n.SetupBlock?.Accept(this);
         n.LoopBlock?.Accept(this);
     }
