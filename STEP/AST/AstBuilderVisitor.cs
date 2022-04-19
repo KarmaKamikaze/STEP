@@ -76,8 +76,8 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
     public override VarsNode VisitVariables([NotNull] STEPParser.VariablesContext context)
     {
-        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this))
-            .Where(child => child != null).ToList(); // Terminals are null
+        List<VarDclNode> children = context.children.Select(kiddies => kiddies.Accept(this))
+            .OfType<VarDclNode>().ToList(); // Terminals are null
         
         VarsNode node = (VarsNode)NodeFactory.MakeNode(AstNodeType.VarsNode);
         node.Dcls = children;
