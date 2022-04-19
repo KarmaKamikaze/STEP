@@ -61,20 +61,25 @@ public class TypeCheckerTests {
     {
         // Arrange
         const string id = "x";
+        
+        // Intercept symbol table entry request, save locally
        SymTableEntry symbolTableEntry = new();
         _symbolTableMock.Setup(x => x.EnterSymbol(It.IsAny<string>(), It.IsAny<TypeVal>()))
             .Callback<string, TypeVal>((a, b) => symbolTableEntry = new SymTableEntry(){ Name = a, Type = b});
+        
+        // Intercept symbol table receive request, use local
         _symbolTableMock.Setup(x => x.RetrieveSymbol(id))
             .Returns(symbolTableEntry);
+        
         var dclNode = new VarDclNode()
         {
-            Left = new IdNode() {Id = id},
-            Right = new NumberNode() {Value = 69}
+            Left = new IdNode() {Id = id, Type = TypeVal.Number},
+            Right = new NumberNode() {Value = 50 }
         };
-        _typeVisitor.Visit(dclNode);
         var idNode = new IdNode() {Id = id};
 
         // Act
+        _typeVisitor.Visit(dclNode);
         _typeVisitor.Visit(idNode);
         
         // Assert
@@ -1078,11 +1083,11 @@ public class TypeCheckerTests {
         progNode.Accept(_typeVisitor);
         
         // Assert
-        // Is the vardcl okay? requires expr node = number, as var id is number
+        // Is the vardcl ok? requires expr node = number, as var id is number
         Assert.Equal(TypeVal.Ok, varDcl.Type);
         Assert.Equal(TypeVal.Number, exprNode.Type);
         
-        // Is the ifnode okay? requires condition = bool, andnode exprs = bool 
+        // Is the ifnode ok? requires condition = bool, andnode exprs = bool 
         Assert.Equal(TypeVal.Ok, ifNode.Type);
         Assert.Equal(TypeVal.Boolean, boolCond.Type);
         Assert.Equal(TypeVal.Boolean, boolLeft.Type);
