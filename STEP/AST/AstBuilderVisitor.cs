@@ -226,8 +226,233 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         return arrLitNode;
     }
 
+    public override ExprNode VisitLogicexpr([NotNull] STEPParser.LogicexprContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+
+        if(context.AND() != null)
+        {
+            AndNode andNode = (AndNode) NodeFactory.MakeNode(AstNodeType.AndNode);
+            andNode.Left = (ExprNode)children.First(child => child is ExprNode);
+            andNode.Right = (ExprNode)children.Last(child => child is ExprNode);
+            return andNode;
+        }
+        if(context.OR() != null)
+        {
+            OrNode orNode = (OrNode) NodeFactory.MakeNode(AstNodeType.OrNode);
+            orNode.Left = (ExprNode)children.First(child => child is ExprNode);
+            orNode.Right = (ExprNode)children.Last(child => child is ExprNode);
+            return orNode;
+        }
+        
+        // If it is neither an "and" or an "or" node, we therefore we simply return the child.
+        return (ExprNode)children.First();
+    }
+
+    public override ExprNode VisitLogicequal([NotNull] STEPParser.LogicequalContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+    
+        if(context.EQ() != null)
+        {
+            EqNode eqNode = (EqNode) NodeFactory.MakeNode(AstNodeType.EqNode);
+            eqNode.Left = (ExprNode)children.First(child => child is ExprNode);
+            eqNode.Right = (ExprNode)children.Last(child => child is ExprNode);
+            return eqNode;
+        }
+        if(context.NEQ() != null)
+        {
+            NeqNode neqNode = (NeqNode) NodeFactory.MakeNode(AstNodeType.NeqNode);
+            neqNode.Left = (ExprNode)children.First(child => child is ExprNode);
+            neqNode.Right = (ExprNode)children.Last(child => child is ExprNode);
+            return neqNode;
+        }
+        
+        // If it is neither an "eq" or an "neq" node, we therefore we simply return the child.
+        return (ExprNode)children.First();
+    }
+    
+    public override ExprNode VisitLogiccomp([NotNull] STEPParser.LogiccompContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+
+        if (context.logiccompop() != null)
+        {
+            if (context.logiccompop().GRTHANEQ() != null)
+            {
+                GThanEqNode node = (GThanEqNode) NodeFactory.MakeNode(AstNodeType.GThanEqNode);              
+                node.Left = (ExprNode)children.First(child => child is ExprNode);
+                node.Right = (ExprNode)children.Last(child => child is ExprNode);
+                return node;
+            }
+            if (context.logiccompop().GRTHAN() != null) 
+            {
+                GThanNode node = (GThanNode) NodeFactory.MakeNode(AstNodeType.GThanNode);              
+                node.Left = (ExprNode)children.First(child => child is ExprNode);
+                node.Right = (ExprNode)children.Last(child => child is ExprNode);
+                return node;
+            }
+            if (context.logiccompop().LTHANEQ() != null) 
+            {
+                LThanEqNode node = (LThanEqNode) NodeFactory.MakeNode(AstNodeType.LThanEqNode);              
+                node.Left = (ExprNode)children.First(child => child is ExprNode);
+                node.Right = (ExprNode)children.Last(child => child is ExprNode);
+                return node;
+            }
+            if (context.logiccompop().LTHAN() != null) 
+            {
+                LThanNode node = (LThanNode) NodeFactory.MakeNode(AstNodeType.LThanNode);              
+                node.Left = (ExprNode)children.First(child => child is ExprNode);
+                node.Right = (ExprNode)children.Last(child => child is ExprNode);
+                return node;
+            }
+        }
+
+        // If it is neither an "greq", "gr", "lteq" or " node, we therefore we simply return the child.
+        return (ExprNode)children.First();
+    }
+    
+    public override ExprNode VisitLogicvalue([NotNull] STEPParser.LogicvalueContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+
+        if (context.NEG() != null)
+        {
+            NegNode node = (NegNode) NodeFactory.MakeNode(AstNodeType.NegNode);              
+            node.Left = (ExprNode)children.First(child => child is ExprNode);
+            node.Right = null;
+            return node;
+        }
+
+        return (ExprNode)children.First(child => child is ExprNode);
+    }
+
+
     public override ExprNode VisitExpr([NotNull] STEPParser.ExprContext context)
     {
-        return (ExprNode) NodeFactory.MakeNode(AstNodeType.FuncExprNode);
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+
+        if (context.PLUS() != null)
+        {
+            PlusNode node = (PlusNode) NodeFactory.MakeNode(AstNodeType.PlusNode);              
+            node.Left = (ExprNode)children.First(child => child is ExprNode);
+            node.Right = (ExprNode)children.Last(child => child is ExprNode);
+            return node;
+        }
+        if (context.MINUS() != null)
+        {
+            MinusNode node = (MinusNode) NodeFactory.MakeNode(AstNodeType.MinusNode);              
+            node.Left = (ExprNode)children.First(child => child is ExprNode);
+            node.Right = (ExprNode)children.Last(child => child is ExprNode);
+            return node;
+        }
+        
+        return (ExprNode)children.First(child => child is ExprNode);
     }
+    
+    public override ExprNode VisitTerm([NotNull] STEPParser.TermContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+    
+        if (context.MULT() != null)
+        {
+            MultNode node = (MultNode) NodeFactory.MakeNode(AstNodeType.MultNode);              
+            node.Left = (ExprNode)children.First(child => child is ExprNode);
+            node.Right = (ExprNode)children.Last(child => child is ExprNode);
+            return node;
+        }
+        if (context.DIVIDE() != null)
+        {
+            DivNode node = (DivNode) NodeFactory.MakeNode(AstNodeType.DivNode);              
+            node.Left = (ExprNode)children.First(child => child is ExprNode);
+            node.Right = (ExprNode)children.Last(child => child is ExprNode);
+            return node;
+        }
+        
+        return (ExprNode)children.First(child => child is ExprNode);
+    }
+    
+    public override ExprNode VisitFactor([NotNull] STEPParser.FactorContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+        
+        if (context.POW() != null)
+        {
+            PowNode node = (PowNode) NodeFactory.MakeNode(AstNodeType.PowNode);              
+            node.Left = (ExprNode)children.First(child => child is ExprNode);
+            node.Right = (ExprNode)children.Last(child => child is ExprNode);
+            return node;
+        }
+        
+        return (ExprNode)children.First(child => child is ExprNode);
+    }
+    
+    public override ExprNode VisitValue([NotNull] STEPParser.ValueContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+    
+        if(context.ID() != null)
+        {
+            IdNode idNode = (IdNode)NodeFactory.MakeNode(AstNodeType.IdNode);
+            idNode.Id = context.ID().GetText();
+            if(context.arrindex() != null)
+            {
+                ArrayAccessNode node = (ArrayAccessNode)NodeFactory.MakeNode(AstNodeType.ArrayAccessNode);               
+                node.Array = idNode;
+                node.Index = (ExprNode)children.Last(child => child is ExprNode);
+                return node;
+            }
+            return idNode;        
+        }
+
+        if(context.logicexpr() != null)
+        {
+            ParenNode node = (ParenNode)NodeFactory.MakeNode(AstNodeType.ParenNode);
+            node.Left = (ExprNode)children.First(child => child is ExprNode);
+            node.Right = null;
+            return node;
+        }
+        
+        return (ExprNode)children.First(child => child is ExprNode);
+    }
+    
+    public override ExprNode VisitConstant([NotNull] STEPParser.ConstantContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+
+        if (context.NUMLITERAL() != null)
+        {
+            NumberNode numNode = (NumberNode)NodeFactory.MakeNode(AstNodeType.NumberNode);
+            numNode.Value = Double.Parse(context.NUMLITERAL().GetText());
+            
+            if(context.MINUS() != null)
+            {
+                UMinusNode node = (UMinusNode)NodeFactory.MakeNode(AstNodeType.UMinusNode);           
+                node.Left = numNode;
+                return node;
+            }
+            
+            return numNode;
+        }
+        else if (context.STRLITERAL() != null)
+        {
+            StringNode node = (StringNode)NodeFactory.MakeNode(AstNodeType.StringNode);
+            node.Value = context.STRLITERAL().GetText();
+            return node;
+        }
+        else // boolean literal is not null
+        {
+            BoolNode node = (BoolNode)NodeFactory.MakeNode(AstNodeType.BoolNode);
+            node.Value = context.BOOLLITERAL().GetText().ToLower() == "true";
+            return node;
+        }
+    }
+ 
+ /*   public override AstNode VisitFunccall([NotNull] STEPParser.FunccallContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+        
+        
+    }
+   */ 
 }
