@@ -38,11 +38,11 @@ public class TypeCheckerTests {
 
         // Act
         _typeVisitor.Visit(strLiteralNode);
-        
+       
         // Assert
         Assert.Equal(TypeVal.String, strLiteralNode.Type);
     }
-        
+       
     [Fact]
     public void BoolNode_ShouldBeBool()
     {
@@ -61,15 +61,15 @@ public class TypeCheckerTests {
     {
         // Arrange
         const string id = "x";
-        SymTableEntry symbolTableEntry = new();
+       SymTableEntry symbolTableEntry = new();
         _symbolTableMock.Setup(x => x.EnterSymbol(It.IsAny<string>(), It.IsAny<TypeVal>()))
-        .Callback<string, TypeVal>((a, b) => symbolTableEntry = new SymTableEntry(){ Name = a, Type = b});
+            .Callback<string, TypeVal>((a, b) => symbolTableEntry = new SymTableEntry(){ Name = a, Type = b});
         _symbolTableMock.Setup(x => x.RetrieveSymbol(id))
-        .Returns(symbolTableEntry);
+            .Returns(symbolTableEntry);
         var dclNode = new VarDclNode()
         {
-        Left = new IdNode() {Id = id},
-        Right = new NumberNode() {Value = 69}
+            Left = new IdNode() {Id = id},
+            Right = new NumberNode() {Value = 69}
         };
         _typeVisitor.Visit(dclNode);
         var idNode = new IdNode() {Id = id};
@@ -89,8 +89,8 @@ public class TypeCheckerTests {
         var parenNode = new ParenNode() {Left = exprNode};
         
         // Act
-        _typeVisitor.Visit(parenNode);
-
+         _typeVisitor.Visit(parenNode);
+         
         // Assert
         Assert.Equal(exprNode.Type, parenNode.Type);
     }
@@ -100,11 +100,13 @@ public class TypeCheckerTests {
     {
         // Arrange
         var exprNode = new NumberNode() {Value = 69420};
-        var UMinusNode = new UMinusNode() {Left = exprNode};
+        var uMinusNode = new UMinusNode() {Left = exprNode};
+        
         // Act
-        _typevisitor.Visit(
+        uMinusNode.Accept(_typeVisitor);
         
         // Assert
+        Assert.Equal(exprNode.Type, uMinusNode.Type);
     }
 
     [Fact]
@@ -116,7 +118,7 @@ public class TypeCheckerTests {
         
         // Act
         _typeVisitor.Visit(negNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Error, negNode.Type);
     }
@@ -130,7 +132,7 @@ public class TypeCheckerTests {
         
         // Act
         _typeVisitor.Visit(negNode);
-
+         
         // Assert
         Assert.Equal(TypeVal.Boolean, negNode.Type);
     }
@@ -144,16 +146,16 @@ public class TypeCheckerTests {
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
         var symbol = new SymTableEntry() {Type = type};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
-        .Returns(symbol);
+            .Returns(symbol);
         var multNode = new MultNode()
         {
-        Left = new IdNode() { Id = "x" },
-        Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Id = "x" },
+            Right = new IdNode() { Id = "y" }
         };
         
         // Act
         _typeVisitor.Visit(multNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Error, multNode.Type);
     }
@@ -166,8 +168,8 @@ public class TypeCheckerTests {
         var rightExpr = new NumberNode();
         var multNode = new MultNode()
         {
-        Left = leftExpr,
-        Right = rightExpr
+            Left = leftExpr,
+            Right = rightExpr
         };
         
         // Act
@@ -186,16 +188,16 @@ public class TypeCheckerTests {
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
         var symbol = new SymTableEntry() {Type = type};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
-        .Returns(symbol);
+            .Returns(symbol);
         var divNode = new DivNode()
         {
-        Left = new IdNode() { Id = "x" },
-        Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Id = "x" },
+            Right = new IdNode() { Id = "y" }
         };
         
         // Act
         _typeVisitor.Visit(divNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Error, divNode.Type);
     }
@@ -208,13 +210,13 @@ public class TypeCheckerTests {
         var rightExpr = new NumberNode();
         var divNode = new DivNode()
         {
-        Left = leftExpr,
-        Right = rightExpr
+            Left = leftExpr,
+            Right = rightExpr
         };
         
         // Act
         _typeVisitor.Visit(divNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Number, divNode.Type);
     }
@@ -228,16 +230,16 @@ public class TypeCheckerTests {
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
         var symbol = new SymTableEntry() {Type = type};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
-        .Returns(symbol);
+            .Returns(symbol);
         var powNode = new PowNode()
         {
-        Left = new IdNode() { Id = "x" },
-        Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Id = "x" },
+            Right = new IdNode() { Id = "y" }
         };
         
         // Act
         _typeVisitor.Visit(powNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Error, powNode.Type);
     }
@@ -250,13 +252,13 @@ public class TypeCheckerTests {
         var rightExpr = new NumberNode();
         var powNode = new PowNode()
         {
-        Left = leftExpr,
-        Right = rightExpr
+            Left = leftExpr,
+            Right = rightExpr
         };
         
         // Act
         _typeVisitor.Visit(powNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Number, powNode.Type);
     }
@@ -270,16 +272,16 @@ public class TypeCheckerTests {
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
         var symbol = new SymTableEntry() {Type = type};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
-        .Returns(symbol);
+            .Returns(symbol);
         var minusNode = new MinusNode()
         {
-        Left = new IdNode() { Id = "x" },
-        Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Id = "x" },
+            Right = new IdNode() { Id = "y" }
         };
         
         // Act
         _typeVisitor.Visit(minusNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Error, minusNode.Type);
     }
@@ -292,13 +294,13 @@ public class TypeCheckerTests {
         var rightExpr = new NumberNode();
         var minusNode = new MinusNode()
         {
-        Left = leftExpr,
-        Right = rightExpr
+            Left = leftExpr,
+            Right = rightExpr
         };
         
         // Act
         _typeVisitor.Visit(minusNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Number, minusNode.Type);
     }
@@ -311,13 +313,13 @@ public class TypeCheckerTests {
         var rightExpr = new NumberNode();
         var plusNode = new PlusNode()
         {
-        Left = leftExpr,
-        Right = rightExpr
+            Left = leftExpr,
+            Right = rightExpr
         };
         
         // Act
         _typeVisitor.Visit(plusNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Number, plusNode.Type);
     }
@@ -330,13 +332,13 @@ public class TypeCheckerTests {
         var rightExpr = new NumberNode();
         var plusNode = new PlusNode()
         {
-        Left = leftExpr,
-        Right = rightExpr
+            Left = leftExpr,
+            Right = rightExpr
         };
         
         // Act
         _typeVisitor.Visit(plusNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.String, plusNode.Type);
     }
@@ -349,13 +351,13 @@ public class TypeCheckerTests {
         var rightExpr = new BoolNode();
         var plusNode = new PlusNode()
         {
-        Left = leftExpr,
-        Right = rightExpr
+            Left = leftExpr,
+            Right = rightExpr
         };
         
         // Act
         _typeVisitor.Visit(plusNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Error, plusNode.Type);
     }
@@ -370,13 +372,13 @@ public class TypeCheckerTests {
         var rightExpr = new BoolNode();
         var andNode = new AndNode()
         {
-        Left = leftExpr,
-        Right = rightExpr
+            Left = leftExpr,
+            Right = rightExpr
         };
         
         // Act
         _typeVisitor.Visit(andNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Boolean, andNode.Type);
     }
@@ -390,16 +392,16 @@ public class TypeCheckerTests {
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
         var symbol = new SymTableEntry() {Type = type};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
-        .Returns(symbol);
+            .Returns(symbol);
         var andNode = new AndNode()
         {
-        Left = new IdNode() { Id = "x" },
-        Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Id = "x" },
+            Right = new IdNode() { Id = "y" }
         };
         
         // Act
         _typeVisitor.Visit(andNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Error, andNode.Type);
     }
@@ -412,13 +414,13 @@ public class TypeCheckerTests {
         var rightExpr = new BoolNode();
         var orNode = new OrNode()
         {
-        Left = leftExpr,
-        Right = rightExpr
+            Left = leftExpr,
+            Right = rightExpr
         };
         
         // Act
         _typeVisitor.Visit(orNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Boolean, orNode.Type);
     }
@@ -432,16 +434,16 @@ public class TypeCheckerTests {
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
         var symbol = new SymTableEntry() {Type = type};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
-        .Returns(symbol);
+            .Returns(symbol);
         var orNode = new OrNode()
         {
-        Left = new IdNode() { Id = "x" },
-        Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Id = "x" },
+            Right = new IdNode() { Id = "y" }
         };
         
         // Act
         _typeVisitor.Visit(orNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Error, orNode.Type);
     }
@@ -456,16 +458,16 @@ public class TypeCheckerTests {
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
         var symbol = new SymTableEntry() {Type = type};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
-        .Returns(symbol);
+            .Returns(symbol);
         var eqNode = new EqNode()
         {
-        Left = new IdNode() { Id = "x" },
-        Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Id = "x" },
+            Right = new IdNode() { Id = "y" }
         };
         
         // Act
         _typeVisitor.Visit(eqNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Boolean, eqNode.Type);
     }
@@ -476,13 +478,13 @@ public class TypeCheckerTests {
         // Arrange
         var eqNode = new EqNode()
         {
-        Left = new NumberNode(),
-        Right = new StringNode()
+            Left = new NumberNode(),
+            Right = new StringNode()
         };
         
         // Act
         _typeVisitor.Visit(eqNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Error, eqNode.Type);
     }
@@ -497,16 +499,16 @@ public class TypeCheckerTests {
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
         var symbol = new SymTableEntry() {Type = type};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
-        .Returns(symbol);
+            .Returns(symbol);
         var neqNode = new NeqNode()
         {
-        Left = new IdNode() { Id = "x" },
-        Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Id = "x" },
+            Right = new IdNode() { Id = "y" }
         };
         
         // Act
         _typeVisitor.Visit(neqNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Boolean, neqNode.Type);
     }
@@ -517,13 +519,13 @@ public class TypeCheckerTests {
         // Arrange
         var neqNode = new NeqNode()
         {
-        Left = new NumberNode(),
-        Right = new StringNode()
+            Left = new NumberNode(),
+            Right = new StringNode()
         };
         
         // Act
         _typeVisitor.Visit(neqNode);
-        
+         
         // Assert
         Assert.Equal(TypeVal.Error, neqNode.Type);
     }
@@ -715,12 +717,12 @@ public class TypeCheckerTests {
         var symbol1 = new SymTableEntry() {Type = type1};
         var symbol2 = new SymTableEntry() {Type = type2};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("left"))
-        .Returns(symbol1);
+            .Returns(symbol1);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
-        .Returns(symbol2);
+            .Returns(symbol2);
         var varDclNode = new VarDclNode {
-        Left = new IdNode() {Id = "left"},
-        Right = new IdNode() {Id = "right"}
+            Left = new IdNode() {Id = "left"},
+            Right = new IdNode() {Id = "right"}
         };
 
         //Act
@@ -740,12 +742,12 @@ public class TypeCheckerTests {
         var symbol1 = new SymTableEntry() {Type = type};
         var symbol2 = new SymTableEntry() {Type = TypeVal.Error};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("left"))
-        .Returns(symbol1);
+            .Returns(symbol1);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
-        .Returns(symbol2);
+            .Returns(symbol2);
         var varDclNode = new VarDclNode {
-        Left = new IdNode() {Id = "left"},
-        Right = new IdNode() {Id = "right"}
+            Left = new IdNode() {Id = "left"},
+            Right = new IdNode() {Id = "right"}
         };
 
         //Act
@@ -763,7 +765,7 @@ public class TypeCheckerTests {
             .Returns(symbol);
         var arrDclNode = new ArrDclNode() {
             Left = new IdNode() {Id = "left"},
-            ArrLitRight = new List<ExprNode>() {new IdNode() {Id = "arrlit1"}}
+            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}}
         };
         
         // Act
@@ -788,7 +790,7 @@ public class TypeCheckerTests {
             .Returns(symbol2);
         var arrDclNode = new ArrDclNode() {
             Left = new IdNode() {Id = "left"},
-            ArrLitRight = new List<ExprNode>(){new IdNode(){Id = "right"}}
+            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}}
         };
 
         //Act
@@ -813,7 +815,7 @@ public class TypeCheckerTests {
             .Returns(symbol2);
         var arrDclNode = new ArrDclNode {
             Left = new IdNode() {Id = "left"},
-            ArrLitRight = new List<ExprNode>(){new IdNode() {Id = "right"}}
+            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}}
         };
 
         //Act
@@ -834,7 +836,7 @@ public class TypeCheckerTests {
         //Arrange
         var symbol = new SymTableEntry() {Type = type1};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("bool"))
-        .Returns(symbol);
+            .Returns(symbol);
         var ifNode = new IfNode {
             Condition = new IdNode() {Id = "bool"},
             ThenClause = new List<StmtNode>(){new ContNode()},
@@ -857,7 +859,7 @@ public class TypeCheckerTests {
         //Arrange
         var symbol = new SymTableEntry() {Type = type};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("cond"))
-        .Returns(symbol);
+            .Returns(symbol);
         var whileNode = new WhileNode{
             Condition = new IdNode(){Id = "cond"},
             Body = new List<StmtNode>(){new ContNode()}
@@ -907,10 +909,10 @@ public class TypeCheckerTests {
         // Arrange
         var symbol = new SymTableEntry() {Type = type};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
-        .Returns(symbol);
+            .Returns(symbol);
         var assNode = new AssNode() {
-        Id = new IdNode() {Id = "left"},
-        Expr = new IdNode() {Id = "right"}
+            Id = new IdNode() {Id = "left"},
+            Expr = new IdNode() {Id = "right"}
         };
         
         // Act
@@ -930,12 +932,12 @@ public class TypeCheckerTests {
         var symbol1 = new SymTableEntry() {Type = type1};
         var symbol2 = new SymTableEntry() {Type = type2};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("left"))
-        .Returns(symbol1);
+            .Returns(symbol1);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
-        .Returns(symbol2);
+            .Returns(symbol2);
         var assNode = new AssNode() {
-        Id = new IdNode() {Id = "left"},
-        Expr = new IdNode() {Id = "right"}
+            Id = new IdNode() {Id = "left"},
+            Expr = new IdNode() {Id = "right"}
         };
 
         //Act
