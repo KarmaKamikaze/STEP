@@ -96,7 +96,7 @@ public class TypeCheckerTests {
     }
     
     [Fact]
-    public void UMinusNode_TypeMatch_LeftTypeIsNumber()
+    public void UMinusNode_LeftIsNumber_IsTypeNumber()
     {
         // Arrange
         var exprNode = new NumberNode() {Value = 69420};
@@ -106,7 +106,27 @@ public class TypeCheckerTests {
         uMinusNode.Accept(_typeVisitor);
         
         // Assert
-        Assert.Equal(exprNode.Type, uMinusNode.Type);
+        Assert.Equal(TypeVal.Number, uMinusNode.Type);
+    }
+    
+    [Theory]
+    [InlineData(TypeVal.Boolean)]
+    [InlineData(TypeVal.String)]
+    [InlineData(TypeVal.Error)]
+    public void UMinusNode_LeftIsNotNumber_IsTypeError(TypeVal type)
+    {
+        // Arrange
+        var symbol = new SymTableEntry() {Type = type};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
+            .Returns(symbol);
+        var exprNode = new IdNode() {Id = "val"};
+        var uMinusNode = new UMinusNode() {Left = exprNode};
+        
+        // Act
+        uMinusNode.Accept(_typeVisitor);
+        
+        // Assert
+        Assert.Equal(TypeVal.Error, uMinusNode.Type);
     }
 
     [Fact]
@@ -693,10 +713,13 @@ public class TypeCheckerTests {
     {
     //Arrange
     var symbol = new SymTableEntry() {Type = type};
-    _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
+    _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
         .Returns(symbol);
     var varDclNode = new VarDclNode {
-        Left = new IdNode() {Id = "left"},
+        Left = new IdNode() {
+            Id = "left",
+            Type = type
+        },
         Right = new IdNode() {Id = "right"}
     };
 
@@ -714,14 +737,14 @@ public class TypeCheckerTests {
     public void VarDclNode_TypeMismatch_IsTypeError(TypeVal type1, TypeVal type2)
     {
         //Arrange
-        var symbol1 = new SymTableEntry() {Type = type1};
-        var symbol2 = new SymTableEntry() {Type = type2};
-        _symbolTableMock.Setup(x => x.RetrieveSymbol("left"))
-            .Returns(symbol1);
+        var symbol = new SymTableEntry() {Type = type2};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
-            .Returns(symbol2);
+            .Returns(symbol);
         var varDclNode = new VarDclNode {
-            Left = new IdNode() {Id = "left"},
+            Left = new IdNode() {
+                Id = "left",
+                Type = type1
+            },
             Right = new IdNode() {Id = "right"}
         };
 
@@ -739,14 +762,14 @@ public class TypeCheckerTests {
     public void VarDclNode_ExprHasError_IsTypeError(TypeVal type)
     {
         //Arrange
-        var symbol1 = new SymTableEntry() {Type = type};
         var symbol2 = new SymTableEntry() {Type = TypeVal.Error};
-        _symbolTableMock.Setup(x => x.RetrieveSymbol("left"))
-            .Returns(symbol1);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
             .Returns(symbol2);
         var varDclNode = new VarDclNode {
-            Left = new IdNode() {Id = "left"},
+            Left = new IdNode() {
+                Id = "left",
+                Type = type
+            },
             Right = new IdNode() {Id = "right"}
         };
 
@@ -947,5 +970,123 @@ public class TypeCheckerTests {
         Assert.Equal(TypeVal.Error, assNode.Type);
     }
 
+    [Theory]
+    [InlineData(TypeVal.Number)]
+    [InlineData(TypeVal.String)]
+    [InlineData(TypeVal.Boolean)]
+    public void RetNode_TypeMatch_IsTypeOk(TypeVal type) {
+        // Arrange
+        var symbol = new SymTableEntry() {Type = type};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
+            .Returns(symbol);
+        var retNode = new RetNode() {
+            Parent = new FuncDefNode() {Type = type},
+            RetVal = new IdNode() {Id = "type"}
+        };
+        
+        // Act
+        retNode.Accept(_typeVisitor);
+        
+        // Assert
+        Assert.Equal(TypeVal.Ok, retNode.Type);
+    }
+
+    [Theory]
+    [InlineData(TypeVal.Number, TypeVal.Boolean)]
+    [InlineData(TypeVal.String, TypeVal.Number)]
+    [InlineData(TypeVal.Boolean, TypeVal.String)]
+    public void RetNode_TypeMismatch_IsTypeError(TypeVal type1, TypeVal type2) {
+        // Arrange
+        var symbol = new SymTableEntry() {Type = type2};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
+            .Returns(symbol);
+        var retNode = new RetNode() {
+            Parent = new FuncDefNode() {Type = type1},
+            RetVal = new IdNode() {Id = "type2"}
+        };
+        
+        // Act
+        retNode.Accept(_typeVisitor);
+        
+        // Assert
+        Assert.Equal(TypeVal.Error, retNode.Type); 
+    }
+
+    [Fact]
+    public void RetNode_NullExprParentIsBlank_IsTypeOk() {
+        // Arrange
+        var retNode = new RetNode() {
+            Parent = new FuncDefNode() {Type = TypeVal.Blank},
+            RetVal = null
+        };
+        
+        // Act
+        retNode.Accept(_typeVisitor);
+        
+        // Assert
+        Assert.Equal(TypeVal.Ok, retNode.Type);
+    }
+
     #endregion Statements
+
+    #region Traversal
+
+    [Fact]
+    public void ASTTraversalTest() {
+        // Arrange
+        var symbol = new SymTableEntry() {Name = "b", Type = TypeVal.Number};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol(symbol.Name)) 
+            .Returns(symbol); // Simulate existing number b
+        var exprNode = new PlusNode() {
+            Left = new NumberNode() {Value = 2},
+            Right = new NumberNode() {Value = 5}
+        };
+        var idNode = new IdNode() {
+            Id = "a",
+            Type = TypeVal.Number
+        };
+        var varDcl = new VarDclNode() {
+            Left = idNode,
+            Right = exprNode
+        };
+        var boolLeft = new GThanNode() {
+            Left = new IdNode(){Id = "b"},
+            Right = new NumberNode(){Value = 5}
+        };
+        var boolRight = new EqNode() {
+            Left = new NumberNode(){Value = 10},
+            Right = new NumberNode(){Value = 10} 
+        };
+        var boolCond = new AndNode() {
+            Left = boolLeft,
+            Right = boolRight
+        };
+        var ifNode = new IfNode() {
+            Condition = boolCond,
+            ThenClause = new List<StmtNode>() {new ContNode()}
+        };
+        var progNode = new ProgNode() {
+            SetupBlock = new SetupNode() {
+                Stmts = new List<StmtNode>() {
+                    varDcl,
+                    ifNode
+                }
+            }
+        };
+        
+        // Act
+        progNode.Accept(_typeVisitor);
+        
+        // Assert
+        // Is the vardcl okay? requires expr node = number, as var id is number
+        Assert.Equal(TypeVal.Ok, varDcl.Type);
+        Assert.Equal(TypeVal.Number, exprNode.Type);
+        
+        // Is the ifnode okay? requires condition = bool, andnode exprs = bool 
+        Assert.Equal(TypeVal.Ok, ifNode.Type);
+        Assert.Equal(TypeVal.Boolean, boolCond.Type);
+        Assert.Equal(TypeVal.Boolean, boolLeft.Type);
+        Assert.Equal(TypeVal.Boolean, boolRight.Type);
+    }
+    #endregion
 }

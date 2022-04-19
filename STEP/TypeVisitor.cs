@@ -158,11 +158,11 @@ public class TypeVisitor : IVisitor {
     }
 
     public void Visit(VarDclNode n) {
-        n.Left.Accept(this);
+        DclVisitor dclVisitor = new DclVisitor(_symbolTable);
+        n.Left.Accept(dclVisitor);
         n.Right.Accept(this);
         if (n.Left.Type == n.Right.Type) {
             n.Type = TypeVal.Ok;
-            _symbolTable.EnterSymbol(n.Left.Id, n.Left.Type);
         }
         else {
             n.Type = TypeVal.Error;
@@ -170,9 +170,10 @@ public class TypeVisitor : IVisitor {
     }
 
     public void Visit(AssNode n) { // Add constant check, needs to be in ST (i think)
+        AssVisitor assVisitor = new AssVisitor(_symbolTable);
+        n.Id.Accept(assVisitor);
         n.Expr.Accept(this);
-        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id);
-        if (symbol?.Type == n.Expr.Type) {
+        if (n.Id.Type == n.Expr.Type) {
             n.Type = TypeVal.Ok;
         }
         else {
@@ -180,7 +181,7 @@ public class TypeVisitor : IVisitor {
         }
     }
 
-    public void Visit(IdNode n) {
+    public virtual void Visit(IdNode n) {
         var symbol = _symbolTable.RetrieveSymbol(n.Id);
         n.Type = symbol?.Type ?? TypeVal.Error;
     }
@@ -285,7 +286,7 @@ public class TypeVisitor : IVisitor {
         n.Initializer.Accept(this);
         n.Limit.Accept(this);
         n.Update.Accept(this);
-        if (n.Initializer.Type == TypeVal.Number && n.Limit.Type == TypeVal.Number && n.Update.Type == TypeVal.Number) { // If it's a constant, it's number.. If it's vardcl, it's Ok??? 
+        if (n.Initializer.Type == TypeVal.Number && n.Limit.Type == TypeVal.Number && n.Update.Type == TypeVal.Number) { // If it's a literal, it's number.. If it's vardcl, it's Ok??? 
             n.Type = TypeVal.Ok;
         }
         else {
@@ -320,6 +321,12 @@ public class TypeVisitor : IVisitor {
     public void Visit(FuncExprNode n) {
         var symbol = _symbolTable.RetrieveSymbol(n.Id.Id);
         n.Type = symbol?.Type ?? TypeVal.Error;
+        foreach (var param in n.Params) {
+            param.Accept(this);
+            if (param.Type == TypeVal.Error) { // Add param and formal param type comparison later 
+                n.Type = TypeVal.Error;
+            }
+        }
     }
 
     public void Visit(FuncStmtNode n) {
@@ -341,17 +348,22 @@ public class TypeVisitor : IVisitor {
     }
 
     public void Visit(RetNode n) {
-        n.RetVal.Accept(this);
         var parentFunc = n.Parent;
         while (parentFunc is not FuncDefNode or null) {
             parentFunc = parentFunc.Parent;
         }
 
-        if (parentFunc.Type == n.RetVal.Type) {
+        if (parentFunc.Type == TypeVal.Blank) {
             n.Type = TypeVal.Ok;
         }
         else {
-            n.Type = TypeVal.Error;
+            n.RetVal.Accept(this);
+            if (parentFunc.Type == n.RetVal.Type) {
+                n.Type = TypeVal.Ok;
+            }
+            else {
+                n.Type = TypeVal.Error;
+            }
         }
     }
 

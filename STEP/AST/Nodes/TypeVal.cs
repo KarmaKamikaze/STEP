@@ -5,6 +5,7 @@ public enum TypeVal
     Number,
     String,
     Boolean,
+    Blank,
     Ok,
     Error
 }
