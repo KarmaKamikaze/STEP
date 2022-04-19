@@ -173,18 +173,18 @@ public class TypeVisitor : IVisitor {
     }
 
     public void Visit(PlusNode n) {
-         n.Left.Accept(this);
-         n.Right.Accept(this);
-         if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number)
-         {
-             n.Type = TypeVal.Number;
-         }
-         else if (n.Left.Type == TypeVal.String || n.Right.Type == TypeVal.String) {
-             n.Type = TypeVal.String;
-         }
-         else {
-             n.Type = TypeVal.Error;
-         }
+        n.Left.Accept(this);
+        n.Right.Accept(this);
+        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number)
+        {
+            n.Type = TypeVal.Number;
+        }
+        else if (n.Left.Type == TypeVal.String || n.Right.Type == TypeVal.String) {
+            n.Type = TypeVal.String;
+        }
+        else {
+            n.Type = TypeVal.Error;
+        }
     }
 
     public void Visit(MinusNode n) {
