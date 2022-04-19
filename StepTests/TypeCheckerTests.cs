@@ -38,11 +38,11 @@ public class TypeCheckerTests {
 
         // Act
         _typeVisitor.Visit(strLiteralNode);
-       
+        
         // Assert
         Assert.Equal(TypeVal.String, strLiteralNode.Type);
     }
-       
+        
     [Fact]
     public void BoolNode_ShouldBeBool()
     {
@@ -90,7 +90,7 @@ public class TypeCheckerTests {
         
         // Act
         _typeVisitor.Visit(parenNode);
-        
+
         // Assert
         Assert.Equal(exprNode.Type, parenNode.Type);
     }
