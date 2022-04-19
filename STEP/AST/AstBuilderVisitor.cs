@@ -212,6 +212,20 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         return node;
     }
 
+    public override ExprNode VisitArr_id_or_lit([NotNull] STEPParser.Arr_id_or_litContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+        if(children.Count == 1)
+        {
+            IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
+            idNode.Id = context.ID().GetText();
+            return idNode;
+        }
+        ArrLiteralNode arrLitNode = (ArrLiteralNode)NodeFactory.MakeNode(AstNodeType.ArrayLiteralNode);
+        arrLitNode.Elements = children.OfType<ExprNode>().ToList();
+        return arrLitNode;
+    }
+
     public override ExprNode VisitExpr([NotNull] STEPParser.ExprContext context)
     {
         return (ExprNode) NodeFactory.MakeNode(AstNodeType.FuncExprNode);
