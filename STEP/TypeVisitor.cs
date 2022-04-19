@@ -129,10 +129,23 @@ public class TypeVisitor : IVisitor {
 
     public void Visit(ArrDclNode n) {
         n.Left.Accept(this);
-        foreach (var node in n.ArrLitRight) {
-            node.Accept(this);
-            if (node.Type != n.Left.Type) {
+        n.Right.Accept(this);
+        n.Type = (n.Left.Type != n.Right.Type) 
+            ? TypeVal.Error 
+            : n.Left.Type;
+    }
+
+    public void Visit(ArrLiteralNode n)
+    {
+        // Check if all elements have the same type
+        var firstType = n.Elements.FirstOrDefault()?.Type;
+        foreach (var expr in n.Elements)
+        {
+            expr.Accept(this);
+            if (expr.Type != firstType)
+            {
                 n.Type = TypeVal.Error;
+                break;
             }
         }
     }
@@ -173,18 +186,18 @@ public class TypeVisitor : IVisitor {
     }
 
     public void Visit(PlusNode n) {
-         n.Left.Accept(this);
-         n.Right.Accept(this);
-         if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number)
-         {
-             n.Type = TypeVal.Number;
-         }
-         else if (n.Left.Type == TypeVal.String || n.Right.Type == TypeVal.String) {
-             n.Type = TypeVal.String;
-         }
-         else {
-             n.Type = TypeVal.Error;
-         }
+        n.Left.Accept(this);
+        n.Right.Accept(this);
+        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number)
+        {
+            n.Type = TypeVal.Number;
+        }
+        else if (n.Left.Type == TypeVal.String || n.Right.Type == TypeVal.String) {
+            n.Type = TypeVal.String;
+        }
+        else {
+            n.Type = TypeVal.Error;
+        }
     }
 
     public void Visit(MinusNode n) {

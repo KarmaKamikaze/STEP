@@ -103,10 +103,12 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
     public override VarsNode VisitVariables([NotNull] STEPParser.VariablesContext context)
     {
-        VarsNode node;
-        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this))
-            .Where(child => child != null).ToList(); // Terminals are null
+        VarsNode node = (VarsNode)NodeFactory.MakeNode(AstNodeType.VarsNode);
+        List<VarDclNode> children = context.children.Select(kiddies => kiddies.Accept(this))
+            .Where(child => child != null).Cast<VarDclNode>().ToList(); // Terminals are null
 
+        node.Dcls = children;
+        /*
         if (children.Count >= 1)
             node = (VarsNode) AstNode.MakeFamily(AstNodeType.VarsNode, children);
         else
@@ -114,7 +116,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             node = (VarsNode) NodeFactory.MakeNode(AstNodeType.VarsNode);
             node.AdoptChildren(NodeFactory.MakeNode(null));
         }
-
+        */
         return node;
     }
 

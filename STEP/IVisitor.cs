@@ -19,6 +19,7 @@ public interface IVisitor {
     public void Visit(StringNode n);
     public void Visit(BoolNode n);
     public void Visit(ArrDclNode n);
+    public void Visit(ArrLiteralNode n);
     public void Visit(ArrayAccessNode n);
     public void Visit(VarDclNode n);
     public void Visit(AssNode n);

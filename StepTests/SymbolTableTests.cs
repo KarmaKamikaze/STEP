@@ -82,7 +82,7 @@ public class SymbolTableTests
         // Assert
         Assert.Null(result);
     }
-   
+    
     [Fact]
     public void CloseScope_CloseTheGlobalScope_ThrowsException()
     {
