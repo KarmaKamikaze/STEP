@@ -2,7 +2,6 @@
 
 public enum AstNodeType
 {
-    NullNode,
     // Expressions
     IdNode,
     PlusNode,
@@ -26,6 +25,7 @@ public enum AstNodeType
     BoolNode,
     FuncExprNode,
     ArrayAccessNode,
+    ArrayLiteralNode,
     // Variable Declarations
     ArrDclNode,
     VarDclNode,

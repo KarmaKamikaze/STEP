@@ -51,6 +51,8 @@ public static class NodeFactory
                 return new FuncExprNode() {NodeType = AstNodeType.FuncExprNode};
             case AstNodeType.ArrayAccessNode:
                 return new ArrayAccessNode() {NodeType = AstNodeType.ArrayAccessNode};
+            case AstNodeType.ArrayLiteralNode:
+                return new ArrayAccessNode() {NodeType = AstNodeType.ArrayLiteralNode};
                 // Variable Declarations
             case AstNodeType.ArrDclNode:
                 return new ArrDclNode() {NodeType = AstNodeType.ArrDclNode};
@@ -88,7 +90,7 @@ public static class NodeFactory
             case AstNodeType.FuncsNode:
                 return new FuncsNode() {NodeType = AstNodeType.FuncsNode};
             default:
-                return new NullNode();
+                return null;
         }
     }
 }

@@ -46,8 +46,6 @@ class Program
             AstNode root = astBuilder.Build(tree);
             TypeVisitor typeVisitor = new();
             root.Accept(typeVisitor);
-
-            Printer(root);
         }
         catch (Exception e)
         {
@@ -67,23 +65,5 @@ class Program
         Console.WriteLine("Press any key to exit...");
         Console.ReadKey();
         Environment.Exit(0);
-    }
-
-    public static void Printer(AstNode node)
-    {
-        if (node == null)
-            return;
-        Console.WriteLine($"Parent: {node.Parent}");
-        Console.WriteLine($"Type: {node.GetType()}");
-        Console.WriteLine($"Node: {node.NodeType}");
-        Console.WriteLine($"Left child: {node.LeftmostChild}");
-        Console.WriteLine($"Leftmost sibling: {node.LeftmostSibling}");
-        Console.WriteLine($"Right sibling: {node.RightSibling}");
-        Console.WriteLine();
-
-        Printer(node.LeftmostChild);
-        if (node.RightSibling != null)
-            Printer(node.RightSibling);
-
     }
 }
