@@ -64,7 +64,7 @@ public class SymbolTable : ISymbolTable
         //exception to check if a symbol is declared locally more than once
         if(IsDeclaredLocally(name))
         {
-            throw new DuplicateDeclarationException("An id of this name have allready been declared", name);
+            throw new DuplicateDeclarationException("An id of this name have already been declared", name);
         }
         var symbolEntry = new SymTableEntry 
         {
