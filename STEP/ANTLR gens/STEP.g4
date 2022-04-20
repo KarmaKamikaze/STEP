@@ -170,14 +170,14 @@ grammar STEP;
         ;
   
   value 
-        : constant 
+        : MINUS? (constant 
         | ID arrindex? 
         | LPAREN logicexpr RPAREN 
-        | funccall
+        | funccall)
         ;
   
   constant 
-        : MINUS? NUMLITERAL 
+        : NUMLITERAL 
         | STRLITERAL 
         | BOOLLITERAL
         ;

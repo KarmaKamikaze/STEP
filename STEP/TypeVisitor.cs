@@ -152,9 +152,14 @@ public class TypeVisitor : IVisitor {
 
     public void Visit(ArrayAccessNode n) {
         n.Array.Accept(this);
+        if (n.Index.Type == TypeVal.Number) {
+            n.Type = n.Array.Type;
+        }
+        else {
+            n.Type = TypeVal.Error;
+        }
         // Index is expression node, should we "calculate" the expression if possible to check if
         // index is >= 0 and < ArrSize?
-        n.Type = n.Array.Type;
     }
 
     public void Visit(VarDclNode n) {
