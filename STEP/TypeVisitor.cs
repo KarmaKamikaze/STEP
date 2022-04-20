@@ -1,4 +1,5 @@
-﻿using STEP.AST;
+﻿using System.Data;
+using STEP.AST;
 using STEP.AST.Nodes;
 
 namespace STEP; 
@@ -152,6 +153,7 @@ public class TypeVisitor : IVisitor {
 
     public void Visit(ArrayAccessNode n) {
         n.Array.Accept(this);
+        n.Index.Accept(this);
         if (n.Index.Type == TypeVal.Number) {
             n.Type = n.Array.Type;
         }
@@ -319,29 +321,53 @@ public class TypeVisitor : IVisitor {
             stmtNode.Accept(this);
         }
         n.ReturnType.Accept(this);
-        n.Type = ((AstNode) n.ReturnType).Type; // ?
-        _symbolTable.EnterSymbol(n);
+        bool typeMismatch = false;
+        foreach (var retNode in n.Stmts.OfType<RetNode>()) {
+            if (retNode.RetVal.Type != n.ReturnType.Type) {
+                typeMismatch = true;
+            }
+        }
+
+        if (!typeMismatch) {
+            n.Type = n.ReturnType.Type;
+            _symbolTable.EnterSymbol(n);
+        }
+        else {
+            n.Type = TypeVal.Error;
+        }
     }
 
     public void Visit(FuncExprNode n) {
-        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id);
-        n.Type = symbol?.Type ?? TypeVal.Error;
+        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id) as FunctionSymTableEntry;
+        if (symbol is null) { // Should this be here?
+            throw new NoNullAllowedException("The retrieved symbol was not a function symbol table entry");
+        }
+        n.Type = symbol.Type;
+        var parameterTypes = symbol.Parameters.Values.ToArray();
+        int i = 0;
         foreach (var param in n.Params) {
             param.Accept(this);
-            if (param.Type == TypeVal.Error) { // Add param and formal param type comparison later 
+            if (param.Type != parameterTypes[i] || param.Type == TypeVal.Error) {
                 n.Type = TypeVal.Error;
             }
+            i++;
         }
     }
 
     public void Visit(FuncStmtNode n) {
-        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id);
-        n.Type = symbol?.Type ?? TypeVal.Error;
+        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id) as FunctionSymTableEntry;
+        if (symbol is null) { // Should this be here?
+            throw new NoNullAllowedException("The retrieved symbol was not a function symbol table entry");
+        }
+        n.Type = symbol.Type;
+        var parameterTypes = symbol.Parameters.Values.ToArray();
+        int i = 0;
         foreach (var param in n.Params) {
             param.Accept(this);
-            if (param.Type == TypeVal.Error) { // Add param and formal param type comparison later 
+            if (param.Type != parameterTypes[i] || param.Type == TypeVal.Error) {
                 n.Type = TypeVal.Error;
             }
+            i++;
         }
     }
 
@@ -357,7 +383,6 @@ public class TypeVisitor : IVisitor {
         while (parentFunc is not FuncDefNode or null) {
             parentFunc = parentFunc.Parent;
         }
-
         if (parentFunc.Type == TypeVal.Blank) {
             n.Type = TypeVal.Ok;
         }
@@ -398,8 +423,6 @@ public class TypeVisitor : IVisitor {
             _symbolTable.EnterSymbol(node.Left.Id, node.Type);
         }
     }
-
-    public void Visit(NullNode n) { }
 
     public void Visit(ProgNode n) {
         n.VarsBlock?.Accept(this);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using STEP;
 using STEP.AST;
 using STEP.AST.Nodes;
@@ -706,7 +707,145 @@ public class TypeCheckerTests {
         // Assert
         Assert.Equal(TypeVal.Boolean, lThanEqNode.Type);
     }
+
+    [Theory]
+    [InlineData(TypeVal.Number)]
+    [InlineData(TypeVal.String)]
+    [InlineData(TypeVal.Boolean)]
+    public void ArrayAccessNode_IndexIsNumber_AssignsArrayType(TypeVal type) {
+        // Arrange
+        var symbol = new SymTableEntry() {Type = type};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("array"))
+            .Returns(symbol);
+        var symbol2 = new SymTableEntry() {Type = TypeVal.Number};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("index"))
+            .Returns(symbol2);
+        var arrAccNode = new ArrayAccessNode() {
+            Array = new IdNode() {Id = "array"},
+            Index = new IdNode() {Id = "index"}
+        };
+        // Act
+        arrAccNode.Accept(_typeVisitor);
+
+        // Assert
+        Assert.Equal(type, arrAccNode.Type);
+    }
     
+    [Theory]
+    [InlineData(TypeVal.String)]
+    [InlineData(TypeVal.Boolean)]
+    [InlineData(TypeVal.Error)]
+    public void ArrayAccessNode_IndexIsNotNumber_AssignsError(TypeVal type) {
+        // Arrange
+        var symbol = new SymTableEntry() {Type = TypeVal.Number};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("array"))
+            .Returns(symbol);
+        var symbol2 = new SymTableEntry() {Type = type};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("index"))
+            .Returns(symbol2);
+        var arrAccNode = new ArrayAccessNode() {
+            Array = new IdNode() {Id = "array"},
+            Index = new IdNode() {Id = "index"}
+        };
+        // Act
+        arrAccNode.Accept(_typeVisitor);
+
+        // Assert
+        Assert.Equal(TypeVal.Error, arrAccNode.Type);  
+    }
+
+    [Theory]
+    [InlineData(TypeVal.Number)]
+    [InlineData(TypeVal.String)]
+    [InlineData(TypeVal.Boolean)]
+    public void FuncExprNode_ParamsMatch_IsTypeMatch(TypeVal type) {
+        // Arrange
+        var symbol = new FunctionSymTableEntry() {
+            Type = type,
+            Parameters = new Dictionary<string, TypeVal>() {
+                {"a", TypeVal.Number},
+                {"b", TypeVal.String},
+                {"c", TypeVal.Boolean}
+            }
+        };
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
+            .Returns(symbol);
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("a"))
+            .Returns(new SymTableEntry(){Type = TypeVal.Number});
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("b"))
+            .Returns(new SymTableEntry(){Type = TypeVal.String});
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
+            .Returns(new SymTableEntry(){Type = TypeVal.Boolean});
+        var funcExprNode = new FuncExprNode() {
+            Id = new IdNode() {Id = "func"},
+            Params = new List<ExprNode>() {
+                new IdNode() {Id = "a"},
+                new IdNode() {Id = "b"},
+                new IdNode() {Id = "c"}
+            }
+        };
+
+        // Act
+        funcExprNode.Accept(_typeVisitor);
+
+        // Assert
+        Assert.Equal(type, funcExprNode.Type);
+    }
+    
+    [Theory]
+    [InlineData(TypeVal.Number)]
+    [InlineData(TypeVal.String)]
+    [InlineData(TypeVal.Boolean)]
+    public void FuncExprNode_ParamsMismatch_IsTypeError(TypeVal type) {
+        // Arrange
+        var symbol = new FunctionSymTableEntry() {
+            Type = type,
+            Parameters = new Dictionary<string, TypeVal>() {
+                {"a", TypeVal.Number},
+                {"b", TypeVal.String},
+                {"c", TypeVal.Boolean}
+            }
+        };
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
+            .Returns(symbol);
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("a"))
+            .Returns(new SymTableEntry(){Type = TypeVal.Number});
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("b"))
+            .Returns(new SymTableEntry(){Type = TypeVal.String});
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
+            .Returns(new SymTableEntry(){Type = TypeVal.Boolean});
+        var funcExprNode = new FuncExprNode() {
+            Id = new IdNode() {Id = "func"},
+            Params = new List<ExprNode>() {
+                new IdNode() {Id = "c"},
+                new IdNode() {Id = "a"},
+                new IdNode() {Id = "b"}
+            }
+        };
+
+        // Act
+        funcExprNode.Accept(_typeVisitor);
+
+        // Assert
+        Assert.Equal(TypeVal.Error, funcExprNode.Type);
+    }
+
+    [Fact]
+    public void FuncExprNode_IsNotFunc_ThrowsException() {
+        // Arrange
+        var symbol = new SymTableEntry() {Type = TypeVal.Number};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
+            .Returns(symbol);
+        var funcExprNode = new FuncExprNode() {
+            Id = new IdNode() {Id = "func"},
+        };
+        
+        // Act
+        var action = () => funcExprNode.Accept(_typeVisitor);
+
+        // Assert
+        Assert.Throws<NoNullAllowedException>(action);
+    }
     #endregion
     
     #region Declarations
@@ -851,7 +990,75 @@ public class TypeCheckerTests {
 
         //Assert
         Assert.Equal(TypeVal.Error, arrDclNode.Type);
-    }    
+    }
+
+    [Fact]
+    public void FuncDefNode_IsTypeOk_CorrectlyEnteredInSymbolTable() {
+        // Arrange
+        _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
+            .Returns(new SymTableEntry() {Type = TypeVal.Number});
+        var funcDefNode = new FuncDefNode() {
+            Name = new IdNode() {Id = "Add2"},
+            Stmts = new List<StmtNode>() {
+                new AssNode() {
+                    Id = new IdNode(){Id = "a"},
+                    Expr = new PlusNode() {
+                        Left = new IdNode(){Id = "a", Type = TypeVal.Number},
+                        Right = new NumberNode(){Value = 2}
+                    }
+                },
+                new RetNode() {
+                    Parent = new FuncDefNode(){ReturnType = new IdNode(){Type = TypeVal.Number}},
+                    RetVal = new IdNode(){Id = "return1", Type = TypeVal.Number}
+                }
+            },
+            FormalParams = new Dictionary<IdNode, (TypeVal, bool)>() {
+                {new IdNode(){Id = "a"}, (TypeVal.Number, false)}
+            },
+            ReturnType = new IdNode() {Id = "return2"}
+        };
+
+        // Act
+        funcDefNode.Accept(_typeVisitor);
+
+        // Assert
+        Assert.Equal(TypeVal.Number, funcDefNode.Type);
+        _symbolTableMock.Verify(x => x.EnterSymbol(funcDefNode), Times.Once);
+    }
+    
+    [Fact]
+    public void FuncDefNode_IsTypeError_NotEnteredInSymbolTable() {
+        // Arrange
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("return"))
+            .Returns(new SymTableEntry() {Type = TypeVal.Boolean});
+        var funcDefNode = new FuncDefNode() {
+            Name = new IdNode() {Id = "Add2"},
+            Stmts = new List<StmtNode>() {
+                new AssNode() {
+                    Id = new IdNode(){Id = "a"},
+                    Expr = new PlusNode() {
+                        Left = new IdNode(){Id = "a", Type = TypeVal.Number},
+                        Right = new NumberNode(){Value = 2}
+                    }
+                },
+                new RetNode() {
+                    Parent = new FuncDefNode(){ReturnType = new IdNode(){Type = TypeVal.Number}},
+                    RetVal = new IdNode(){Id = "a"}
+                }
+            },
+            FormalParams = new Dictionary<IdNode, (TypeVal, bool)>() {
+                {new IdNode(){Id = "a"}, (TypeVal.Number, false)}
+            },
+            ReturnType = new IdNode() {Id = "return"}
+        };
+
+        // Act
+        funcDefNode.Accept(_typeVisitor);
+
+        // Assert
+        Assert.Equal(TypeVal.Error, funcDefNode.Type);
+        _symbolTableMock.Verify(x => x.EnterSymbol(funcDefNode), Times.Never);
+    }
     #endregion
     
     #region Statements
@@ -868,7 +1075,7 @@ public class TypeCheckerTests {
         var ifNode = new IfNode {
             Condition = new IdNode() {Id = "bool"},
             ThenClause = new List<StmtNode>(){new ContNode()},
-            ElseClause = new List<StmtNode>(){new ContNode()}
+            ElseClause = new List<StmtNode>(){new BreakNode()}
         };
     
         //Act
@@ -985,7 +1192,10 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var retNode = new RetNode() {
-            Parent = new FuncDefNode() {Type = type},
+            Parent = new IfNode() {
+                Parent = new FuncDefNode() {Type = type},
+                
+            },
             RetVal = new IdNode() {Id = "type"}
         };
         
@@ -1030,6 +1240,93 @@ public class TypeCheckerTests {
         
         // Assert
         Assert.Equal(TypeVal.Ok, retNode.Type);
+    }
+    
+    [Fact]
+    public void FuncStmtNode_ParamsMatch_IsTypeMatch() {
+        // Arrange
+        var symbol = new FunctionSymTableEntry() {
+            Type = TypeVal.Blank,
+            Parameters = new Dictionary<string, TypeVal>() {
+                {"a", TypeVal.Number},
+                {"b", TypeVal.String},
+                {"c", TypeVal.Boolean}
+            }
+        };
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
+            .Returns(symbol);
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("a"))
+            .Returns(new SymTableEntry(){Type = TypeVal.Number});
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("b"))
+            .Returns(new SymTableEntry(){Type = TypeVal.String});
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
+            .Returns(new SymTableEntry(){Type = TypeVal.Boolean});
+        var funcExprNode = new FuncStmtNode() {
+            Id = new IdNode() {Id = "func"},
+            Params = new List<ExprNode>() {
+                new IdNode() {Id = "a"},
+                new IdNode() {Id = "b"},
+                new IdNode() {Id = "c"}
+            }
+        };
+
+        // Act
+        funcExprNode.Accept(_typeVisitor);
+
+        // Assert
+        Assert.Equal(TypeVal.Blank, funcExprNode.Type);
+    }
+    
+    [Fact]
+    public void FuncStmtNode_ParamsMismatch_IsTypeError() {
+        // Arrange
+        var symbol = new FunctionSymTableEntry() {
+            Type = TypeVal.Blank,
+            Parameters = new Dictionary<string, TypeVal>() {
+                {"a", TypeVal.Number},
+                {"b", TypeVal.String},
+                {"c", TypeVal.Boolean}
+            }
+        };
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
+            .Returns(symbol);
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("a"))
+            .Returns(new SymTableEntry(){Type = TypeVal.Number});
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("b"))
+            .Returns(new SymTableEntry(){Type = TypeVal.String});
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
+            .Returns(new SymTableEntry(){Type = TypeVal.Boolean});
+        var funcExprNode = new FuncStmtNode() {
+            Id = new IdNode() {Id = "func"},
+            Params = new List<ExprNode>() {
+                new IdNode() {Id = "c"},
+                new IdNode() {Id = "a"},
+                new IdNode() {Id = "b"}
+            }
+        };
+
+        // Act
+        funcExprNode.Accept(_typeVisitor);
+
+        // Assert
+        Assert.Equal(TypeVal.Error, funcExprNode.Type);
+    }
+    
+    [Fact]
+    public void FuncsTMTNode_IsNotFunc_ThrowsException() {
+        // Arrange
+        var symbol = new SymTableEntry() {Type = TypeVal.Number};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
+            .Returns(symbol);
+        var funcExprNode = new FuncStmtNode() {
+            Id = new IdNode() {Id = "func"},
+        };
+        
+        // Act
+        var action = () => funcExprNode.Accept(_typeVisitor);
+
+        // Assert
+        Assert.Throws<NoNullAllowedException>(action);
     }
 
     #endregion Statements

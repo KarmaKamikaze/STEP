@@ -47,7 +47,6 @@ public interface IVisitor {
     public void Visit(RetNode n);
     public void Visit(IfNode n);
     public void Visit(VarsNode n);
-    public void Visit(NullNode n);
     public void Visit(ProgNode n);
     public void Visit(SetupNode n);
 }
