@@ -387,7 +387,20 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         
         return (ExprNode)children.First(child => child is ExprNode);
     }
-    
+
+    // Helper function
+    private ExprNode UMinusCheck([NotNull] STEPParser.ValueContext context, ExprNode node)
+    {
+        UMinusNode uNode = (UMinusNode) NodeFactory.MakeNode(AstNodeType.UMinusNode);
+        if (context.MINUS() != null)
+        {
+            uNode.Left = node;
+            return uNode;
+        }
+
+        return node;
+    }
+
     public override ExprNode VisitValue([NotNull] STEPParser.ValueContext context)
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
@@ -402,40 +415,19 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
                 ArrayAccessNode node = (ArrayAccessNode)NodeFactory.MakeNode(AstNodeType.ArrayAccessNode);               
                 node.Array = idNode;
                 node.Index = (ExprNode)children.Last(child => child is ExprNode);
-                if(context.MINUS() != null)
-                {
-                    uNode.Left = node;
-                    return uNode;
-                }
-                return node;
+                return UMinusCheck(context, node);
             }
-            if(context.MINUS() != null)
-            {          
-                uNode.Left = idNode;
-                return uNode;
-            }
-            return idNode;        
+            return UMinusCheck(context, idNode);       
         }
 
         if(context.logicexpr() != null)
         {
             ParenNode node = (ParenNode)NodeFactory.MakeNode(AstNodeType.ParenNode);
             node.Left = (ExprNode)children.First(child => child is ExprNode);
-            node.Right = null;
-            if(context.MINUS() != null)
-            {          
-                uNode.Left = node;
-                return uNode;
-            }
-            return node;
+            return UMinusCheck(context, node);
         }
         
-        if(context.MINUS() != null)
-        {          
-            uNode.Left = (ExprNode)children.First(child => child is ExprNode);
-            return uNode;
-        }
-        return (ExprNode)children.First(child => child is ExprNode);
+        return UMinusCheck(context, (ExprNode)children.First(child => child is ExprNode));
     }
     
     public override ExprNode VisitConstant([NotNull] STEPParser.ConstantContext context)
