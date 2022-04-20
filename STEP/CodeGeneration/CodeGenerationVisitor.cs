@@ -251,10 +251,15 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ContNode n)
     {
+        n.Accept(this);
+        EmitAppend("continue");
     }
 
     public void Visit(BreakNode n)
     {
+        //måske dam ?
+        n.Accept(this);
+        EmitAppend(" break ");
     }
 
     public void Visit(LoopNode n)
@@ -289,15 +294,12 @@ public class CodeGenerationVisitor : IVisitor
     {
     }
 
-    public void Visit(NullNode n)
-    {
-    }
-
     public void Visit(ProgNode n)
     {
     }
 
     public void Visit(SetupNode n)
     {
+        
     }
 }
