@@ -426,6 +426,13 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         return node;
     }
 
+    public override ExprNode VisitArrindex([NotNull] STEPParser.ArrindexContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+
+        return (ExprNode)children.First(child => child is ExprNode);
+    }
+
     public override ExprNode VisitValue([NotNull] STEPParser.ValueContext context)
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
@@ -558,7 +565,8 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
         ForNode node = (ForNode) NodeFactory.MakeNode(AstNodeType.ForNode);
-        
+
+        Console.WriteLine("children exprnodes:" + children.OfType<ExprNode>().ToList().Count);
         node.Initializer = children.First(child => child != null);
         children.Remove(node.Initializer);
         
@@ -572,7 +580,35 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         
         return node;
     }
-    
+
+    public override AstNode VisitFor_iter_opt([NotNull] STEPParser.For_iter_optContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+
+        if(context.ID() != null)
+        {
+            IdNode idNode = (IdNode)NodeFactory.MakeNode(AstNodeType.IdNode);
+            idNode.Id = context.ID().GetText();
+            if (children.Any(child => child is ExprNode))
+            {
+                ArrayAccessNode node = (ArrayAccessNode)NodeFactory.MakeNode(AstNodeType.ArrayAccessNode);
+                
+                node.Array = idNode;
+                node.Index = (ExprNode)children.First(child => child is ExprNode);
+                return node;
+            }
+            return idNode;
+        }
+        else if(children.Any(child => child is VarDclNode))
+        {
+            return (VarDclNode)children.First(child => child is VarDclNode);
+        }
+        else // A child is an AssNode
+        {
+            return (AssNode)children.First(child => child is AssNode);
+        }
+    }
+
     public override IfNode VisitIfstmt([NotNull] STEPParser.IfstmtContext context)
     {
         return IfNodeGenerator(context);       

@@ -19,19 +19,10 @@ namespace STEP.AST
 
         private void Indent()
         {
-            for (int i = 0; i <= ind; i++)
+            for (int i = 0; i < ind; i++)
             {
                 Console.Write("  ");
             }
-        }
-
-        private void PrintandIndent(string s)
-        {
-            for(int i = 0; i <= ind; i++)
-            {
-                Console.Write("  ");
-            }
-            Console.Write(s);
         }
 
         public void Visit(ProgNode node)
@@ -49,14 +40,14 @@ namespace STEP.AST
         {
             if (node != null)
             {
-                PrintandIndent("VarsNode\n");
+                Print("VarsNode\n");
                 ind++;
                 foreach(VarDclNode dcl in node.Dcls)
                 {
                     dcl.Accept(this);
                 }
                 ind--;
-                PrintandIndent("end VarsNode\n");
+                Print("end VarsNode\n");
             }
         }
 
@@ -64,14 +55,14 @@ namespace STEP.AST
         {
             if (node != null)
             {
-                PrintandIndent("SetupNode\n");
+                Print("SetupNode\n");
                 ind++;
                 foreach (StmtNode stmt in node.Stmts)
                 {
                     stmt.Accept(this);
                 }
                 ind--;
-                PrintandIndent("end SetupNode\n");
+                Print("end SetupNode\n");
             }
         }
 
@@ -96,14 +87,14 @@ namespace STEP.AST
         {
             if (node != null)
             {
-                PrintandIndent("LoopNode\n");
+                Print("LoopNode\n");
                 ind++;
                 foreach (StmtNode stmt in node.Stmts)
                 {
                     stmt.Accept(this);
                 }
                 ind--;
-                PrintandIndent("end LoopNode\n");
+                Print("end LoopNode\n");
             }
         }
 
@@ -111,14 +102,14 @@ namespace STEP.AST
         {
             if (node != null)
             {
-                PrintandIndent("FuncsNode\n");
+                Print("FuncsNode\n");
                 ind++;
                 foreach (FuncDefNode funcdef in node.FuncDcls)
                 {
                     funcdef.Accept(this);
                 }
                 ind--;
-                PrintandIndent("end FuncsNode\n");
+                Print("end FuncsNode\n");
             }
         }
 
@@ -273,12 +264,31 @@ namespace STEP.AST
 
         public void Visit(ArrayAccessNode n)
         {
-            throw new NotImplementedException();
+            if (n != null)
+            {
+                n.Array.Accept(this);
+                Print("[");
+                n.Index.Accept(this);
+                Print("]");
+            }
         }
 
         public void Visit(AssNode n)
         {
-            throw new NotImplementedException();
+            if (n != null)
+            {
+                Indent();
+                n.Id.Accept(this);
+                if (n.ArrIndex != null)
+                {
+                    Print("[");
+                    n.ArrIndex.Accept(this);
+                    Print("]");
+                }
+                Print(" = ");
+                n.Expr.Accept(this);
+                Print("\n");
+            }
         }
 
         public void Visit(IdNode n)
@@ -360,12 +370,46 @@ namespace STEP.AST
 
         public void Visit(WhileNode n)
         {
-            throw new NotImplementedException();
+            if (n != null)
+            {
+                Indent();
+                Print("while (");
+                n.Condition.Accept(this);
+                Print(")\n");
+                ind++;
+
+                foreach (StmtNode stmt in n.Body)
+                {
+                    stmt.Accept(this);
+                }
+                ind--;
+                Indent();
+                Print("end while\n");
+            }
         }
 
         public void Visit(ForNode n)
         {
-            throw new NotImplementedException();
+            if (n != null)
+            {
+                Indent();
+                Print("for (");
+                n.Initializer.Accept(this);
+                Print(" to ");
+                n.Limit.Accept(this);
+                Print(", change by ");
+                n.Update.Accept(this);
+                Print(")\n");
+                ind++;
+
+                foreach (StmtNode stmt in n.Body)
+                {
+                    stmt.Accept(this);
+                }
+                ind--;
+                Indent();
+                Print("end for\n");
+            }
         }
 
         public void Visit(ContNode n)
