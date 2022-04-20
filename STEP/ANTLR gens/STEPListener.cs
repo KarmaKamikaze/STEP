@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from D:/Documents/Programming/STEP/STEP\STEP.g4 by ANTLR 4.9.2
+// Generated from D:/Documents/Programming/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
 
 // Unreachable code detected
 #pragma warning disable 0162

@@ -391,7 +391,8 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override ExprNode VisitValue([NotNull] STEPParser.ValueContext context)
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
-    
+        UMinusNode uNode = (UMinusNode)NodeFactory.MakeNode(AstNodeType.UMinusNode);  
+        
         if(context.ID() != null)
         {
             IdNode idNode = (IdNode)NodeFactory.MakeNode(AstNodeType.IdNode);
@@ -403,11 +404,15 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
                 node.Index = (ExprNode)children.Last(child => child is ExprNode);
                 if(context.MINUS() != null)
                 {
-                    UMinusNode uNode = (UMinusNode)NodeFactory.MakeNode(AstNodeType.UMinusNode);           
                     uNode.Left = node;
                     return uNode;
                 }
                 return node;
+            }
+            if(context.MINUS() != null)
+            {          
+                uNode.Left = idNode;
+                return uNode;
             }
             return idNode;        
         }
@@ -417,9 +422,19 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             ParenNode node = (ParenNode)NodeFactory.MakeNode(AstNodeType.ParenNode);
             node.Left = (ExprNode)children.First(child => child is ExprNode);
             node.Right = null;
+            if(context.MINUS() != null)
+            {          
+                uNode.Left = node;
+                return uNode;
+            }
             return node;
         }
         
+        if(context.MINUS() != null)
+        {          
+            uNode.Left = (ExprNode)children.First(child => child is ExprNode);
+            return uNode;
+        }
         return (ExprNode)children.First(child => child is ExprNode);
     }
     
@@ -431,13 +446,6 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         {
             NumberNode numNode = (NumberNode)NodeFactory.MakeNode(AstNodeType.NumberNode);
             numNode.Value = Double.Parse(context.NUMLITERAL().GetText());
-            
-            if(context.MINUS() != null)
-            {
-                UMinusNode node = (UMinusNode)NodeFactory.MakeNode(AstNodeType.UMinusNode);           
-                node.Left = numNode;
-                return node;
-            }
             
             return numNode;
         }
