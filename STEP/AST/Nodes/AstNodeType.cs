@@ -33,7 +33,6 @@ public enum AstNodeType
     // Statements
     AssNode,
     FuncStmtNode,
-    LoopStmtNode,
     WhileNode,
     ForNode,
     IfNode,
