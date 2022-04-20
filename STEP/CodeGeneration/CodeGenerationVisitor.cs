@@ -251,19 +251,12 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ContNode n)
     {
-        n.Accept(this);
-        EmitAppend("continue");
+        EmitAppend("continue;");
     }
 
     public void Visit(BreakNode n)
     {
-        //måske dam ?
-        n.Accept(this);
-        EmitAppend(" break ");
-    }
-
-    public void Visit(LoopNode n)
-    {
+        EmitAppend("break;");
     }
 
     public void Visit(FuncDefNode n)
@@ -284,6 +277,14 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(RetNode n)
     {
+        // If no expression, emit empty return
+        if (n.RetVal is null) {
+            EmitLine("return;");
+        }
+        else {
+            EmitAppend("return ");
+            n.RetVal.Accept(this);
+        }
     }
 
     public void Visit(IfNode n)
@@ -292,14 +293,35 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(VarsNode n)
     {
+        foreach(var dclNode in n.Dcls) {
+            dclNode.Accept(this);
+        }
     }
 
     public void Visit(ProgNode n)
     {
+        // TODO: library inclusion?
+        n.VarsBlock?.Accept(this);
+        n.FuncsBlock?.Accept(this);
+        n.SetupBlock?.Accept(this);
+        n.LoopBlock?.Accept(this);
     }
 
     public void Visit(SetupNode n)
     {
-        
+        EmitLine("void setup() {");
+        foreach(var stmt in n.Stmts) {
+            stmt.Accept(this);
+        }
+        EmitLine("}");
+    }
+    
+    public void Visit(LoopNode n)
+    {
+        EmitLine("void loop() {");
+        foreach(var stmt in n.Stmts) {
+            stmt.Accept(this);
+        }
+        EmitLine("}");
     }
 }
