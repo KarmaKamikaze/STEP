@@ -1,4 +1,5 @@
-﻿using Antlr4.Runtime.Misc;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
 using STEP.AST.Nodes;
 
 namespace STEP.AST;
@@ -129,7 +130,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Type =
-            TypeVal.Number; // Maybe not the right place to assign the type? Maybe should be done in typechecking or symbol table creation?
+            TypeVal.Number;
 
         idNode.Id = context.ID().GetText();
 
@@ -147,7 +148,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Type =
-            TypeVal.String; // Maybe not the right place to assign the type? Maybe should be done in typechecking or symbol table creation?
+            TypeVal.String;
 
         idNode.Id = context.ID().GetText();
 
@@ -166,7 +167,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Type =
-            TypeVal.Boolean; // Maybe not the right place to assign the type? Maybe should be done in typechecking or symbol table creation?
+            TypeVal.Boolean;
 
         idNode.Id = context.ID().GetText();
 
@@ -186,16 +187,16 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         {
             case "number":
                 idNode.Type =
-                    TypeVal.Number; // Maybe not the right place to assign the type? Maybe should be done in typechecking or symbol table creation?
+                    TypeVal.Number;
                 break;
             case "string":
                 idNode.Type =
-                    TypeVal.String; // Maybe not the right place to assign the type? Maybe should be done in typechecking or symbol table creation?
+                    TypeVal.String;
 
                 break;
             case "boolean":
                 idNode.Type =
-                    TypeVal.Boolean; // Maybe not the right place to assign the type? Maybe should be done in typechecking or symbol table creation?
+                    TypeVal.Boolean;
 
                 break;
             default:
@@ -400,6 +401,12 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
                 ArrayAccessNode node = (ArrayAccessNode)NodeFactory.MakeNode(AstNodeType.ArrayAccessNode);               
                 node.Array = idNode;
                 node.Index = (ExprNode)children.Last(child => child is ExprNode);
+                if(context.MINUS() != null)
+                {
+                    UMinusNode uNode = (UMinusNode)NodeFactory.MakeNode(AstNodeType.UMinusNode);           
+                    uNode.Left = node;
+                    return uNode;
+                }
                 return node;
             }
             return idNode;        
@@ -448,11 +455,36 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
     }
  
- /*   public override AstNode VisitFunccall([NotNull] STEPParser.FunccallContext context)
+    public override AstNode VisitFunccall([NotNull] STEPParser.FunccallContext context)
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+        IdNode idNode = (IdNode)NodeFactory.MakeNode(AstNodeType.IdNode);
+        idNode.Id = context.ID().GetText();
         
-        
+        if(context.Parent is STEPParser.ValueContext)
+        {
+            FuncExprNode exprNode = (FuncExprNode)NodeFactory.MakeNode(AstNodeType.FuncExprNode);
+            exprNode.Id = idNode;
+            exprNode.Params = children.OfType<ExprNode>().ToList();
+            return exprNode;
+        }
+
+        if (context.Parent is STEPParser.StmtsContext)
+        {
+            FuncStmtNode stmtNode = (FuncStmtNode)NodeFactory.MakeNode(AstNodeType.FuncStmtNode);
+            stmtNode.Id = idNode;
+            stmtNode.Params = children.OfType<ExprNode>().ToList();
+            return stmtNode;
+        }
+        else
+        {
+            throw new InvalidOperationException("Funccall nodes should be a child of either Value or Stmt nodes.");
+        }
     }
-   */ 
+   
+   
+   
+   
+   
+   
 }
