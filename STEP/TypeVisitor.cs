@@ -319,8 +319,8 @@ public class TypeVisitor : IVisitor {
             stmtNode.Accept(this);
         }
         n.ReturnType.Accept(this);
-        _symbolTable.EnterSymbol(n.Name.Id, n.Type);
         n.Type = ((AstNode) n.ReturnType).Type; // ?
+        _symbolTable.EnterSymbol(n);
     }
 
     public void Visit(FuncExprNode n) {

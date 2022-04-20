@@ -74,7 +74,33 @@ public class SymbolTable : ISymbolTable
         // Add the symbol to the innermost scope (top of the scopeStack)
         _scopeStack.Peek().Add(name, symbolEntry);
     }
-    
+
+    public void EnterSymbol(FuncDefNode node)
+    {
+        string name = node.Name.Id;
+        //exception to check if a symbol is declared locally more than once
+        if(IsDeclaredLocally(name))
+        {
+            throw new DuplicateDeclarationException("An id of this name have already been declared", name);
+        }
+
+        // Convert formal parameters into a dictionary of strings and TypeVals
+        var parameters = new Dictionary<string, TypeVal>();
+        foreach (var param in node.FormalParams)
+        {
+            parameters.Add(param.Key.Id, param.Value.Item1);
+        }
+        
+        var symbolEntry = new FunctionSymTableEntry() 
+        {
+            Name = name,
+            Type = node.Type,
+            Parameters = parameters
+        };
+        // Add the symbol to the innermost scope (top of the scopeStack)
+        _scopeStack.Peek().Add(name, symbolEntry);
+    }
+
     public bool IsDeclaredLocally(string id)
     {
         return _scopeStack.Peek().ContainsKey(id);
