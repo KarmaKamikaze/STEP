@@ -210,6 +210,25 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         node.Size = Int32.Parse(context.arrsizedcl().GetText().Trim('[', ']'));
 
+        if(children.Any(child => child is IdNode))
+        {
+            node.IsId = true;
+            node.IdRight = (IdNode)children.First(child => child is IdNode);
+        }
+        else
+        {
+            node.Right = (ArrLiteralNode) children.First(child => child is ArrLiteralNode);
+        }
+
+        return node;
+    }
+
+    public override ArrLiteralNode VisitParams_options([NotNull] STEPParser.Params_optionsContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+        ArrLiteralNode node = (ArrLiteralNode)NodeFactory.MakeNode(AstNodeType.ArrayLiteralNode);
+        node.Elements = children.OfType<ExprNode>().ToList();
+
         return node;
     }
 
@@ -223,9 +242,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             return idNode;
         }
 
-        ArrLiteralNode arrLitNode = (ArrLiteralNode) NodeFactory.MakeNode(AstNodeType.ArrayLiteralNode);
-        arrLitNode.Elements = children.OfType<ExprNode>().ToList();
-        return arrLitNode;
+        return (ArrLiteralNode)children.First(child => child is ArrLiteralNode);
     }
 
     public override ExprNode VisitLogicexpr([NotNull] STEPParser.LogicexprContext context)
@@ -470,11 +487,13 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Id = context.ID().GetText();
 
+        List<ExprNode> parameters = ((ArrLiteralNode)children.First(child => child is ArrLiteralNode)).Elements;
+
         if (context.Parent is STEPParser.ValueContext)
         {
             FuncExprNode exprNode = (FuncExprNode) NodeFactory.MakeNode(AstNodeType.FuncExprNode);
             exprNode.Id = idNode;
-            exprNode.Params = children.OfType<ExprNode>().ToList();
+            exprNode.Params = parameters;
             return exprNode;
         }
 
@@ -482,7 +501,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         {
             FuncStmtNode stmtNode = (FuncStmtNode) NodeFactory.MakeNode(AstNodeType.FuncStmtNode);
             stmtNode.Id = idNode;
-            stmtNode.Params = children.OfType<ExprNode>().ToList();
+            stmtNode.Params = parameters;
             return stmtNode;
         }
         else

@@ -1,0 +1,12 @@
+variables
+  number a = b
+  string ass = "hej" + 10
+  boolean test = true
+  boolean test2 = (10 <= 12) or -2+f(10,2,2+1,ass,f(1,2,3,4))
+  number test3 = 10*2-3/(2*1)
+  string[10] str = arr
+  number[2] arrtest = [2,1,1+2,f(10,2),ass]
+end variables
+
+setup
+end setup

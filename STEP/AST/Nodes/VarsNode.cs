@@ -2,8 +2,6 @@
 
 public class VarsNode : AstNode
 {
-    public SymTableEntry AttributesRef { get; set; }
-    public string Id { get; set; }
     public override void Accept(IVisitor v) {
         v.Visit(this);
     }
