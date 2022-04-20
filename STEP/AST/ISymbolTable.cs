@@ -34,6 +34,13 @@ public interface ISymbolTable {
     void EnterSymbol(string name, TypeVal type);
     
     /// <summary>
+    /// Enters a symbol for the given function definition in the current scope if not already declared within the scope.
+    /// </summary>
+    /// <param name="node">The function definition node to enter.</param>
+    /// <exception cref="DuplicateDeclarationException">Thrown if the given name is already declared in the current scope.</exception>
+    void EnterSymbol(FuncDefNode node);
+    
+    /// <summary>
     /// Tests whether a symbol with the given <paramref name="id"/> exists in the current (innermost) scope.
     /// </summary>
     /// <param name="id">The name of the symbol to test for.</param>
