@@ -45,6 +45,7 @@ namespace STEP.AST
                 foreach(VarDclNode dcl in node.Dcls)
                 {
                     dcl.Accept(this);
+                    Print("\n");
                 }
                 ind--;
                 Print("end VarsNode\n");
@@ -60,6 +61,7 @@ namespace STEP.AST
                 foreach (StmtNode stmt in node.Stmts)
                 {
                     stmt.Accept(this);
+                    Print("\n");
                 }
                 ind--;
                 Print("end SetupNode\n");
@@ -79,7 +81,6 @@ namespace STEP.AST
                 node.Left.Accept(this);
                 Print(" = ");
                 node.Right.Accept(this);
-                Print("\n");
             }
         }
 
@@ -92,6 +93,7 @@ namespace STEP.AST
                 foreach (StmtNode stmt in node.Stmts)
                 {
                     stmt.Accept(this);
+                    Print("\n");
                 }
                 ind--;
                 Print("end LoopNode\n");
@@ -246,7 +248,6 @@ namespace STEP.AST
                 {
                     n.Right.Accept(this);
                 }
-                Print("\n");
             }
         }
 
@@ -287,7 +288,6 @@ namespace STEP.AST
                 }
                 Print(" = ");
                 n.Expr.Accept(this);
-                Print("\n");
             }
         }
 
@@ -381,10 +381,11 @@ namespace STEP.AST
                 foreach (StmtNode stmt in n.Body)
                 {
                     stmt.Accept(this);
+                    Print("\n");
                 }
                 ind--;
                 Indent();
-                Print("end while\n");
+                Print("end while");
             }
         }
 
@@ -405,21 +406,30 @@ namespace STEP.AST
                 foreach (StmtNode stmt in n.Body)
                 {
                     stmt.Accept(this);
+                    Print("\n");
                 }
                 ind--;
                 Indent();
-                Print("end for\n");
+                Print("end for");
             }
         }
 
         public void Visit(ContNode n)
         {
-            throw new NotImplementedException();
+            if(n != null)
+            {
+                Indent();
+                Print("continue");
+            }
         }
 
         public void Visit(BreakNode n)
         {
-            throw new NotImplementedException();
+            if (n != null)
+            {
+                Indent();
+                Print("break");
+            }
         }
 
         public void Visit(FuncDefNode n)
@@ -445,7 +455,19 @@ namespace STEP.AST
 
         public void Visit(FuncStmtNode n)
         {
-            throw new NotImplementedException();
+            if (n != null)
+            {
+                Indent();
+                n.Id.Accept(this);
+                Print("(");
+                n.Params[0].Accept(this);
+                for (int i = 1; i < n.Params.Count; i++)
+                {
+                    Print(", ");
+                    n.Params[i].Accept(this);
+                }
+                Print(")");
+            }
         }
 
         public void Visit(RetNode n)
@@ -455,7 +477,32 @@ namespace STEP.AST
 
         public void Visit(IfNode n)
         {
-            throw new NotImplementedException();
+            if (n != null)
+            {
+                Indent();
+                Print("if(");
+                n.Condition.Accept(this);
+                Print(")\n");
+
+                ind++;
+
+                foreach (StmtNode stmt in n.ThenClause)
+                {
+                    stmt.Accept(this);
+                    Print("\n");
+                }
+                ind--;
+                Indent();
+                Print("else\n");
+                ind++;
+                foreach (StmtNode stmt in n.ElseClause)
+                {
+                    stmt.Accept(this);
+                    Print("\n");
+                }
+                ind--;
+                Print("end if\n");
+            }
         }
     }
 }

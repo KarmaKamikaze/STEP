@@ -504,13 +504,14 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             return exprNode;
         }
 
-        if (context.Parent is STEPParser.StmtsContext)
+        if (context.Parent is STEPParser.StmtsContext or STEPParser.Loop_stmtsContext)
         {
             FuncStmtNode stmtNode = (FuncStmtNode) NodeFactory.MakeNode(AstNodeType.FuncStmtNode);
             stmtNode.Id = idNode;
             stmtNode.Params = parameters;
             return stmtNode;
         }
+
         else
         {
             throw new InvalidOperationException("Funccall nodes should be a child of either Value or Stmt nodes.");

@@ -46,8 +46,8 @@ class Program
             AstNode root = astBuilder.Build(tree);
             SarmiPrinter printer = new SarmiPrinter();
             root.Accept(printer);
-            TypeVisitor typeVisitor = new();
-            root.Accept(typeVisitor);
+            //TypeVisitor typeVisitor = new();
+            //root.Accept(typeVisitor);
             
 
         }
