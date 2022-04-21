@@ -501,7 +501,8 @@ namespace STEP.AST
                     Print("\n");
                 }
                 ind--;
-                Print("end if\n");
+                Indent();
+                Print("end if");
             }
         }
     }
