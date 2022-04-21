@@ -567,7 +567,6 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
         ForNode node = (ForNode) NodeFactory.MakeNode(AstNodeType.ForNode);
 
-        Console.WriteLine("children exprnodes:" + children.OfType<ExprNode>().ToList().Count);
         node.Initializer = children.First(child => child != null);
         children.Remove(node.Initializer);
         
@@ -639,8 +638,11 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             {
                 node.ThenClause.Add((StmtNode)children[index++]);
             }
-            
-            index++; // Increment the index to skip the else terminal
+
+            while (children[index] == null)
+            {
+                index++; // Increment the index to skip the else terminal
+            }
             
             // Add the remaining statement nodes to the ElseClause.
             while(children[index] is StmtNode)
