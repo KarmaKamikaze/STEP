@@ -611,23 +611,99 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
     public override IfNode VisitIfstmt([NotNull] STEPParser.IfstmtContext context)
     {
-        return IfNodeGenerator(context);       
+        IfNode node = (IfNode) NodeFactory.MakeNode(AstNodeType.IfNode);
+        // Get condition
+        node.Condition = (ExprNode) context.logicexpr().Accept(this);
+        
+        // Get then clause
+        foreach (var stmt in context.stmt())
+        {
+            node.ThenClause.Add((StmtNode) stmt.Accept(this));
+        }
+        
+        // Get all else-if-clauses
+        foreach (var elseIf in context.elseifstmt())
+        {
+            node.ElseIfClauses.Add((ElseIfNode) elseIf.Accept(this));
+        }
+        
+        // Get else clause
+        foreach (var stmt in context.elsestmt().stmt())
+        {
+            node.ElseClause.Add((StmtNode) stmt.Accept(this));
+        }
+        return node;
+    }
+
+    public override ElseIfNode VisitElseifstmt([NotNull] STEPParser.ElseifstmtContext context)
+    {
+        // TODO: use factory
+        var condition = (ExprNode) context.logicexpr().Accept(this);
+        var body = new List<StmtNode>();
+        foreach (var stmt in context.stmt())
+        {
+            body.Add((StmtNode) stmt.Accept(this));
+        }
+        return new ElseIfNode()
+        {
+            Condition = condition,
+            Body = body
+        };
     }
     
     public override IfNode VisitLoopifstmt([NotNull] STEPParser.LoopifstmtContext context)
     {
-        return IfNodeGenerator(context);
+        IfNode node = (IfNode) NodeFactory.MakeNode(AstNodeType.IfNode);
+        // Get condition
+        node.Condition = (ExprNode) context.logicexpr().Accept(this);
+        
+        // Get then clause
+        foreach (var stmt in context.loopifbody())
+        {
+            node.ThenClause.Add((StmtNode) stmt.Accept(this));
+        }
+        
+        // Get all else-if-clauses
+        foreach (var elseIf in context.loopelseifstmt())
+        {
+            node.ElseIfClauses.Add((ElseIfNode) elseIf.Accept(this));
+        }
+        
+        // Get else clause
+        foreach (var stmt in context.loopelsestmt().loopifbody())
+        {
+            node.ElseClause.Add((StmtNode) stmt.Accept(this));
+        }
+        return node;
+    }
+    
+    public override ElseIfNode VisitLoopelseifstmt([NotNull] STEPParser.LoopelseifstmtContext context)
+    {
+        var condition = (ExprNode) context.logicexpr().Accept(this);
+        var body = new List<StmtNode>();
+        foreach (var stmt in context.loopifbody())
+        {
+            body.Add((StmtNode) stmt.Accept(this));
+        }
+        return new ElseIfNode()
+        {
+            Condition = condition,
+            Body = body
+        };
     }
 
     // The method only accepts either STEPParser.IfstmtContext or STEPParser.LoopifstmtContext type contexts.
+    [Obsolete("Should not be used after the inclusion of else-if clauses")]
     private IfNode IfNodeGenerator<T>(T context) where T: ParserRuleContext
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
         IfNode node = (IfNode) NodeFactory.MakeNode(AstNodeType.IfNode);
 
+        // Get condition
         node.Condition = (ExprNode)children.First(child => child is ExprNode);
-        if ((context as STEPParser.IfstmtContext)?.ELSE() != null ||
-            (context as STEPParser.LoopifstmtContext)?.ELSE() != null)
+        
+        if ((context as STEPParser.IfstmtContext)?.elsestmt() != null ||
+            (context as STEPParser.LoopifstmtContext)?.loopelsestmt() != null)
         {
             /* Find the first statement node in the list of children and use it to add all statements
              * (before the first null node) to the ThenClause.
@@ -649,15 +725,11 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             {
                 node.ElseClause.Add((StmtNode)children[index++]);
             }
-    
         }
         else
         {
             node.ThenClause = children.OfType<StmtNode>().ToList();
         }
-        
         return node;
     }
-        
-    
 }

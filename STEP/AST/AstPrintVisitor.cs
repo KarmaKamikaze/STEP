@@ -30,6 +30,12 @@ public class AstPrintVisitor : IVisitor
         }
     }
 
+    public void Visit(ElseIfNode n)
+    {
+        // TODO: Implement this
+        throw new NotImplementedException();
+    }
+
     public void Visit(VarsNode node)
     {
         if (node != null)

@@ -105,19 +105,19 @@ grammar STEP;
   
   ifstmt
         : IF LPAREN logicexpr RPAREN stmt* elseifstmt* elsestmt? ENDIF;
-        
+
   elseifstmt
         : ELSE IF LPAREN logicexpr RPAREN stmt*;
-        
+
   elsestmt
         : ELSE stmt*;
 
   loopifstmt
         : IF LPAREN logicexpr RPAREN loopifbody* loopelseifstmt* loopelsestmt? ENDIF;
-        
+
   loopelseifstmt
         : ELSE IF LPAREN logicexpr RPAREN loopifbody*;
-        
+
   loopelsestmt
         : ELSE loopifbody*;
 
@@ -125,12 +125,12 @@ grammar STEP;
 //        : IF LPAREN logicexpr RPAREN stmt* ENDIF
 //        | IF LPAREN logicexpr RPAREN stmt* ELSE stmt* ENDIF
 //        ;
-  
+//  
 //  loopifstmt 
 //        : IF LPAREN logicexpr RPAREN loopifbody* ENDIF 
 //        | IF LPAREN logicexpr RPAREN loopifbody* ELSE loopifbody* ENDIF
 //        ;
-  
+
   whilestmt 
         : REPEATWHILE LPAREN logicexpr RPAREN loop_stmt* ENDWHILE
         ;
