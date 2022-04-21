@@ -25,6 +25,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Boolean, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -35,6 +36,7 @@ public class TypeVisitor : IVisitor {
                 n.Type = TypeVal.Boolean;
         } else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Boolean, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -46,6 +48,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(n.Left.Type, n.Right.Type);
         }
     }
 
@@ -57,6 +60,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(n.Left.Type, n.Right.Type);
         }
     }
 
@@ -68,6 +72,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -79,6 +84,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -90,6 +96,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -101,6 +108,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -111,6 +119,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Boolean, n.Left.Type);
         }
     }
     
@@ -132,23 +141,26 @@ public class TypeVisitor : IVisitor {
         n.Left.Accept(this);
         n.Right.Accept(this);
         n.Type = (n.Left.Type != n.Right.Type) 
-            ? TypeVal.Error 
+            ? throw new TypeException(n.Left.Type, n.Right.Type)
             : n.Left.Type;
     }
 
     public void Visit(ArrLiteralNode n)
     {
         // Check if all elements have the same type
+        n.Elements.FirstOrDefault()?.Accept(this);
         var firstType = n.Elements.FirstOrDefault()?.Type;
-        foreach (var expr in n.Elements)
+        foreach (var expr in n.Elements.Skip(1))
         {
             expr.Accept(this);
             if (expr.Type != firstType)
             {
                 n.Type = TypeVal.Error;
-                break;
+                throw new TypeException(firstType!.Value, expr.Type);
             }
         }
+
+        n.Type = (TypeVal) firstType; // Hmm
     }
 
     public void Visit(ArrayAccessNode n) {
@@ -159,6 +171,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Index);
         }
         // Index is expression node, should we "calculate" the expression if possible to check if
         // index is >= 0 and < ArrSize?
@@ -173,6 +186,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(n.Left.Type, n.Right.Type);
         }
     }
 
@@ -185,12 +199,13 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(n.Id.Type, n.Expr.Type);
         }
     }
 
     public virtual void Visit(IdNode n) {
         var symbol = _symbolTable.RetrieveSymbol(n.Id);
-        n.Type = symbol?.Type ?? TypeVal.Error;
+        n.Type = symbol?.Type ?? throw new TypeException(n.Id);
     }
 
     public void Visit(PlusNode n) {
@@ -205,6 +220,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, TypeVal.String, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -216,6 +232,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -227,6 +244,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -238,6 +256,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -249,6 +268,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -264,6 +284,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left);
         }
     }
     
@@ -277,6 +298,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Boolean, n);
         }
         foreach (var stmtNode in n.Body) {
             stmtNode.Accept(this); // i sure hope dynamic dispatch works monkaW
@@ -298,6 +320,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Initializer.Type, n.Limit.Type, n.Update);
         }
         _symbolTable.CloseScope();
     }
@@ -322,9 +345,11 @@ public class TypeVisitor : IVisitor {
         }
         n.ReturnType.Accept(this);
         bool typeMismatch = false;
+        RetNode offendingTypeRetNode = null;
         foreach (var retNode in n.Stmts.OfType<RetNode>()) {
             if (retNode.RetVal.Type != n.ReturnType.Type) {
                 typeMismatch = true;
+                offendingTypeRetNode = retNode;
             }
         }
 
@@ -334,6 +359,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(n.ReturnType.Type, offendingTypeRetNode.RetVal);
         }
     }
 
@@ -349,6 +375,7 @@ public class TypeVisitor : IVisitor {
             param.Accept(this);
             if (param.Type != parameterTypes[i] || param.Type == TypeVal.Error) {
                 n.Type = TypeVal.Error;
+                throw new TypeException(parameterTypes[i], param);
             }
             i++;
         }
@@ -366,6 +393,7 @@ public class TypeVisitor : IVisitor {
             param.Accept(this);
             if (param.Type != parameterTypes[i] || param.Type == TypeVal.Error) {
                 n.Type = TypeVal.Error;
+                throw new TypeException(parameterTypes[i], param);
             }
             i++;
         }
@@ -393,6 +421,7 @@ public class TypeVisitor : IVisitor {
             }
             else {
                 n.Type = TypeVal.Error;
+                throw new TypeException(parentFunc.Type, n.RetVal);
             }
         }
     }
@@ -404,6 +433,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
+            throw new TypeException(TypeVal.Boolean, n.Condition);
         }
         _symbolTable.OpenScope();
         foreach (var node in n.ThenClause) {
