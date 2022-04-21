@@ -1,24 +1,28 @@
 ﻿using System.Globalization;
+using System.Text;
 using STEP.AST.Nodes;
 
 namespace STEP.CodeGeneration;
 
 public class CodeGenerationVisitor : IVisitor
 {
+    private readonly StringBuilder _stringBuilder = new();
+    public string Output => _stringBuilder.ToString();
+    
     private void EmitLine(string line)
     {
-        Console.WriteLine(line);
+        _stringBuilder.AppendLine(line);
     }
 
     private void EmitAppend(string line)
     {
-        Console.Write(line);
+        _stringBuilder.Append(line);
     }
 
     private void EmitAppend(TypeVal typeVal)
     {
         // TODO: translate our types to Arduino types here
-        Console.Write(typeVal.ToString().ToLowerInvariant());
+        _stringBuilder.Append(typeVal.ToString()+" ");
     }
     
     public void Visit(AndNode n)
@@ -112,7 +116,7 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(ArrDclNode n)
     {
         // Type id[size] = { elements };
-        EmitAppend(n.Type + " ");
+        EmitAppend(n.Type);
         n.Left.Accept(this);
         EmitAppend(" = ");
         n.Right.Accept(this);
@@ -146,7 +150,7 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(VarDclNode n)
     {
         // Type id = expr;
-        EmitAppend(n.Type + " ");
+        EmitAppend(n.Type);
         n.Left.Accept(this);
         EmitAppend(" = ");
         n.Right.Accept(this);
@@ -170,6 +174,23 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(PlusNode n)
     {
+        // TODO: String concatenation, maybe use strcat(str1, str2) in C
+        if (n.Type is TypeVal.String)
+        {
+            if (n.Left.Type is TypeVal.String && n.Right.Type is not TypeVal.String)
+            {
+                // Convert right to string
+                // Use Arduino's built in String() class
+                EmitAppend("String(");
+                n.Right.Accept(this);
+                EmitAppend(")");
+            }
+            else if (n.Left.Type is not TypeVal.String)
+            {
+                // Convert left to string
+            }
+        }
+        
         // expr1 + expr2
         n.Left.Accept(this);
         EmitAppend(" + ");
@@ -251,28 +272,83 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ContNode n)
     {
-        EmitAppend("continue;");
+        EmitLine("continue;");
     }
 
     public void Visit(BreakNode n)
     {
-        EmitAppend("break;");
+        EmitLine("break;");
     }
 
     public void Visit(FuncDefNode n)
     {
+        /* Type Id(Type1 Id1, ..., Typek Idk) {
+         *   statements
+         * }
+         */
+        EmitAppend(n.ReturnType.Type);
+        n.Name.Accept(this);
+        EmitAppend("(");
+        // TODO: maybe this can be made prettier in a traditional for-loop!
+        int i = 0;
+        foreach (var param in n.FormalParams)
+        {
+            EmitAppend(param.Value.Item1); // Type 
+            param.Key.Accept(this); // Id
+            if (i < n.FormalParams.Count - 1)
+            {
+                EmitAppend(", ");
+            }
+            i++;
+        }
+        EmitLine(")");
+        
+        // Body
+        foreach (StmtNode stmt in n.Stmts)
+        {
+            stmt.Accept(this);
+        }
+        EmitLine("}");
     }
 
     public void Visit(FuncExprNode n)
     {
+        // Id(Param1, ..., Paramk)
+        n.Id.Accept(this);
+        EmitAppend("(");
+        for (int i = 0; i < n.Params.Count; i++)
+        {
+            n.Params[i].Accept(this);
+            if (i < n.Params.Count - 1)
+            {
+                EmitAppend(", ");
+            }
+        }
+        EmitAppend(")");
     }
 
     public void Visit(FuncStmtNode n)
     {
+        // Id(Param1, ..., Paramk);
+        n.Id.Accept(this);
+        EmitAppend("(");
+        for (int i = 0; i < n.Params.Count; i++)
+        {
+            n.Params[i].Accept(this);
+            if (i < n.Params.Count - 1)
+            {
+                EmitAppend(", ");
+            }
+        }
+        EmitLine(");");
     }
 
     public void Visit(FuncsNode n)
     {
+        foreach (var funDcl in n.FuncDcls)
+        {
+            funDcl.Accept(this);
+        }
     }
 
     public void Visit(RetNode n)
@@ -289,6 +365,55 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(IfNode n)
     {
+        /* if(condition) {
+         *   ThenClause
+         * }
+         * else {
+         *   ElseClause
+         * }
+         */
+        
+        EmitAppend("if(");
+        n.Condition.Accept(this);
+        EmitLine(") {");
+        foreach(var stmt in n.ThenClause) {
+            stmt.Accept(this);
+        }
+        EmitLine("}");
+        if (n.ElseClause != null)
+        {
+            EmitLine("else {");
+            foreach (var stmt in n.ElseClause)
+            {
+                stmt.Accept(this);
+            }
+            EmitLine("}");
+        }
+        
+        /* if (expr1)
+         *   statements1
+         * else 
+         *   if (expr1)
+         *     statements2
+         *   end if
+         * end if
+         *
+         * if (expr1)
+         *   statements
+         * end if
+         * if (expr2)
+         *   statements
+         * end if
+         *
+         * TODO: Det her er ikke muligt i STEP
+         * if (expr1)
+         *   statements1
+         * else if (expr2)
+         *   statements2
+         * else
+         *   statements3
+         * end if
+         */
     }
 
     public void Visit(VarsNode n)
