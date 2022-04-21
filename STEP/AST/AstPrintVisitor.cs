@@ -18,7 +18,7 @@ public class AstPrintVisitor : IVisitor
             Console.Write("  ");
         }
     }
-
+    
     public void Visit(ProgNode node)
     {
         if (node != null)
@@ -30,10 +30,22 @@ public class AstPrintVisitor : IVisitor
         }
     }
 
-    public void Visit(ElseIfNode n)
+    public void Visit(ElseIfNode node)
     {
-        // TODO: Implement this
-        throw new NotImplementedException();
+        if (node != null)
+        {
+            Indent();
+            Print("else if(");
+            node.Condition.Accept(this);
+            Print(")\n");
+            _ind++;
+            foreach (StmtNode stmt in node.Body)
+            {
+                stmt.Accept(this);
+                Print("\n");
+            }
+            _ind--;
+        }
     }
 
     public void Visit(VarsNode node)
@@ -483,14 +495,19 @@ public class AstPrintVisitor : IVisitor
             Print("if(");
             n.Condition.Accept(this);
             Print(")\n");
-
             _ind++;
-
             foreach (StmtNode stmt in n.ThenClause)
             {
                 stmt.Accept(this);
                 Print("\n");
             }
+            _ind--;
+            
+            foreach (ElseIfNode elseIf in n.ElseIfClauses)
+            {
+                elseIf.Accept(this);
+            }
+            
             _ind--;
             Indent();
             Print("else\n");
