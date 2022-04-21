@@ -28,6 +28,7 @@ grammar STEP;
         
   var_or_nl 
         : vardcl 
+        | pindcl
         | NL
         ;
   
@@ -178,6 +179,7 @@ grammar STEP;
   
   constant 
         : NUMLITERAL 
+        | INTLITERAL
         | STRLITERAL 
         | BOOLLITERAL
         ;
@@ -235,6 +237,11 @@ grammar STEP;
   booldcl 
         : BOOLEAN ID ASSIGN logicexpr
         ;
+        
+  pindcl
+        : ANALOGPIN ID ASSIGN INTLITERAL
+        | DIGITALPIN ID ASSIGN INTLITERAL
+        ;
   
   arrdcl 
         : type arrsizedcl ID ASSIGN arr_id_or_lit
@@ -246,7 +253,7 @@ grammar STEP;
         ;
   
   arrsizedcl 
-        : LBRACK NUMLITERAL RBRACK
+        : LBRACK INTLITERAL RBRACK
         ;
 
 // Fragments
@@ -286,6 +293,7 @@ grammar STEP;
   NEG                           : '!';
   NL                            : LINE_TERMINATOR;
   COMMA                         : ',';
+  INTLITERAL                    : DIGIT+;
   NUMLITERAL                    : DIGIT+ ('.' DIGIT*)?;
   STRLITERAL                    : DBLQUOTE STRING_CONTENT* DBLQUOTE;
   BOOLLITERAL                   : NEG? ('true' | 'false');
@@ -305,6 +313,8 @@ grammar STEP;
   NUMBER                        : 'number';
   STRING                        : 'string';
   BOOLEAN                       : 'boolean';
+  ANALOGPIN                     : 'analogpin';
+  DIGITALPIN                    : 'digitalpin';
   IF                            : 'if';
   ENDIF                         : 'end if';
   ELSE                          : 'else';

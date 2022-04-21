@@ -171,7 +171,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Index);
+            throw new TypeException($"Type mismatch, expected array index to be of type {TypeVal.Number}, actual type is {n.Index.Type}");
         }
         // Index is expression node, should we "calculate" the expression if possible to check if
         // index is >= 0 and < ArrSize?
@@ -194,6 +194,12 @@ public class TypeVisitor : IVisitor {
         AssVisitor assVisitor = new AssVisitor(_symbolTable);
         n.Id.Accept(assVisitor);
         n.Expr.Accept(this);
+        if (n.Id.Type is TypeVal.Analogpin or TypeVal.Digitalpin) {
+            throw new TypeException("Cannot reassign values to pin variables");
+        }
+        // if (n.Id.IsConstant) {
+        //     throw new TypeException("Cannot reassign values to constant variables");
+        // }
         if (n.Id.Type == n.Expr.Type) {
             n.Type = TypeVal.Ok;
         }
@@ -205,7 +211,7 @@ public class TypeVisitor : IVisitor {
 
     public virtual void Visit(IdNode n) {
         var symbol = _symbolTable.RetrieveSymbol(n.Id);
-        n.Type = symbol?.Type ?? throw new TypeException(n.Id);
+        n.Type = symbol?.Type ?? throw new SymbolNotDeclaredException(n.Id);
     }
 
     public void Visit(PlusNode n) {
@@ -284,7 +290,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left);
+            throw new TypeException($"Type mismatch, expected value to be of type {TypeVal.Number}, actual type is {n.Left.Type}");
         }
     }
     
@@ -298,7 +304,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Boolean, n);
+            throw new TypeException($"Type mismatch, expected condition to be of type {TypeVal.Boolean}, actual type is {n.Condition.Type}");
         }
         foreach (var stmtNode in n.Body) {
             stmtNode.Accept(this); // i sure hope dynamic dispatch works monkaW
@@ -320,7 +326,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Initializer.Type, n.Limit.Type, n.Update);
+            throw new TypeException($"Type mismatch, expected for-parameters to be of types (Number, Number, Number), actual types are ({n.Initializer.Type}, {n.Limit.Type}, {n.Update.Type})");
         }
         _symbolTable.CloseScope();
     }
@@ -341,26 +347,28 @@ public class TypeVisitor : IVisitor {
     public void Visit(FuncDefNode n) {
         n.Name.Accept(this);
         foreach (var stmtNode in n.Stmts) {
-            stmtNode.Accept(this);
+            stmtNode.Accept(this); // Should throw exception if return doesn't match type
         }
         n.ReturnType.Accept(this);
-        bool typeMismatch = false;
-        RetNode offendingTypeRetNode = null;
-        foreach (var retNode in n.Stmts.OfType<RetNode>()) {
-            if (retNode.RetVal.Type != n.ReturnType.Type) {
-                typeMismatch = true;
-                offendingTypeRetNode = retNode;
-            }
-        }
-
-        if (!typeMismatch) {
-            n.Type = n.ReturnType.Type;
-            _symbolTable.EnterSymbol(n);
-        }
-        else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(n.ReturnType.Type, offendingTypeRetNode.RetVal);
-        }
+        n.Type = n.ReturnType.Type;
+        _symbolTable.EnterSymbol(n);
+        // bool typeMismatch = false;
+        // RetNode offendingTypeRetNode = null;
+        // foreach (var retNode in n.Stmts.OfType<RetNode>()) { // Doesn't check nested returns
+        //     if (retNode.RetVal.Type != n.ReturnType.Type) {
+        //         typeMismatch = true;
+        //         offendingTypeRetNode = retNode;
+        //     }
+        // }
+        //
+        // if (!typeMismatch) {
+        //     n.Type = n.ReturnType.Type;
+        //     _symbolTable.EnterSymbol(n);
+        // }
+        // else {
+        //     n.Type = TypeVal.Error;
+        //     throw new TypeException($"Type mismatch, expected returns to be of type {n.ReturnType}, actual type is {offendingTypeRetNode.Type}");
+        // }
     }
 
     public void Visit(FuncExprNode n) {
@@ -375,7 +383,7 @@ public class TypeVisitor : IVisitor {
             param.Accept(this);
             if (param.Type != parameterTypes[i] || param.Type == TypeVal.Error) {
                 n.Type = TypeVal.Error;
-                throw new TypeException(parameterTypes[i], param);
+                throw new TypeException($"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, actual type is {param.Type}");
             }
             i++;
         }
@@ -393,7 +401,7 @@ public class TypeVisitor : IVisitor {
             param.Accept(this);
             if (param.Type != parameterTypes[i] || param.Type == TypeVal.Error) {
                 n.Type = TypeVal.Error;
-                throw new TypeException(parameterTypes[i], param);
+                throw new TypeException($"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, actual type is {param.Type}");
             }
             i++;
         }
@@ -421,7 +429,7 @@ public class TypeVisitor : IVisitor {
             }
             else {
                 n.Type = TypeVal.Error;
-                throw new TypeException(parentFunc.Type, n.RetVal);
+                throw new TypeException($"Type mismatch, expected return value to be of type {parentFunc.Type}, actual type is {n.RetVal.Type}");
             }
         }
     }
@@ -433,7 +441,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Boolean, n.Condition);
+            throw new TypeException($"Type mismatch, expected condition to be of type {TypeVal.Boolean}, actual type is {n.Condition.Type}");
         }
         _symbolTable.OpenScope();
         foreach (var node in n.ThenClause) {

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from D:/Documents/Programming/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
+// Generated from C:/Users/Mikkel/Documents/Codebase/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -19,7 +19,6 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
-namespace STEP {
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using IToken = Antlr4.Runtime.IToken;
@@ -303,6 +302,12 @@ public interface ISTEPVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitBooldcl([NotNull] STEPParser.BooldclContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="STEPParser.pindcl"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitPindcl([NotNull] STEPParser.PindclContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="STEPParser.arrdcl"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -321,4 +326,3 @@ public interface ISTEPVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitArrsizedcl([NotNull] STEPParser.ArrsizedclContext context);
 }
-} // namespace STEP

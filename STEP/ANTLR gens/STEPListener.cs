@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from D:/Documents/Programming/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
+// Generated from C:/Users/Mikkel/Documents/Codebase/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -19,7 +19,6 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
-namespace STEP {
 using Antlr4.Runtime.Misc;
 using IParseTreeListener = Antlr4.Runtime.Tree.IParseTreeListener;
 using IToken = Antlr4.Runtime.IToken;
@@ -482,6 +481,16 @@ public interface ISTEPListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitBooldcl([NotNull] STEPParser.BooldclContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.pindcl"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterPindcl([NotNull] STEPParser.PindclContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.pindcl"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitPindcl([NotNull] STEPParser.PindclContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.arrdcl"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -512,4 +521,3 @@ public interface ISTEPListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitArrsizedcl([NotNull] STEPParser.ArrsizedclContext context);
 }
-} // namespace STEP
