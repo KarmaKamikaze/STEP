@@ -36,6 +36,7 @@ public enum AstNodeType
     WhileNode,
     ForNode,
     IfNode,
+    ElseIfNode,
     RetNode,
     ContNode,
     BreakNode,

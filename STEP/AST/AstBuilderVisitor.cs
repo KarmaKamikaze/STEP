@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using STEP.AST.Nodes;
+using System.Xml.Linq;
 
 namespace STEP.AST;
 
@@ -618,7 +619,11 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         // Get then clause
         foreach (var stmt in context.stmt())
         {
-            node.ThenClause.Add((StmtNode) stmt.Accept(this));
+            // Ensure that we do not add empty statements (which are null)
+            if(stmt.Accept(this) is StmtNode stmtNode)
+            {
+                node.ThenClause.Add(stmtNode);
+            }
         }
         
         // Get all else-if-clauses
@@ -628,27 +633,29 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
         
         // Get else clause
-        foreach (var stmt in context.elsestmt().stmt())
+        foreach (var stmt in context.elsestmt().stmt().Where(x => x != null))
         {
-            node.ElseClause.Add((StmtNode) stmt.Accept(this));
+            if (stmt.Accept(this) is StmtNode stmtNode)
+            {
+                node.ElseClause.Add(stmtNode);
+            }
         }
         return node;
     }
 
     public override ElseIfNode VisitElseifstmt([NotNull] STEPParser.ElseifstmtContext context)
     {
-        // TODO: use factory
-        var condition = (ExprNode) context.logicexpr().Accept(this);
-        var body = new List<StmtNode>();
+        var node = (ElseIfNode)NodeFactory.MakeNode(AstNodeType.ElseIfNode);
+        node.Condition = (ExprNode) context.logicexpr().Accept(this);
+        node.Body = new List<StmtNode>();
         foreach (var stmt in context.stmt())
         {
-            body.Add((StmtNode) stmt.Accept(this));
+            if (stmt.Accept(this) is StmtNode stmtNode)
+            { 
+                node.Body.Add(stmtNode);
+            }
         }
-        return new ElseIfNode()
-        {
-            Condition = condition,
-            Body = body
-        };
+        return node;
     }
     
     public override IfNode VisitLoopifstmt([NotNull] STEPParser.LoopifstmtContext context)
@@ -660,7 +667,10 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         // Get then clause
         foreach (var stmt in context.loopifbody())
         {
-            node.ThenClause.Add((StmtNode) stmt.Accept(this));
+            if (stmt.Accept(this) is StmtNode stmtNode)
+            {
+                node.ThenClause.Add(stmtNode);
+            }
         }
         
         // Get all else-if-clauses
@@ -672,24 +682,27 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         // Get else clause
         foreach (var stmt in context.loopelsestmt().loopifbody())
         {
-            node.ElseClause.Add((StmtNode) stmt.Accept(this));
+            if (stmt.Accept(this) is StmtNode stmtNode)
+            {
+                node.ElseClause.Add(stmtNode);
+            }
         }
         return node;
     }
     
     public override ElseIfNode VisitLoopelseifstmt([NotNull] STEPParser.LoopelseifstmtContext context)
     {
-        var condition = (ExprNode) context.logicexpr().Accept(this);
-        var body = new List<StmtNode>();
+        var node = (ElseIfNode)NodeFactory.MakeNode(AstNodeType.ElseIfNode);
+        node.Condition = (ExprNode) context.logicexpr().Accept(this);
+        node.Body = new List<StmtNode>();
         foreach (var stmt in context.loopifbody())
         {
-            body.Add((StmtNode) stmt.Accept(this));
+            if (stmt.Accept(this) is StmtNode stmtNode)
+            {
+                node.Body.Add(stmtNode);
+            }
         }
-        return new ElseIfNode()
-        {
-            Condition = condition,
-            Body = body
-        };
+        return node;
     }
 
     // The method only accepts either STEPParser.IfstmtContext or STEPParser.LoopifstmtContext type contexts.

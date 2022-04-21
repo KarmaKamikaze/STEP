@@ -508,7 +508,6 @@ public class AstPrintVisitor : IVisitor
                 elseIf.Accept(this);
             }
             
-            _ind--;
             Indent();
             Print("else\n");
             _ind++;
