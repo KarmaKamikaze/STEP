@@ -477,7 +477,9 @@ public class AstPrintVisitor : IVisitor
             Print("if(");
             n.Condition.Accept(this);
             Print(")\n");
+
             _ind++;
+
             foreach (StmtNode stmt in n.ThenClause)
             {
                 stmt.Accept(this);
@@ -493,7 +495,8 @@ public class AstPrintVisitor : IVisitor
                 Print("\n");
             }
             _ind--;
-            Print("end if\n");
+            Indent();
+            Print("end if");
         }
     }
 }
