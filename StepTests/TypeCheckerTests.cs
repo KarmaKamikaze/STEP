@@ -68,10 +68,6 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.EnterSymbol(It.IsAny<string>(), It.IsAny<TypeVal>()))
             .Callback<string, TypeVal>((a, b) => symbolTableEntry = new SymTableEntry(){ Name = a, Type = b});
         
-        // Intercept symbol table receive request, use local
-        _symbolTableMock.Setup(x => x.RetrieveSymbol(id))
-            .Returns(symbolTableEntry);
-        
         var dclNode = new VarDclNode()
         {
             Left = new IdNode() {Id = id, Type = TypeVal.Number},
@@ -81,6 +77,9 @@ public class TypeCheckerTests {
 
         // Act
         _typeVisitor.Visit(dclNode);
+        // Intercept symbol table receive request, use local
+        _symbolTableMock.Setup(x => x.RetrieveSymbol(id))
+            .Returns(symbolTableEntry);
         _typeVisitor.Visit(idNode);
         
         // Assert
@@ -119,7 +118,7 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Boolean)]
     [InlineData(TypeVal.String)]
     [InlineData(TypeVal.Error)]
-    public void UMinusNode_LeftIsNotNumber_IsTypeError(TypeVal type)
+    public void UMinusNode_LeftIsNotNumber_ThrowsTypeException(TypeVal type)
     {
         // Arrange
         var symbol = new SymTableEntry() {Type = type};
@@ -129,24 +128,24 @@ public class TypeCheckerTests {
         var uMinusNode = new UMinusNode() {Left = exprNode};
         
         // Act
-        uMinusNode.Accept(_typeVisitor);
+        var test = () => uMinusNode.Accept(_typeVisitor);
         
         // Assert
-        Assert.Equal(TypeVal.Error, uMinusNode.Type);
+        Assert.Throws<TypeException>(test);
     }
 
     [Fact]
-    public void NegNode_ExprIsNotBoolean_ReportsTypeError()
+    public void NegNode_ExprIsNotBoolean_ThrowsTypeException()
     {        
         // Arrange
         var exprNode = new NumberNode() {Value = 420};
         var negNode = new NegNode() {Left = exprNode};
         
         // Act
-        _typeVisitor.Visit(negNode);
+        var test = () => _typeVisitor.Visit(negNode);
          
         // Assert
-        Assert.Equal(TypeVal.Error, negNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     [Fact]
@@ -166,7 +165,7 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(TypeVal.Boolean)]
     [InlineData(TypeVal.String)]
-    public void MultNode_InvalidDomain_ReportsTypeError(TypeVal type)
+    public void MultNode_InvalidDomain_ThrowsTypeException(TypeVal type)
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
@@ -180,10 +179,10 @@ public class TypeCheckerTests {
         };
         
         // Act
-        _typeVisitor.Visit(multNode);
+        var test = () => _typeVisitor.Visit(multNode);
          
         // Assert
-        Assert.Equal(TypeVal.Error, multNode.Type);
+        Assert.Throws<TypeException>(test);
     }
 
     [Fact]
@@ -208,7 +207,7 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(TypeVal.Boolean)]
     [InlineData(TypeVal.String)]
-    public void DivNode_InvalidDomain_ReportsTypeError(TypeVal type)
+    public void DivNode_InvalidDomain_ThrowsTypeException(TypeVal type)
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
@@ -222,10 +221,10 @@ public class TypeCheckerTests {
         };
         
         // Act
-        _typeVisitor.Visit(divNode);
+        var test = () => _typeVisitor.Visit(divNode);
          
         // Assert
-        Assert.Equal(TypeVal.Error, divNode.Type);
+        Assert.Throws<TypeException>(test);
     }
 
     [Fact]
@@ -250,7 +249,7 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(TypeVal.Boolean)]
     [InlineData(TypeVal.String)]
-    public void PowNode_InvalidDomain_ReportsTypeError(TypeVal type)
+    public void PowNode_InvalidDomain_ThrowsTypeException(TypeVal type)
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
@@ -264,10 +263,10 @@ public class TypeCheckerTests {
         };
         
         // Act
-        _typeVisitor.Visit(powNode);
+        var test = () => _typeVisitor.Visit(powNode);
          
         // Assert
-        Assert.Equal(TypeVal.Error, powNode.Type);
+        Assert.Throws<TypeException>(test);
     }
 
     [Fact]
@@ -292,7 +291,7 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(TypeVal.Boolean)]
     [InlineData(TypeVal.String)]
-    public void MinusNode_InvalidDomain_ReportsTypeError(TypeVal type)
+    public void MinusNode_InvalidDomain_ThrowsTypeException(TypeVal type)
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
@@ -306,10 +305,10 @@ public class TypeCheckerTests {
         };
         
         // Act
-        _typeVisitor.Visit(minusNode);
+        var test = () => _typeVisitor.Visit(minusNode);
          
         // Assert
-        Assert.Equal(TypeVal.Error, minusNode.Type);
+        Assert.Throws<TypeException>(test);
     }
 
     [Fact]
@@ -370,7 +369,7 @@ public class TypeCheckerTests {
     }
 
     [Fact]
-    public void AddNode_EitherOperandIsBoolean_ReportsTypeError()
+    public void AddNode_EitherOperandIsBoolean_ThrowsTypeException()
     {
         // Arrange
         var leftExpr = new NumberNode();
@@ -382,10 +381,10 @@ public class TypeCheckerTests {
         };
         
         // Act
-        _typeVisitor.Visit(plusNode);
+        var test = () => _typeVisitor.Visit(plusNode);
          
         // Assert
-        Assert.Equal(TypeVal.Error, plusNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     //TODO: Function call expression
@@ -412,7 +411,7 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(TypeVal.Number)]
     [InlineData(TypeVal.String)]
-    public void AndNode_InvalidDomain_ReportsTypeError(TypeVal type)
+    public void AndNode_InvalidDomain_ThrowsTypeException(TypeVal type)
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
@@ -426,10 +425,10 @@ public class TypeCheckerTests {
         };
         
         // Act
-        _typeVisitor.Visit(andNode);
+        var test = () => _typeVisitor.Visit(andNode);
          
         // Assert
-        Assert.Equal(TypeVal.Error, andNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     [Fact]
@@ -454,7 +453,7 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(TypeVal.Number)]
     [InlineData(TypeVal.String)]
-    public void OrNode_InvalidDomain_ReportsTypeError(TypeVal type)
+    public void OrNode_InvalidDomain_ThrowsTypeException(TypeVal type)
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
@@ -468,10 +467,10 @@ public class TypeCheckerTests {
         };
         
         // Act
-        _typeVisitor.Visit(orNode);
+        var test = () => _typeVisitor.Visit(orNode);
          
         // Assert
-        Assert.Equal(TypeVal.Error, orNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     [Theory]
@@ -499,7 +498,7 @@ public class TypeCheckerTests {
     }
 
     [Fact]
-    public void EqNode_OperandsAreNotSameType_ReportsTypeError()
+    public void EqNode_OperandsAreNotSameType_ThrowsTypeException()
     {
         // Arrange
         var eqNode = new EqNode()
@@ -509,10 +508,10 @@ public class TypeCheckerTests {
         };
         
         // Act
-        _typeVisitor.Visit(eqNode);
+        var test = () => _typeVisitor.Visit(eqNode);
          
         // Assert
-        Assert.Equal(TypeVal.Error, eqNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     [Theory]
@@ -540,7 +539,7 @@ public class TypeCheckerTests {
     }
 
     [Fact]
-    public void NeqNode_OperandsAreNotSameType_ReportsTypeError()
+    public void NeqNode_OperandsAreNotSameType_ThrowsTypeException()
     {
         // Arrange
         var neqNode = new NeqNode()
@@ -550,16 +549,16 @@ public class TypeCheckerTests {
         };
         
         // Act
-        _typeVisitor.Visit(neqNode);
+        var test = () => _typeVisitor.Visit(neqNode);
          
         // Assert
-        Assert.Equal(TypeVal.Error, neqNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     [Theory]
     [InlineData(TypeVal.String)]
     [InlineData(TypeVal.Boolean)]
-    public void GThanNode_TypeMismatch_IsTypeError(TypeVal type)
+    public void GThanNode_TypeMismatch_ThrowsTypeException(TypeVal type)
     {
         // Arrange
         var symbol = new SymTableEntry() {Type = type};
@@ -570,9 +569,9 @@ public class TypeCheckerTests {
         Right = new IdNode() {Id = "right"}
         };
         // Act
-        gThanNode.Accept(_typeVisitor);
+        var test = () => gThanNode.Accept(_typeVisitor);
         // Assert
-        Assert.Equal(TypeVal.Error, gThanNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     [Fact]
@@ -595,7 +594,7 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(TypeVal.String)]
     [InlineData(TypeVal.Boolean)]
-    public void GThanEqNode_TypeMismatch_IsTypeError(TypeVal type)
+    public void GThanEqNode_TypeMismatch_ThrowsTypeException(TypeVal type)
     {
         // Arrange
         var symbol = new SymTableEntry() {Type = type};
@@ -606,9 +605,9 @@ public class TypeCheckerTests {
             Right = new IdNode() {Id = "right"}
         };
         // Act
-        gThanEqNode.Accept(_typeVisitor);
+        var test = () => gThanEqNode.Accept(_typeVisitor);
         // Assert
-        Assert.Equal(TypeVal.Error, gThanEqNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     [Fact]
@@ -631,7 +630,7 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(TypeVal.String)]
     [InlineData(TypeVal.Boolean)]
-    public void LThanNode_WrongTypes_IsTypeError(TypeVal type)
+    public void LThanNode_WrongTypes_ThrowsTypeException(TypeVal type)
     {
         // Arrange
         var symbol = new SymTableEntry() {Type = type};
@@ -643,10 +642,10 @@ public class TypeCheckerTests {
         };
 
         // Act
-        lThanNode.Accept(_typeVisitor);
+        var test = () => lThanNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Equal(TypeVal.Error, lThanNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     [Fact]
@@ -671,7 +670,7 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(TypeVal.String)]
     [InlineData(TypeVal.Boolean)]
-    public void LThanEqNode_WrongTypes_IsTypeError(TypeVal type)
+    public void LThanEqNode_WrongTypes_ThrowsTypeException(TypeVal type)
     {
         // Arrange
         var symbol = new SymTableEntry() {Type = type};
@@ -683,10 +682,10 @@ public class TypeCheckerTests {
         };
 
         // Act
-        lThanEqNode.Accept(_typeVisitor);
+        var test = () => lThanEqNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Equal(TypeVal.Error, lThanEqNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     [Fact]
@@ -735,7 +734,7 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.String)]
     [InlineData(TypeVal.Boolean)]
     [InlineData(TypeVal.Error)]
-    public void ArrayAccessNode_IndexIsNotNumber_AssignsError(TypeVal type) {
+    public void ArrayAccessNode_IndexIsNotNumber_ThrowsTypeException(TypeVal type) {
         // Arrange
         var symbol = new SymTableEntry() {Type = TypeVal.Number};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("array"))
@@ -748,10 +747,10 @@ public class TypeCheckerTests {
             Index = new IdNode() {Id = "index"}
         };
         // Act
-        arrAccNode.Accept(_typeVisitor);
+        var test = () => arrAccNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Equal(TypeVal.Error, arrAccNode.Type);  
+        Assert.Throws<TypeException>(test);
     }
 
     [Theory]
@@ -796,7 +795,7 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Number)]
     [InlineData(TypeVal.String)]
     [InlineData(TypeVal.Boolean)]
-    public void FuncExprNode_ParamsMismatch_IsTypeError(TypeVal type) {
+    public void FuncExprNode_ParamsMismatch_ThrowsTypeException(TypeVal type) {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
             Type = type,
@@ -824,10 +823,10 @@ public class TypeCheckerTests {
         };
 
         // Act
-        funcExprNode.Accept(_typeVisitor);
+        var test = () => funcExprNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Equal(TypeVal.Error, funcExprNode.Type);
+        Assert.Throws<TypeException>(test);
     }
 
     [Fact]
@@ -878,7 +877,7 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Number, TypeVal.Boolean)]
     [InlineData(TypeVal.String, TypeVal.Number)]
     [InlineData(TypeVal.Boolean, TypeVal.String)]
-    public void VarDclNode_TypeMismatch_IsTypeError(TypeVal type1, TypeVal type2)
+    public void VarDclNode_TypeMismatch_ThrowsTypeException(TypeVal type1, TypeVal type2)
     {
         //Arrange
         var symbol = new SymTableEntry() {Type = type2};
@@ -893,17 +892,17 @@ public class TypeCheckerTests {
         };
 
         //Act
-        varDclNode.Accept(_typeVisitor);
+        var test = () => varDclNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Equal(TypeVal.Error, varDclNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     [Theory]
     [InlineData(TypeVal.Number)]
     [InlineData(TypeVal.Boolean)]
     [InlineData(TypeVal.String)]
-    public void VarDclNode_ExprHasError_IsTypeError(TypeVal type)
+    public void VarDclNode_ExprHasError_ThrowsTypeException(TypeVal type)
     {
         //Arrange
         var symbol2 = new SymTableEntry() {Type = TypeVal.Error};
@@ -918,10 +917,10 @@ public class TypeCheckerTests {
         };
 
         //Act
-        varDclNode.Accept(_typeVisitor);
+        var test = () => varDclNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Equal(TypeVal.Error, varDclNode.Type);
+        Assert.Throws<TypeException>(test);
     }
 
     [Fact]
@@ -946,7 +945,7 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Number, TypeVal.Boolean)]
     [InlineData(TypeVal.String, TypeVal.Number)]
     [InlineData(TypeVal.Boolean, TypeVal.String)]
-    public void ArrDclNode_TypeMismatch_IsTypeError(TypeVal type1, TypeVal type2)
+    public void ArrDclNode_TypeMismatch_ThrowsTypeException(TypeVal type1, TypeVal type2)
     {
         //Arrange
         var symbol1 = new SymTableEntry() {Type = type1};
@@ -961,17 +960,17 @@ public class TypeCheckerTests {
         };
 
         //Act
-        arrDclNode.Accept(_typeVisitor);
+        var test = () => arrDclNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Equal(TypeVal.Error, arrDclNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     [Theory]
     [InlineData(TypeVal.Number)]
     [InlineData(TypeVal.Boolean)]
     [InlineData(TypeVal.String)]
-    public void ArrDclNode_ExprHasError_IsTypeError(TypeVal type)
+    public void ArrDclNode_ExprHasError_ThrowsTypeException(TypeVal type)
     {
         //Arrange
         var symbol1 = new SymTableEntry() {Type = type};
@@ -986,10 +985,10 @@ public class TypeCheckerTests {
         };
 
         //Act
-        arrDclNode.Accept(_typeVisitor);
+        var test = () => arrDclNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Equal(TypeVal.Error, arrDclNode.Type);
+        Assert.Throws<TypeException>(test);
     }
 
     [Fact]
@@ -1053,23 +1052,22 @@ public class TypeCheckerTests {
         };
 
         // Act
-        funcDefNode.Accept(_typeVisitor);
+        var test = () => funcDefNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Equal(TypeVal.Error, funcDefNode.Type);
+        Assert.Throws<TypeException>(test);
         _symbolTableMock.Verify(x => x.EnterSymbol(funcDefNode), Times.Never);
     }
     #endregion
     
     #region Statements
     [Theory]
-    [InlineData(TypeVal.Number, TypeVal.Error)]
-    [InlineData(TypeVal.Boolean, TypeVal.Ok)]
-    [InlineData(TypeVal.String, TypeVal.Error)]
-    public void IfNode_ConditionMatches_NodeAccepted(TypeVal type1, TypeVal expectedResult)
+    [InlineData(TypeVal.Number)]
+    [InlineData(TypeVal.String)]
+    public void IfNode_ConditionTypeMismatch_ThrowsTypeException(TypeVal type)
     {
         //Arrange
-        var symbol = new SymTableEntry() {Type = type1};
+        var symbol = new SymTableEntry() {Type = type};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("bool"))
             .Returns(symbol);
         var ifNode = new IfNode {
@@ -1079,17 +1077,16 @@ public class TypeCheckerTests {
         };
     
         //Act
-        ifNode.Accept(_typeVisitor);
+        var test = () => ifNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Equal(expectedResult, ifNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     [Theory]
-    [InlineData(TypeVal.Number, TypeVal.Error)]
-    [InlineData(TypeVal.Boolean, TypeVal.Ok)]
-    [InlineData(TypeVal.String, TypeVal.Error)]
-    public void WhileNode_TypeMatch_TypeOkOrTypeError(TypeVal type, TypeVal expectedResult)
+    [InlineData(TypeVal.Number)]
+    [InlineData(TypeVal.String)]
+    public void WhileNode_ConditionTypeMismatch_ThrowsTypeException(TypeVal type)
     {
         //Arrange
         var symbol = new SymTableEntry() {Type = type};
@@ -1101,16 +1098,15 @@ public class TypeCheckerTests {
         };
         
         //Act
-        whileNode.Accept(_typeVisitor);
+        var test = () => whileNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Equal(expectedResult, whileNode.Type);
+        Assert.Throws<TypeException>(test);
     }
 
     [Theory]
-    [InlineData(TypeVal.Number, TypeVal.Number, TypeVal.Number, TypeVal.Ok)]
-    [InlineData(TypeVal.String, TypeVal.Number, TypeVal.Boolean, TypeVal.Error)]
-    public void ForNode_TypeMatch_TypeOkOrTypeError(TypeVal type1, TypeVal type2, TypeVal type3, TypeVal type4)
+    [InlineData(TypeVal.String, TypeVal.Number, TypeVal.Boolean)]
+    public void ForNode_TypeMismatch_ThrowsTypeException(TypeVal type1, TypeVal type2, TypeVal type3)
     {
         //Arrange
         var symbol1 = new SymTableEntry() {Type = type1};
@@ -1130,10 +1126,10 @@ public class TypeCheckerTests {
         };
         
         //Act
-        forNode.Accept(_typeVisitor);
+        var test = () => forNode.Accept(_typeVisitor);
         
         //Assert
-        Assert.Equal(type4, forNode.Type);
+        Assert.Throws<TypeException>(test);
     }
 
     [Theory]
@@ -1161,7 +1157,7 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Number, TypeVal.Boolean)]
     [InlineData(TypeVal.String, TypeVal.Number)]
     [InlineData(TypeVal.Boolean, TypeVal.String)]
-    public void AssNode_TypeMismatch_IsTypeError(TypeVal type1, TypeVal type2)
+    public void AssNode_TypeMismatch_ThrowsTypeException(TypeVal type1, TypeVal type2)
     {
         //Arrange
         var symbol1 = new SymTableEntry() {Type = type1};
@@ -1176,10 +1172,10 @@ public class TypeCheckerTests {
         };
 
         //Act
-        assNode.Accept(_typeVisitor);
+        var test = () => assNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Equal(TypeVal.Error, assNode.Type);
+        Assert.Throws<TypeException>(test);
     }
 
     [Theory]
@@ -1210,7 +1206,7 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Number, TypeVal.Boolean)]
     [InlineData(TypeVal.String, TypeVal.Number)]
     [InlineData(TypeVal.Boolean, TypeVal.String)]
-    public void RetNode_TypeMismatch_IsTypeError(TypeVal type1, TypeVal type2) {
+    public void RetNode_TypeMismatch_ThrowsTypeException(TypeVal type1, TypeVal type2) {
         // Arrange
         var symbol = new SymTableEntry() {Type = type2};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
@@ -1221,10 +1217,10 @@ public class TypeCheckerTests {
         };
         
         // Act
-        retNode.Accept(_typeVisitor);
-        
+        var test = () => retNode.Accept(_typeVisitor);
+
         // Assert
-        Assert.Equal(TypeVal.Error, retNode.Type); 
+        Assert.Throws<TypeException>(test);
     }
 
     [Fact]
@@ -1278,7 +1274,7 @@ public class TypeCheckerTests {
     }
     
     [Fact]
-    public void FuncStmtNode_ParamsMismatch_IsTypeError() {
+    public void FuncStmtNode_ParamsMismatch_ThrowsTypeException() {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
             Type = TypeVal.Blank,
@@ -1306,10 +1302,10 @@ public class TypeCheckerTests {
         };
 
         // Act
-        funcExprNode.Accept(_typeVisitor);
+        var test = () => funcExprNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Equal(TypeVal.Error, funcExprNode.Type);
+        Assert.Throws<TypeException>(test);
     }
     
     [Fact]
@@ -1323,10 +1319,10 @@ public class TypeCheckerTests {
         };
         
         // Act
-        var action = () => funcExprNode.Accept(_typeVisitor);
+        var test = () => funcExprNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<NoNullAllowedException>(action);
+        Assert.Throws<NoNullAllowedException>(test);
     }
 
     #endregion Statements
