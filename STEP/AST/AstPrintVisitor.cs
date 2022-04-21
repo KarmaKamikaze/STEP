@@ -467,7 +467,15 @@ public class AstPrintVisitor : IVisitor
 
     public void Visit(RetNode n)
     {
-        throw new NotImplementedException();
+        if (n != null)
+        {
+            Indent();
+            Print("return");
+            if (n.RetVal != null)
+            {
+                n.RetVal.Accept(this);
+            }
+        }
     }
 
     public void Visit(IfNode n)
