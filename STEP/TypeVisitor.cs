@@ -53,7 +53,7 @@ public class TypeVisitor : IVisitor {
     public void Visit(EqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == n.Right.Type) {
+        if (n.Left.Type.ActualType == n.Right.Type.ActualType) {
             n.Type.ActualType = TypeVal.Boolean;
         }
         else {
@@ -65,7 +65,7 @@ public class TypeVisitor : IVisitor {
     public void Visit(NeqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == n.Right.Type) {
+        if (n.Left.Type.ActualType == n.Right.Type.ActualType) {
             n.Type.ActualType = TypeVal.Boolean;
         }
         else {
@@ -150,9 +150,9 @@ public class TypeVisitor : IVisitor {
     public void Visit(ArrDclNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        n.Type = (n.Left.Type.ActualType != n.Right.Type.ActualType) 
+        n.Type.ActualType = (n.Left.Type.ActualType != n.Right.Type.ActualType) 
             ? throw new TypeException(n.Left.Type.ActualType, n.Right.Type.ActualType)
-            : n.Left.Type;
+            : n.Left.Type.ActualType;
     }
 
     public void Visit(ArrLiteralNode n)
@@ -204,7 +204,7 @@ public class TypeVisitor : IVisitor {
             }
         }
         else {
-            if (n.Left.Type == n.Right.Type) {
+            if (n.Left.Type.ActualType == n.Right.Type.ActualType) {
                 n.Type.ActualType = TypeVal.Ok;
             }
             else {
@@ -224,7 +224,7 @@ public class TypeVisitor : IVisitor {
         // if (n.Id.IsConstant) {
         //     throw new TypeException("Cannot reassign values to constant variables");
         // }
-        if (n.Id.Type == n.Expr.Type) {
+        if (n.Id.Type.ActualType == n.Expr.Type.ActualType) {
             n.Type.ActualType = TypeVal.Ok;
         }
         else {
@@ -448,7 +448,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.RetVal.Accept(this);
-            if (parentFunc.Type == n.RetVal.Type) {
+            if (parentFunc.Type.ActualType == n.RetVal.Type.ActualType) {
                 n.Type.ActualType = TypeVal.Ok;
             }
             else {

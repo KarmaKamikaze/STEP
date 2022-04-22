@@ -100,7 +100,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(idNode);
         
         // Assert
-        Assert.Equal(dclNode.Right.Type, idNode.Type);
+        Assert.Equal(dclNode.Right.Type.ActualType, idNode.Type.ActualType);
     }
 
     [Fact]
