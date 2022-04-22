@@ -6,6 +6,7 @@ using STEP.AST;
 using STEP.AST.Nodes;
 using Xunit;
 using Moq;
+using Type = STEP.Type;
 
 namespace StepTests; 
 
@@ -28,7 +29,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(numLiteralNode);
         
         // Assert
-        Assert.Equal(TypeVal.Number, numLiteralNode.Type);
+        Assert.Equal(TypeVal.Number, numLiteralNode.Type.ActualType);
     }
     
     [Fact]
@@ -41,7 +42,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(strLiteralNode);
        
         // Assert
-        Assert.Equal(TypeVal.String, strLiteralNode.Type);
+        Assert.Equal(TypeVal.String, strLiteralNode.Type.ActualType);
     }
        
     [Fact]
@@ -54,7 +55,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(boolLiteralNode);
         
         // Assert
-        Assert.Equal(TypeVal.Boolean, boolLiteralNode.Type);
+        Assert.Equal(TypeVal.Boolean, boolLiteralNode.Type.ActualType);
     }
 
     [Fact]
@@ -70,7 +71,7 @@ public class TypeCheckerTests {
         
         var dclNode = new VarDclNode()
         {
-            Left = new IdNode() {Id = id, Type = TypeVal.Number},
+            Left = new IdNode() {Id = id, Type = new Type() {ActualType = TypeVal.Number}},
             Right = new NumberNode() {Value = 50 }
         };
         var idNode = new IdNode() {Id = id};
@@ -111,7 +112,7 @@ public class TypeCheckerTests {
         uMinusNode.Accept(_typeVisitor);
         
         // Assert
-        Assert.Equal(TypeVal.Number, uMinusNode.Type);
+        Assert.Equal(TypeVal.Number, uMinusNode.Type.ActualType);
     }
     
     [Theory]
@@ -159,7 +160,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(negNode);
          
         // Assert
-        Assert.Equal(TypeVal.Boolean, negNode.Type);
+        Assert.Equal(TypeVal.Boolean, negNode.Type.ActualType);
     }
 
     [Theory]
@@ -201,7 +202,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(multNode);
          
         // Assert
-        Assert.Equal(TypeVal.Number, multNode.Type);
+        Assert.Equal(TypeVal.Number, multNode.Type.ActualType);
     }
     
     [Theory]
@@ -243,7 +244,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(divNode);
          
         // Assert
-        Assert.Equal(TypeVal.Number, divNode.Type);
+        Assert.Equal(TypeVal.Number, divNode.Type.ActualType);
     }
     
     [Theory]
@@ -285,7 +286,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(powNode);
          
         // Assert
-        Assert.Equal(TypeVal.Number, powNode.Type);
+        Assert.Equal(TypeVal.Number, powNode.Type.ActualType);
     }
     
     [Theory]
@@ -327,7 +328,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(minusNode);
          
         // Assert
-        Assert.Equal(TypeVal.Number, minusNode.Type);
+        Assert.Equal(TypeVal.Number, minusNode.Type.ActualType);
     }
 
     [Fact]
@@ -346,7 +347,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(plusNode);
          
         // Assert
-        Assert.Equal(TypeVal.Number, plusNode.Type);
+        Assert.Equal(TypeVal.Number, plusNode.Type.ActualType);
     }
 
     [Fact]
@@ -365,7 +366,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(plusNode);
          
         // Assert
-        Assert.Equal(TypeVal.String, plusNode.Type);
+        Assert.Equal(TypeVal.String, plusNode.Type.ActualType);
     }
 
     [Fact]
@@ -405,7 +406,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(andNode);
          
         // Assert
-        Assert.Equal(TypeVal.Boolean, andNode.Type);
+        Assert.Equal(TypeVal.Boolean, andNode.Type.ActualType);
     }
     
     [Theory]
@@ -447,7 +448,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(orNode);
          
         // Assert
-        Assert.Equal(TypeVal.Boolean, orNode.Type);
+        Assert.Equal(TypeVal.Boolean, orNode.Type.ActualType);
     }
     
     [Theory]
@@ -494,7 +495,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(eqNode);
          
         // Assert
-        Assert.Equal(TypeVal.Boolean, eqNode.Type);
+        Assert.Equal(TypeVal.Boolean, eqNode.Type.ActualType);
     }
 
     [Fact]
@@ -535,7 +536,7 @@ public class TypeCheckerTests {
         _typeVisitor.Visit(neqNode);
          
         // Assert
-        Assert.Equal(TypeVal.Boolean, neqNode.Type);
+        Assert.Equal(TypeVal.Boolean, neqNode.Type.ActualType);
     }
 
     [Fact]
@@ -588,7 +589,7 @@ public class TypeCheckerTests {
         // Act
         gThanNode.Accept(_typeVisitor);
         // Assert
-        Assert.Equal(TypeVal.Boolean, gThanNode.Type);
+        Assert.Equal(TypeVal.Boolean, gThanNode.Type.ActualType);
     }
     
     [Theory]
@@ -624,7 +625,7 @@ public class TypeCheckerTests {
         // Act
         gThanEqNode.Accept(_typeVisitor);
         // Assert
-        Assert.Equal(TypeVal.Boolean, gThanEqNode.Type);
+        Assert.Equal(TypeVal.Boolean, gThanEqNode.Type.ActualType);
     }
     
     [Theory]
@@ -664,7 +665,7 @@ public class TypeCheckerTests {
         lThanNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Equal(TypeVal.Boolean, lThanNode.Type);
+        Assert.Equal(TypeVal.Boolean, lThanNode.Type.ActualType);
     }
     
     [Theory]
@@ -704,7 +705,7 @@ public class TypeCheckerTests {
         lThanEqNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Equal(TypeVal.Boolean, lThanEqNode.Type);
+        Assert.Equal(TypeVal.Boolean, lThanEqNode.Type.ActualType);
     }
 
     [Theory]
@@ -727,7 +728,7 @@ public class TypeCheckerTests {
         arrAccNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Equal(type, arrAccNode.Type);
+        Assert.Equal(type, arrAccNode.Type.ActualType);
     }
     
     [Theory]
@@ -788,7 +789,7 @@ public class TypeCheckerTests {
         funcExprNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Equal(type, funcExprNode.Type);
+        Assert.Equal(type, funcExprNode.Type.ActualType);
     }
     
     [Theory]
@@ -861,7 +862,7 @@ public class TypeCheckerTests {
     var varDclNode = new VarDclNode {
         Left = new IdNode() {
             Id = "left",
-            Type = type
+            Type = new Type() {ActualType = type}
         },
         Right = new IdNode() {Id = "right"}
     };
@@ -870,7 +871,7 @@ public class TypeCheckerTests {
     varDclNode.Accept(_typeVisitor);
 
     //Assert
-    Assert.Equal(TypeVal.Ok, varDclNode.Type);
+    Assert.Equal(TypeVal.Ok, varDclNode.Type.ActualType);
     }
     
     [Theory]
@@ -886,7 +887,7 @@ public class TypeCheckerTests {
         var varDclNode = new VarDclNode {
             Left = new IdNode() {
                 Id = "left",
-                Type = type1
+                Type = new Type() {ActualType = type1}
             },
             Right = new IdNode() {Id = "right"}
         };
@@ -911,7 +912,7 @@ public class TypeCheckerTests {
         var varDclNode = new VarDclNode {
             Left = new IdNode() {
                 Id = "left",
-                Type = type
+                Type = new Type() {ActualType = type}
             },
             Right = new IdNode() {Id = "right"}
         };
@@ -938,7 +939,7 @@ public class TypeCheckerTests {
         arrDclNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Equal(TypeVal.Number, arrDclNode.Type);
+        Assert.Equal(TypeVal.Number, arrDclNode.Type.ActualType);
     }
     
     [Theory]
@@ -1002,17 +1003,17 @@ public class TypeCheckerTests {
                 new AssNode() {
                     Id = new IdNode(){Id = "a"},
                     Expr = new PlusNode() {
-                        Left = new IdNode(){Id = "a", Type = TypeVal.Number},
+                        Left = new IdNode(){Id = "a", Type = new Type() {ActualType = TypeVal.Number}},
                         Right = new NumberNode(){Value = 2}
                     }
                 },
                 new RetNode() {
-                    Parent = new FuncDefNode(){ReturnType = new IdNode(){Type = TypeVal.Number}},
-                    RetVal = new IdNode(){Id = "return1", Type = TypeVal.Number}
+                    Parent = new FuncDefNode(){ReturnType = new IdNode(){Type = new Type() {ActualType = TypeVal.Number}}},
+                    RetVal = new IdNode(){Id = "return1", Type = new Type() {ActualType = TypeVal.Number}}
                 }
             },
-            FormalParams = new Dictionary<IdNode, (TypeVal, bool)>() {
-                {new IdNode(){Id = "a"}, (TypeVal.Number, false)}
+            FormalParams = new Dictionary<IdNode, Type>() {
+                {new IdNode(){Id = "a"}, new Type() {ActualType = TypeVal.Number, IsArray = false}}
             },
             ReturnType = new IdNode() {Id = "return2"}
         };
@@ -1021,7 +1022,7 @@ public class TypeCheckerTests {
         funcDefNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Equal(TypeVal.Number, funcDefNode.Type);
+        Assert.Equal(TypeVal.Number, funcDefNode.Type.ActualType);
         _symbolTableMock.Verify(x => x.EnterSymbol(funcDefNode), Times.Once);
     }
     
@@ -1036,17 +1037,17 @@ public class TypeCheckerTests {
                 new AssNode() {
                     Id = new IdNode(){Id = "a"},
                     Expr = new PlusNode() {
-                        Left = new IdNode(){Id = "a", Type = TypeVal.Number},
+                        Left = new IdNode(){Id = "a", Type = new Type() {ActualType = TypeVal.Number}},
                         Right = new NumberNode(){Value = 2}
                     }
                 },
                 new RetNode() {
-                    Parent = new FuncDefNode(){ReturnType = new IdNode(){Type = TypeVal.Number}},
+                    Parent = new FuncDefNode(){ReturnType = new IdNode(){Type = new Type() {ActualType = TypeVal.Number}}},
                     RetVal = new IdNode(){Id = "a"}
                 }
             },
-            FormalParams = new Dictionary<IdNode, (TypeVal, bool)>() {
-                {new IdNode(){Id = "a"}, (TypeVal.Number, false)}
+            FormalParams = new Dictionary<IdNode, Type>() {
+                {new IdNode(){Id = "a"}, new Type() {ActualType = TypeVal.Number, IsArray = false}}
             },
             ReturnType = new IdNode() {Id = "return"}
         };
@@ -1150,7 +1151,7 @@ public class TypeCheckerTests {
         assNode.Accept(_typeVisitor);
         
         // Assert
-        Assert.Equal(TypeVal.Ok, assNode.Type);
+        Assert.Equal(TypeVal.Ok, assNode.Type.ActualType);
     }
     
     [Theory]
@@ -1189,7 +1190,7 @@ public class TypeCheckerTests {
             .Returns(symbol);
         var retNode = new RetNode() {
             Parent = new IfNode() {
-                Parent = new FuncDefNode() {Type = type},
+                Parent = new FuncDefNode() {Type = new Type() {ActualType = type}},
                 
             },
             RetVal = new IdNode() {Id = "type"}
@@ -1199,7 +1200,7 @@ public class TypeCheckerTests {
         retNode.Accept(_typeVisitor);
         
         // Assert
-        Assert.Equal(TypeVal.Ok, retNode.Type);
+        Assert.Equal(TypeVal.Ok, retNode.Type.ActualType);
     }
 
     [Theory]
@@ -1212,7 +1213,7 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var retNode = new RetNode() {
-            Parent = new FuncDefNode() {Type = type1},
+            Parent = new FuncDefNode() {Type = new Type() {ActualType = type1}},
             RetVal = new IdNode() {Id = "type2"}
         };
         
@@ -1227,7 +1228,7 @@ public class TypeCheckerTests {
     public void RetNode_NullExprParentIsBlank_IsTypeOk() {
         // Arrange
         var retNode = new RetNode() {
-            Parent = new FuncDefNode() {Type = TypeVal.Blank},
+            Parent = new FuncDefNode() {Type = new Type() {ActualType = TypeVal.Blank}},
             RetVal = null
         };
         
@@ -1235,7 +1236,7 @@ public class TypeCheckerTests {
         retNode.Accept(_typeVisitor);
         
         // Assert
-        Assert.Equal(TypeVal.Ok, retNode.Type);
+        Assert.Equal(TypeVal.Ok, retNode.Type.ActualType);
     }
     
     [Fact]
@@ -1270,7 +1271,7 @@ public class TypeCheckerTests {
         funcExprNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Equal(TypeVal.Blank, funcExprNode.Type);
+        Assert.Equal(TypeVal.Blank, funcExprNode.Type.ActualType);
     }
     
     [Fact]
@@ -1341,7 +1342,7 @@ public class TypeCheckerTests {
         };
         var idNode = new IdNode() {
             Id = "a",
-            Type = TypeVal.Number
+            Type = new Type() {ActualType = TypeVal.Number}
         };
         var varDcl = new VarDclNode() {
             Left = idNode,
@@ -1377,14 +1378,14 @@ public class TypeCheckerTests {
         
         // Assert
         // Is the vardcl ok? requires expr node = number, as var id is number
-        Assert.Equal(TypeVal.Ok, varDcl.Type);
-        Assert.Equal(TypeVal.Number, exprNode.Type);
+        Assert.Equal(TypeVal.Ok, varDcl.Type.ActualType);
+        Assert.Equal(TypeVal.Number, exprNode.Type.ActualType);
         
         // Is the ifnode ok? requires condition = bool, andnode exprs = bool 
-        Assert.Equal(TypeVal.Ok, ifNode.Type);
-        Assert.Equal(TypeVal.Boolean, boolCond.Type);
-        Assert.Equal(TypeVal.Boolean, boolLeft.Type);
-        Assert.Equal(TypeVal.Boolean, boolRight.Type);
+        Assert.Equal(TypeVal.Ok, ifNode.Type.ActualType);
+        Assert.Equal(TypeVal.Boolean, boolCond.Type.ActualType);
+        Assert.Equal(TypeVal.Boolean, boolLeft.Type.ActualType);
+        Assert.Equal(TypeVal.Boolean, boolRight.Type.ActualType);
     }
     #endregion
 }

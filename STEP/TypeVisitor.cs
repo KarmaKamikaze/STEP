@@ -20,23 +20,23 @@ public class TypeVisitor : IVisitor {
     public void Visit(AndNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == TypeVal.Boolean && n.Right.Type == TypeVal.Boolean) {
-            n.Type = TypeVal.Boolean;
+        if (n.Left.Type.ActualType == TypeVal.Boolean && n.Right.Type.ActualType == TypeVal.Boolean) {
+            n.Type.ActualType = TypeVal.Boolean;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Boolean, n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Boolean, n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
     public void Visit(OrNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == TypeVal.Boolean && n.Right.Type == TypeVal.Boolean) {
-                n.Type = TypeVal.Boolean;
+        if (n.Left.Type.ActualType == TypeVal.Boolean && n.Right.Type.ActualType == TypeVal.Boolean) {
+                n.Type.ActualType = TypeVal.Boolean;
         } else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Boolean, n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Boolean, n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
@@ -44,11 +44,11 @@ public class TypeVisitor : IVisitor {
         n.Left.Accept(this);
         n.Right.Accept(this);
         if (n.Left.Type == n.Right.Type) {
-            n.Type = TypeVal.Boolean;
+            n.Type.ActualType = TypeVal.Boolean;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
@@ -56,92 +56,92 @@ public class TypeVisitor : IVisitor {
         n.Left.Accept(this);
         n.Right.Accept(this);
         if (n.Left.Type == n.Right.Type) {
-            n.Type = TypeVal.Boolean;
+            n.Type.ActualType = TypeVal.Boolean;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
     public void Visit(GThanNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
-            n.Type = TypeVal.Boolean;
+        if (n.Left.Type.ActualType == TypeVal.Number && n.Right.Type.ActualType == TypeVal.Number) {
+            n.Type.ActualType = TypeVal.Boolean;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
     public void Visit(GThanEqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
-            n.Type = TypeVal.Boolean;
+        if (n.Left.Type.ActualType == TypeVal.Number && n.Right.Type.ActualType == TypeVal.Number) {
+            n.Type.ActualType = TypeVal.Boolean;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
     public void Visit(LThanNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
-            n.Type = TypeVal.Boolean;
+        if (n.Left.Type.ActualType == TypeVal.Number && n.Right.Type.ActualType == TypeVal.Number) {
+            n.Type.ActualType = TypeVal.Boolean;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
     public void Visit(LThanEqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
-            n.Type = TypeVal.Boolean;
+        if (n.Left.Type.ActualType == TypeVal.Number && n.Right.Type.ActualType == TypeVal.Number) {
+            n.Type.ActualType = TypeVal.Boolean;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
     public void Visit(NegNode n) {
         n.Left.Accept(this);
-        if (n.Left.Type == TypeVal.Boolean) {
-            n.Type = TypeVal.Boolean;
+        if (n.Left.Type.ActualType == TypeVal.Boolean) {
+            n.Type.ActualType = TypeVal.Boolean;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Boolean, n.Left.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Boolean, n.Left.Type.ActualType);
         }
     }
     
     // Expression nodes
 
     public void Visit(NumberNode n) {
-        n.Type = TypeVal.Number;
+        n.Type.ActualType = TypeVal.Number;
     }
 
     public void Visit(StringNode n) {
-        n.Type = TypeVal.String;
+        n.Type.ActualType = TypeVal.String;
     }
 
     public void Visit(BoolNode n) {
-        n.Type = TypeVal.Boolean;
+        n.Type.ActualType = TypeVal.Boolean;
     }
 
     public void Visit(ArrDclNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        n.Type = (n.Left.Type != n.Right.Type) 
-            ? throw new TypeException(n.Left.Type, n.Right.Type)
+        n.Type = (n.Left.Type.ActualType != n.Right.Type.ActualType) 
+            ? throw new TypeException(n.Left.Type.ActualType, n.Right.Type.ActualType)
             : n.Left.Type;
     }
 
@@ -149,28 +149,28 @@ public class TypeVisitor : IVisitor {
     {
         // Check if all elements have the same type
         n.Elements.FirstOrDefault()?.Accept(this);
-        var firstType = n.Elements.FirstOrDefault()?.Type;
+        var firstType = n.Elements.FirstOrDefault()?.Type.ActualType;
         foreach (var expr in n.Elements.Skip(1))
         {
             expr.Accept(this);
-            if (expr.Type != firstType)
+            if (expr.Type.ActualType != firstType)
             {
-                n.Type = TypeVal.Error;
-                throw new TypeException(firstType!.Value, expr.Type);
+                n.Type.ActualType = TypeVal.Error;
+                throw new TypeException(firstType!.Value, expr.Type.ActualType);
             }
         }
 
-        n.Type = (TypeVal) firstType; // Hmm
+        n.Type.ActualType = (TypeVal) firstType; // Hmm
     }
 
     public void Visit(ArrayAccessNode n) {
         n.Array.Accept(this);
         n.Index.Accept(this);
-        if (n.Index.Type == TypeVal.Number) {
+        if (n.Index.Type.ActualType == TypeVal.Number) {
             n.Type = n.Array.Type;
         }
         else {
-            n.Type = TypeVal.Error;
+            n.Type.ActualType = TypeVal.Error;
             throw new TypeException(TypeVal.Number, n.Index);
         }
         // Index is expression node, should we "calculate" the expression if possible to check if
@@ -181,12 +181,12 @@ public class TypeVisitor : IVisitor {
         DclVisitor dclVisitor = new DclVisitor(_symbolTable);
         n.Left.Accept(dclVisitor);
         n.Right.Accept(this);
-        if (n.Left.Type == n.Right.Type) {
-            n.Type = TypeVal.Ok;
+        if (n.Left.Type.ActualType == n.Right.Type.ActualType) {
+            n.Type.ActualType = TypeVal.Ok;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
@@ -195,80 +195,80 @@ public class TypeVisitor : IVisitor {
         n.Id.Accept(assVisitor);
         n.Expr.Accept(this);
         if (n.Id.Type == n.Expr.Type) {
-            n.Type = TypeVal.Ok;
+            n.Type.ActualType = TypeVal.Ok;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(n.Id.Type, n.Expr.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(n.Id.Type.ActualType, n.Expr.Type.ActualType);
         }
     }
 
     public virtual void Visit(IdNode n) {
         var symbol = _symbolTable.RetrieveSymbol(n.Id);
-        n.Type = symbol?.Type ?? throw new TypeException(n.Id);
+        n.Type.ActualType = symbol?.Type ?? throw new TypeException(n.Id);
     }
 
     public void Visit(PlusNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number)
+        if (n.Left.Type.ActualType == TypeVal.Number && n.Right.Type.ActualType == TypeVal.Number)
         {
-            n.Type = TypeVal.Number;
+            n.Type.ActualType = TypeVal.Number;
         }
-        else if (n.Left.Type == TypeVal.String || n.Right.Type == TypeVal.String) {
-            n.Type = TypeVal.String;
+        else if (n.Left.Type.ActualType == TypeVal.String || n.Right.Type.ActualType == TypeVal.String) {
+            n.Type.ActualType = TypeVal.String;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, TypeVal.String, n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, TypeVal.String, n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
     public void Visit(MinusNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
-            n.Type = TypeVal.Number;
+        if (n.Left.Type.ActualType == TypeVal.Number && n.Right.Type.ActualType == TypeVal.Number) {
+            n.Type.ActualType = TypeVal.Number;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
     public void Visit(MultNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
-            n.Type = TypeVal.Number;
+        if (n.Left.Type.ActualType == TypeVal.Number && n.Right.Type.ActualType == TypeVal.Number) {
+            n.Type.ActualType = TypeVal.Number;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
     public void Visit(DivNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
-            n.Type = TypeVal.Number;
+        if (n.Left.Type.ActualType == TypeVal.Number && n.Right.Type.ActualType == TypeVal.Number) {
+            n.Type.ActualType = TypeVal.Number;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
     public void Visit(PowNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type == TypeVal.Number && n.Right.Type == TypeVal.Number) {
-            n.Type = TypeVal.Number;
+        if (n.Left.Type.ActualType == TypeVal.Number && n.Right.Type.ActualType == TypeVal.Number) {
+            n.Type.ActualType = TypeVal.Number;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type, n.Right.Type);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
 
@@ -279,11 +279,11 @@ public class TypeVisitor : IVisitor {
 
     public void Visit(UMinusNode n) {
         n.Left.Accept(this);
-        if (n.Left.Type == TypeVal.Number) {
-            n.Type = TypeVal.Number;
+        if (n.Left.Type.ActualType == TypeVal.Number) {
+            n.Type.ActualType = TypeVal.Number;
         }
         else {
-            n.Type = TypeVal.Error;
+            n.Type.ActualType = TypeVal.Error;
             throw new TypeException(TypeVal.Number, n.Left);
         }
     }
@@ -293,11 +293,11 @@ public class TypeVisitor : IVisitor {
     public void Visit(WhileNode n) {
         _symbolTable.OpenScope();
         n.Condition.Accept(this);
-        if (n.Condition.Type == TypeVal.Boolean) {
-            n.Type = TypeVal.Ok;
+        if (n.Condition.Type.ActualType == TypeVal.Boolean) {
+            n.Type.ActualType = TypeVal.Ok;
         }
         else {
-            n.Type = TypeVal.Error;
+            n.Type.ActualType = TypeVal.Error;
             throw new TypeException(TypeVal.Boolean, n);
         }
         foreach (var stmtNode in n.Body) {
@@ -315,12 +315,12 @@ public class TypeVisitor : IVisitor {
         n.Initializer.Accept(this);
         n.Limit.Accept(this);
         n.Update.Accept(this);
-        if (n.Initializer.Type == TypeVal.Number && n.Limit.Type == TypeVal.Number && n.Update.Type == TypeVal.Number) { // If it's a literal, it's number.. If it's vardcl, it's Ok??? 
-            n.Type = TypeVal.Ok;
+        if (n.Initializer.Type.ActualType == TypeVal.Number && n.Limit.Type.ActualType == TypeVal.Number && n.Update.Type.ActualType == TypeVal.Number) { // If it's a literal, it's number.. If it's vardcl, it's Ok??? 
+            n.Type.ActualType = TypeVal.Ok;
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Initializer.Type, n.Limit.Type, n.Update);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Number, n.Initializer.Type.ActualType, n.Limit.Type.ActualType, n.Update);
         }
         _symbolTable.CloseScope();
     }
@@ -358,8 +358,8 @@ public class TypeVisitor : IVisitor {
             _symbolTable.EnterSymbol(n);
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(n.ReturnType.Type, offendingTypeRetNode.RetVal);
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(n.ReturnType.Type.ActualType, offendingTypeRetNode.RetVal);
         }
     }
 
@@ -368,13 +368,13 @@ public class TypeVisitor : IVisitor {
         if (symbol is null) { // Should this be here?
             throw new NoNullAllowedException("The retrieved symbol was not a function symbol table entry");
         }
-        n.Type = symbol.Type;
+        n.Type.ActualType = symbol.Type;
         var parameterTypes = symbol.Parameters.Values.ToArray();
         int i = 0;
         foreach (var param in n.Params) {
             param.Accept(this);
-            if (param.Type != parameterTypes[i] || param.Type == TypeVal.Error) {
-                n.Type = TypeVal.Error;
+            if (param.Type.ActualType != parameterTypes[i] || param.Type.ActualType == TypeVal.Error) {
+                n.Type.ActualType = TypeVal.Error;
                 throw new TypeException(parameterTypes[i], param);
             }
             i++;
@@ -386,13 +386,13 @@ public class TypeVisitor : IVisitor {
         if (symbol is null) { // Should this be here?
             throw new NoNullAllowedException("The retrieved symbol was not a function symbol table entry");
         }
-        n.Type = symbol.Type;
+        n.Type.ActualType = symbol.Type;
         var parameterTypes = symbol.Parameters.Values.ToArray();
         int i = 0;
         foreach (var param in n.Params) {
             param.Accept(this);
-            if (param.Type != parameterTypes[i] || param.Type == TypeVal.Error) {
-                n.Type = TypeVal.Error;
+            if (param.Type.ActualType != parameterTypes[i] || param.Type.ActualType == TypeVal.Error) {
+                n.Type.ActualType = TypeVal.Error;
                 throw new TypeException(parameterTypes[i], param);
             }
             i++;
@@ -402,7 +402,7 @@ public class TypeVisitor : IVisitor {
     public void Visit(FuncsNode n) {
         foreach (var funcdcl in n.FuncDcls) {
             funcdcl.Accept(this);
-            _symbolTable.EnterSymbol(funcdcl.Name.Id, funcdcl.Type);
+            _symbolTable.EnterSymbol(funcdcl.Name.Id, funcdcl.Type.ActualType);
         }
     }
 
@@ -411,28 +411,28 @@ public class TypeVisitor : IVisitor {
         while (parentFunc is not FuncDefNode or null) {
             parentFunc = parentFunc.Parent;
         }
-        if (parentFunc.Type == TypeVal.Blank) {
-            n.Type = TypeVal.Ok;
+        if (parentFunc.Type.ActualType == TypeVal.Blank) {
+            n.Type.ActualType = TypeVal.Ok;
         }
         else {
             n.RetVal.Accept(this);
             if (parentFunc.Type == n.RetVal.Type) {
-                n.Type = TypeVal.Ok;
+                n.Type.ActualType = TypeVal.Ok;
             }
             else {
-                n.Type = TypeVal.Error;
-                throw new TypeException(parentFunc.Type, n.RetVal);
+                n.Type.ActualType = TypeVal.Error;
+                throw new TypeException(parentFunc.Type.ActualType, n.RetVal);
             }
         }
     }
 
     public void Visit(IfNode n) {
         n.Condition.Accept(this);
-        if (n.Condition.Type == TypeVal.Boolean) {
-            n.Type = TypeVal.Ok;
+        if (n.Condition.Type.ActualType == TypeVal.Boolean) {
+            n.Type.ActualType = TypeVal.Ok;
         }
         else {
-            n.Type = TypeVal.Error;
+            n.Type.ActualType = TypeVal.Error;
             throw new TypeException(TypeVal.Boolean, n.Condition);
         }
         _symbolTable.OpenScope();
@@ -450,7 +450,7 @@ public class TypeVisitor : IVisitor {
     public void Visit(VarsNode n) {
         foreach (var node in n.Dcls) {
             node.Accept(this);
-            _symbolTable.EnterSymbol(node.Left.Id, node.Type);
+            _symbolTable.EnterSymbol(node.Left.Id, node.Type.ActualType);
         }
     }
 

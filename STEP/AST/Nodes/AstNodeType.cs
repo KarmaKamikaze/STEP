@@ -45,5 +45,7 @@ public enum AstNodeType
     ProgNode,
     SetupNode,
     LoopNode,
-    FuncsNode
+    FuncsNode,
+    // Helper nodes
+    NodesList
 }

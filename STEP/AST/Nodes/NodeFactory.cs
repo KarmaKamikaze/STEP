@@ -89,6 +89,8 @@ public static class NodeFactory
                 return new LoopNode() {NodeType = AstNodeType.LoopNode};
             case AstNodeType.FuncsNode:
                 return new FuncsNode() {NodeType = AstNodeType.FuncsNode};
+            case AstNodeType.NodesList:
+                return new NodesList() {NodeType = AstNodeType.NodesList};
             default:
                 return null;
         }
