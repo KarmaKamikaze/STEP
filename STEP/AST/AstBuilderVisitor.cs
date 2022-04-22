@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using STEP.AST.Nodes;
+using System.Globalization;
 
 namespace STEP.AST;
 
@@ -15,7 +16,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
 
-        if (children.Count < 1)
+        if (children.Count == 0)
             throw new ApplicationException("Root node has no children.");
 
         ProgNode parentNode = (ProgNode) children.Single(child => child is ProgNode);
@@ -470,7 +471,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (context.NUMLITERAL() != null)
         {
             NumberNode numNode = (NumberNode) NodeFactory.MakeNode(AstNodeType.NumberNode);
-            numNode.Value = Double.Parse(context.NUMLITERAL().GetText());
+            numNode.Value = Double.Parse(context.NUMLITERAL().GetText(), new CultureInfo("en-US"));
 
             return numNode;
         }
@@ -540,15 +541,29 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override StmtNode VisitStmt([NotNull] STEPParser.StmtContext context)
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
-              
-        return (StmtNode)children.First();
-    }
 
+        if (children.Any(child => child is StmtNode))
+        {
+            return (StmtNode)children.First(child => child is StmtNode);
+        }
+        return null;
+    }
+    
     public override StmtNode VisitLoop_stmt([NotNull] STEPParser.Loop_stmtContext context)
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
-              
-        return (StmtNode)children.First();
+
+        if (children.Any(child => child is StmtNode))
+        {
+            return (StmtNode)children.First(child => child is StmtNode);
+        }
+        return null;
+    }
+
+    public override StmtNode VisitLoop_stmts([NotNull] STEPParser.Loop_stmtsContext context)
+    {
+      List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();  
+      return (StmtNode)children.First(child => child is StmtNode);
     }
 
     public override WhileNode VisitWhilestmt([NotNull] STEPParser.WhilestmtContext context)
@@ -638,9 +653,10 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             {
                 node.ThenClause.Add((StmtNode)children[index++]);
             }
-
+            // TODO: REMEMBER TO TEST NL-ONLY STATEMENTS
             while (children[index] == null)
-            {
+            {   
+                Console.WriteLine("test");
                 index++; // Increment the index to skip the else terminal
             }
             
@@ -658,6 +674,64 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         
         return node;
     }
+
+    public override StmtNode VisitLoopifbody([NotNull] STEPParser.LoopifbodyContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
         
+        if (context.BREAK() != null)
+        {
+            return (BreakNode) NodeFactory.MakeNode(AstNodeType.BreakNode);
+        }
+        if (context.CONTINUE() != null)
+        {
+            return (ContNode) NodeFactory.MakeNode(AstNodeType.ContNode);
+        }
+        if (children.Any(child => child is StmtNode)) 
+        {
+            return (StmtNode) children.First(child => child is StmtNode);
+        }
+        else 
+        {
+            return null;
+        }
+    }
     
+    public override StmtNode VisitRetstmt([NotNull] STEPParser.RetstmtContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+        STEPParser.FuncdclContext parent = (STEPParser.FuncdclContext)context.Parent;
+        RetNode node = (RetNode) NodeFactory.MakeNode(AstNodeType.RetNode);
+        if(parent.BLANK() == null)
+        {
+            node.RetVal = (ExprNode)children.First(child => child is ExprNode);
+            string type = parent.type().GetText().ToLower();
+            node.SurroundingFuncType = type == "number" ? TypeVal.Number :
+                type == "string" ? TypeVal.String : TypeVal.Boolean;
+            return node;
+        }
+        node.SurroundingFuncType = TypeVal.Blank;
+        return node;     
+    }
+
+
+    public override StmtNode VisitFuncdcl([NotNull] STEPParser.FuncdclContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+        
+        FuncDefNode node = (FuncDefNode) NodeFactory.MakeNode(AstNodeType.FuncDefNode);
+        
+        IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
+        idNode.Id = context.ID().GetText();
+        node.Name = idNode;
+
+        node.Stmts = children.OfType<StmtNode>().ToList();
+        
+        
+    }
+
+
+
+
+
 }

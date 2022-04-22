@@ -1,4 +1,5 @@
-﻿using STEP.AST.Nodes;
+﻿using System.Globalization;
+using STEP.AST.Nodes;
 
 namespace STEP.AST;
 
@@ -202,7 +203,7 @@ public class AstPrintVisitor : IVisitor
     {
         if (n != null)
         {
-            Print(n.Value.ToString());
+            Print(n.Value.ToString(new CultureInfo("en-US")));
         }
     }
 
@@ -466,7 +467,15 @@ public class AstPrintVisitor : IVisitor
 
     public void Visit(RetNode n)
     {
-        throw new NotImplementedException();
+        if (n != null)
+        {
+            Indent();
+            Print("return");
+            if (n.RetVal != null)
+            {
+                n.RetVal.Accept(this);
+            }
+        }
     }
 
     public void Visit(IfNode n)
