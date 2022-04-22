@@ -13,7 +13,7 @@ namespace StepTests;
 public class TypeCheckerTests {
     private readonly IVisitor _typeVisitor;
     private readonly Mock<ISymbolTable> _symbolTableMock = new Mock<ISymbolTable>();
-    
+
     public TypeCheckerTests() {
         _typeVisitor = new TypeVisitor(_symbolTableMock.Object);
     }
@@ -978,8 +978,6 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Number)]
     [InlineData(TypeVal.String)]
     [InlineData(TypeVal.Boolean)]
-    [InlineData(TypeVal.Analogpin)]
-    [InlineData(TypeVal.Digitalpin)]
     public void VarDclNode_TypeMatch_IsTypeOk(TypeVal type)
     {
     //Arrange
@@ -1144,9 +1142,12 @@ public class TypeCheckerTests {
             },
             ReturnType = new IdNode() {Id = "return2"}
         };
+        var funcsNode = new FuncsNode() {
+            FuncDcls = new List<FuncDefNode>() {funcDefNode}
+        };
 
         // Act
-        funcDefNode.Accept(_typeVisitor);
+        funcsNode.Accept(_typeVisitor);
 
         // Assert
         Assert.Equal(TypeVal.Number, funcDefNode.Type);
@@ -1221,6 +1222,98 @@ public class TypeCheckerTests {
         Assert.Equal(TypeVal.Number, funcDefNode.Type);
         _symbolTableMock.Verify(x => x.EnterSymbol(funcDefNode), Times.Once);
     }
+    
+    // The following tests are for the integration of the typevisitor and pin table
+    [Theory]
+    [InlineData(TypeVal.Analogpin)]
+    [InlineData(TypeVal.Digitalpin)]
+    public void VarDclNode_PinAlreadyDeclared_ThrowsDuplicateDeclarationException(TypeVal type) { 
+    // Arrange
+    var pinDclNode1 = new VarDclNode() {
+        Left = new IdNode() {Id = "a", Type = type},
+        Right = new NumberNode() {Value = 5}
+    };
+    var pinDclNode2 = new VarDclNode() {
+        Left = new IdNode() {Id = "b", Type = type},
+        Right = new NumberNode() {Value = 5}
+    };
+    var varsNode = new VarsNode() {
+        Dcls = new List<VarDclNode>() {
+            pinDclNode1,
+            pinDclNode2
+        }
+    };
+    
+    // Act
+    var test = () => varsNode.Accept(_typeVisitor);
+
+    // Assert
+    Assert.Throws<DuplicateDeclarationException>(test);
+    }
+    
+    [Theory]
+    [InlineData(TypeVal.Analogpin)]
+    [InlineData(TypeVal.Digitalpin)]
+    public void VarDclNode_PinNotDeclared_DoesNotThrowException(TypeVal type) {
+        // Arrange
+        var pinDclNode1 = new VarDclNode() {
+            Left = new IdNode() {Id = "a", Type = type},
+            Right = new NumberNode() {Value = 4}
+        };
+        var pinDclNode2 = new VarDclNode() {
+            Left = new IdNode() {Id = "b", Type = type},
+            Right = new NumberNode() {Value = 5}
+        };
+        var varsNode = new VarsNode() {
+            Dcls = new List<VarDclNode>() {
+                pinDclNode1,
+                pinDclNode2
+            }
+        };
+    
+        // Act & Assert
+        try {
+            varsNode.Accept(_typeVisitor);
+        }
+        catch (DuplicateDeclarationException e) {
+            Assert.True(false, $"Expected no exception, but got {e.Message}");
+        }
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(6)]
+    public void VarDclNode_AnalogPinOutOfRange(int pinVal) {
+        // Arrange
+        var pinDclNode = new VarDclNode() {
+            Left = new IdNode() {Id = "a", Type = TypeVal.Analogpin},
+            Right = new NumberNode() {Value = pinVal}
+        };
+        
+        // Act
+        var test = () => pinDclNode.Accept(_typeVisitor);
+        
+        // Assert
+        Assert.Throws<ArgumentOutOfRangeException>(test);
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(14)]
+    public void VarDclNode_DigitalPinOutOfRange(int pinVal) {
+        // Arrange
+        var pinDclNode = new VarDclNode() {
+            Left = new IdNode() {Id = "a", Type = TypeVal.Digitalpin},
+            Right = new NumberNode() {Value = pinVal}
+        };
+            
+        // Act
+        var test = () => pinDclNode.Accept(_typeVisitor);
+            
+        // Assert
+        Assert.Throws<ArgumentOutOfRangeException>(test);
+    }
+    
     #endregion
     
     #region Statements
@@ -1246,6 +1339,28 @@ public class TypeCheckerTests {
         Assert.Throws<TypeException>(test);
     }
     
+    [Fact]
+    public void IfNode_ConditionIsBool_DoesNotThrow()
+    {
+        // Arrange
+        var symbol = new SymTableEntry() {Type = TypeVal.Boolean};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("bool"))
+            .Returns(symbol);
+        var ifNode = new IfNode {
+            Condition = new IdNode() {Id = "bool"},
+            ThenClause = new List<StmtNode>(){new ContNode()},
+            ElseClause = new List<StmtNode>(){new BreakNode()}
+        };
+    
+        // Act & Assert
+        try {
+            ifNode.Accept(_typeVisitor);
+        }
+        catch (TypeException e) {
+            Assert.True(false, $"Did not expect exception, but received {e.Message}");
+        }
+    }
+    
     [Theory]
     [InlineData(TypeVal.Number)]
     [InlineData(TypeVal.String)]
@@ -1265,6 +1380,27 @@ public class TypeCheckerTests {
 
         //Assert
         Assert.Throws<TypeException>(test);
+    }
+    
+    [Fact]
+    public void WhileNode_ConditionIsBool_DoesNotThrow()
+    {
+        //Arrange
+        var symbol = new SymTableEntry() {Type = TypeVal.Boolean};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("cond"))
+            .Returns(symbol);
+        var whileNode = new WhileNode{
+            Condition = new IdNode(){Id = "cond"},
+            Body = new List<StmtNode>(){new ContNode()}
+        };
+        
+        // Act & Assert
+        try {
+            whileNode.Accept(_typeVisitor);
+        }
+        catch (TypeException e) {
+            Assert.True(false, $"Did not expect exception, but received {e.Message}");
+        }
     }
 
     [Theory]
@@ -1294,6 +1430,29 @@ public class TypeCheckerTests {
         //Assert
         Assert.Throws<TypeException>(test);
     }
+    
+    [Fact]
+    public void ForNode_TypesAreNumber_DoesNotThrow()
+    {
+        //Arrange
+        var symbol1 = new SymTableEntry() {Type = TypeVal.Number};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
+            .Returns(symbol1);
+        var forNode = new ForNode{
+            Initializer = new IdNode() {Id = "init"},
+            Limit = new IdNode() {Id = "limit"},
+            Update = new IdNode() {Id = "update"},
+            Body = new List<StmtNode>(){new ContNode()}
+        };
+        
+        // Act & Assert
+        try {
+            forNode.Accept(_typeVisitor);
+        }
+        catch (TypeException e) {
+            Assert.True(false, $"Did not expect exception, but received {e.Message}");
+        }
+    }
 
     [Theory]
     [InlineData(TypeVal.Number)]
@@ -1308,9 +1467,12 @@ public class TypeCheckerTests {
             Id = new IdNode() {Id = "left"},
             Expr = new IdNode() {Id = "right"}
         };
+        var loopNode = new LoopNode() {
+            Stmts = new List<StmtNode>() {assNode}
+        };
         
         // Act
-        assNode.Accept(_typeVisitor);
+        loopNode.Accept(_typeVisitor);
         
         // Assert
         Assert.Equal(TypeVal.Ok, assNode.Type);

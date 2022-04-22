@@ -7,13 +7,23 @@ namespace STEP;
 public class TypeVisitor : IVisitor {
     public TypeVisitor() {
         _symbolTable = new SymbolTable();
+        _pinTable = new PinTable();
     }
 
-    public TypeVisitor(ISymbolTable symbolTable) {
+    public TypeVisitor(ISymbolTable symbolTable) : this() {
         _symbolTable = symbolTable;
     }
 
+    public TypeVisitor(IPinTable pinTable) : this() {
+        _pinTable = pinTable;
+    }
+
+    public TypeVisitor(ISymbolTable symbolTable, IPinTable pinTable) : this(symbolTable) {
+        _pinTable = pinTable;
+    }
+
     private readonly ISymbolTable _symbolTable;
+    private readonly IPinTable _pinTable;
     
     // Logic nodes
     
@@ -181,12 +191,26 @@ public class TypeVisitor : IVisitor {
         DclVisitor dclVisitor = new DclVisitor(_symbolTable);
         n.Left.Accept(dclVisitor);
         n.Right.Accept(this);
-        if (n.Left.Type == n.Right.Type) {
-            n.Type = TypeVal.Ok;
+        if (n.Left.Type is TypeVal.Analogpin or TypeVal.Digitalpin) { // Should this be a separate method or PinVisitor?
+            int pinVal = (int) ((NumberNode) n.Right).Value;
+            switch (n.Left.Type) {
+                case TypeVal.Analogpin when pinVal is < 0 or > 5:
+                    throw new ArgumentOutOfRangeException(nameof(pinVal), "Analog pins must be in range 0-5");
+                case TypeVal.Digitalpin when pinVal is < 0 or > 13:
+                    throw new ArgumentOutOfRangeException(nameof(pinVal), "Digital pins must be in range 0-13");
+                default:
+                    _pinTable.RegisterPin(n.Left.Type, pinVal);
+                    break;
+            }
         }
         else {
-            n.Type = TypeVal.Error;
-            throw new TypeException(n.Left.Type, n.Right.Type);
+            if (n.Left.Type == n.Right.Type) {
+                n.Type = TypeVal.Ok;
+            }
+            else {
+                n.Type = TypeVal.Error;
+                throw new TypeException(n.Left.Type, n.Right.Type);
+            } 
         }
     }
 
