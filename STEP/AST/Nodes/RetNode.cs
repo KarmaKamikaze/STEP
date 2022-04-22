@@ -3,7 +3,7 @@
 public class RetNode : StmtNode
 {
     public ExprNode RetVal { get; set; }
-    public TypeVal SurroundingFuncType { get; set; }
+    public Type SurroundingFuncType { get; set; } = new();
     public override void Accept(IVisitor v) {
         v.Visit(this);
     }

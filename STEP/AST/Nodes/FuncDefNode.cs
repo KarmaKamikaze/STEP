@@ -3,8 +3,8 @@
 public class FuncDefNode : AstNode
 {
     public IdNode Name { get; set; }
-    public IdNode ReturnType { get; set; }
-    public Dictionary<IdNode, (TypeVal, bool)> FormalParams { get; set; } // Tuple boolean is true when param is array
+    public Type ReturnType { get; set; }
+    public List<IdNode> FormalParams { get; set; } = new();
     public List<StmtNode> Stmts { get; set; }
     public override void Accept(IVisitor v) {
         v.Visit(this);

@@ -12,10 +12,10 @@ public class AssVisitor : TypeVisitor {
     public override void Visit(IdNode n) {
         var symbol = _symbolTable.RetrieveSymbol(n.Id);
         if (symbol is not null) {
-            n.Type = symbol.Type;
+            n.Type.ActualType = symbol.Type;
         }
         else {
-            n.Type = TypeVal.Error;
+            n.Type.ActualType = TypeVal.Error;
         }
     }
 }

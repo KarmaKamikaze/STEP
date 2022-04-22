@@ -255,6 +255,11 @@ grammar STEP;
   booldcl 
         : BOOLEAN ID ASSIGN logicexpr
         ;
+        
+  pindcl
+        : ANALOGPIN ID ASSIGN INTLITERAL
+        | DIGITALPIN ID ASSIGN INTLITERAL
+        ;
   
     pindcl
         : ANALOGPIN ID ASSIGN INTLITERAL

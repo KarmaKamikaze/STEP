@@ -88,13 +88,13 @@ public class SymbolTable : ISymbolTable
         var parameters = new Dictionary<string, TypeVal>();
         foreach (var param in node.FormalParams)
         {
-            parameters.Add(param.Key.Id, param.Value.Item1);
+            parameters.Add(param.Id, param.Type.ActualType);
         }
         
         var symbolEntry = new FunctionSymTableEntry() 
         {
             Name = name,
-            Type = node.Type,
+            Type = node.Type.ActualType,
             Parameters = parameters
         };
         // Add the symbol to the innermost scope (top of the scopeStack)
