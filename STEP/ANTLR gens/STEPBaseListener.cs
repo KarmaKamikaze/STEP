@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from D:/Documents/Programming/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
+// Generated from C:/Users/Mikkel/Documents/Codebase/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -19,7 +19,6 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
-namespace STEP {
 
 using Antlr4.Runtime.Misc;
 using IErrorNode = Antlr4.Runtime.Tree.IErrorNode;
@@ -577,6 +576,18 @@ public partial class STEPBaseListener : ISTEPListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitBooldcl([NotNull] STEPParser.BooldclContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.pindcl"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPindcl([NotNull] STEPParser.PindclContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.pindcl"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPindcl([NotNull] STEPParser.PindclContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.arrdcl"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -626,4 +637,3 @@ public partial class STEPBaseListener : ISTEPListener {
 	/// <remarks>The default implementation does nothing.</remarks>
 	public virtual void VisitErrorNode([NotNull] IErrorNode node) { }
 }
-} // namespace STEP

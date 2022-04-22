@@ -737,8 +737,12 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     //     node.Stmts = children.OfType<StmtNode>().ToList();
     //     
     //     NodesList nodesList = children.First(child => child is NodesList);
-    //     
-    //     
+    //       
+    //     foreach(AstNode astNode in nodesList.Nodes)
+    //     {
+    //          node.FormalParams.Add((IdNode) astNode);
+    //     }
+    //      
     // }
 
     public override NodesList VisitParams_content([NotNull] STEPParser.Params_contentContext context)
