@@ -99,26 +99,30 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         return node;
     }
 
-    // public override VarDclNode VisitPindcl([NotNull] STEPParser.PindclContext context)
-    // {
-    //     VarDclNode node = (VarDclNode) NodeFactory.MakeNode(AstNodeType.VarDclNode);
-    //     
-    //     IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
-    //     idNode.Id = context.ID().GetText();
-    //     
-    //     if(context.ANALOGPIN != null)
-    //     {
-    //         idNode.Type.ActualType = TypeVal.Analogpin;
-    //     }
-    //     else
-    //     {
-    //         idNode.Type.ActualType = TypeVal.Digitalpin;
-    //     }
-    //     node.Left = idNode;
-    //     
-    //     
-    //     
-    // }
+    public override VarDclNode VisitPindcl([NotNull] STEPParser.PindclContext context)
+    {
+        VarDclNode node = (VarDclNode) NodeFactory.MakeNode(AstNodeType.VarDclNode);
+        
+        IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
+        idNode.Id = context.ID().GetText();
+        
+        if(context.ANALOGPIN() != null)
+        {
+            idNode.Type.ActualType = TypeVal.Analogpin;
+        }
+        else
+        {
+            idNode.Type.ActualType = TypeVal.Digitalpin;
+        }
+        node.Left = idNode;
+        
+        NumberNode numNode = (NumberNode) NodeFactory.MakeNode(AstNodeType.NumberNode);
+        numNode.Value = Int64.Parse(context.INTLITERAL().GetText(), new CultureInfo("en-US"));
+   
+        node.Right = numNode;
+        
+        return node;
+    }
 
     public override AstNode VisitVardcl([NotNull] STEPParser.VardclContext context)
     {
