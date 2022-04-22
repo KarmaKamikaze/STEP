@@ -88,7 +88,7 @@ public class SymbolTable : ISymbolTable
         var parameters = new Dictionary<string, TypeVal>();
         foreach (var param in node.FormalParams)
         {
-            parameters.Add(param.Key.Id, param.Value.ActualType);
+            parameters.Add(param.Id, param.Type.ActualType);
         }
         
         var symbolEntry = new FunctionSymTableEntry() 
