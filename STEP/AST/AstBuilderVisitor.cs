@@ -99,6 +99,27 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         return node;
     }
 
+    // public override VarDclNode VisitPindcl([NotNull] STEPParser.PindclContext context)
+    // {
+    //     VarDclNode node = (VarDclNode) NodeFactory.MakeNode(AstNodeType.VarDclNode);
+    //     
+    //     IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
+    //     idNode.Id = context.ID().GetText();
+    //     
+    //     if(context.ANALOGPIN != null)
+    //     {
+    //         idNode.Type.ActualType = TypeVal.Analogpin;
+    //     }
+    //     else
+    //     {
+    //         idNode.Type.ActualType = TypeVal.Digitalpin;
+    //     }
+    //     node.Left = idNode;
+    //     
+    //     
+    //     
+    // }
+
     public override AstNode VisitVardcl([NotNull] STEPParser.VardclContext context)
     {
         AstNode child = context.children.Select(kiddies => kiddies.Accept(this))
@@ -717,33 +738,49 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             string type = parent.type().GetText().ToLower();
             node.SurroundingFuncType.ActualType = type == "number" ? TypeVal.Number :
                 type == "string" ? TypeVal.String : TypeVal.Boolean;
+            if(parent.brackets() != null)
+            {
+                node.SurroundingFuncType.IsArray = true;
+            }
             return node;
         }
         node.SurroundingFuncType.ActualType = TypeVal.Blank;
         return node;     
     }
 
-
-    // public override StmtNode VisitFuncdcl([NotNull] STEPParser.FuncdclContext context)
-    // {
-    //     List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
-    //     
-    //     FuncDefNode node = (FuncDefNode) NodeFactory.MakeNode(AstNodeType.FuncDefNode);
-    //     
-    //     IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
-    //     idNode.Id = context.ID().GetText();
-    //     node.Name = idNode;
-    //
-    //     node.Stmts = children.OfType<StmtNode>().ToList();
-    //     
-    //     NodesList nodesList = children.First(child => child is NodesList);
-    //       
-    //     foreach(AstNode astNode in nodesList.Nodes)
-    //     {
-    //          node.FormalParams.Add((IdNode) astNode);
-    //     }
-    //      
-    // }
+    public override FuncDefNode VisitFuncdcl([NotNull] STEPParser.FuncdclContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+        
+        FuncDefNode node = (FuncDefNode) NodeFactory.MakeNode(AstNodeType.FuncDefNode);
+        
+        IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
+        idNode.Id = context.ID().GetText();
+        node.Name = idNode;
+    
+        node.Stmts = children.OfType<StmtNode>().ToList();
+        
+        NodesList nodesList = (NodesList) children.First(child => child is NodesList);
+          
+        foreach(AstNode astNode in nodesList.Nodes)
+        {
+             node.FormalParams.Add((IdNode) astNode);
+        }
+        
+        if(context.BLANK() == null)
+        {
+            string type = context.type().GetText().ToLower();
+            node.ReturnType.ActualType =  type == "number" ? TypeVal.Number :
+                type == "string" ? TypeVal.String : TypeVal.Boolean;
+            if(context.brackets() != null)
+            {
+                node.ReturnType.IsArray = true;
+            }
+            return node;
+        }
+        node.ReturnType.ActualType = TypeVal.Blank;
+        return node; 
+    }
 
     public override NodesList VisitParams_content([NotNull] STEPParser.Params_contentContext context)
     {
