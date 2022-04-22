@@ -114,7 +114,7 @@ public class TypeCheckerTests {
          _typeVisitor.Visit(parenNode);
          
         // Assert
-        Assert.Equal(exprNode.Type, parenNode.Type);
+        Assert.Equal(exprNode.Type.ActualType, parenNode.Type.ActualType);
     }
     
     [Fact]
@@ -1134,14 +1134,14 @@ public class TypeCheckerTests {
                     }
                 },
                 new RetNode() {
-                    Parent = new FuncDefNode(){ReturnType = new IdNode(){Type = new Type() {ActualType = TypeVal.Number}}},
+                    Parent = new FuncDefNode(){ReturnType = new Type() {ActualType = TypeVal.Number}},
                     RetVal = new IdNode(){Id = "return1", Type = new Type() {ActualType = TypeVal.Number}}
                 }
             },
-            FormalParams = new Dictionary<IdNode, Type>() {
-                {new IdNode(){Id = "a"}, new Type() {ActualType = TypeVal.Number, IsArray = false}}
+            FormalParams = new List<IdNode>() {
+                new IdNode(){Id = "a"}
             },
-            ReturnType = new IdNode() {Id = "return2"}
+            ReturnType = new Type() {ActualType = TypeVal.Number}
         };
         var funcsNode = new FuncsNode() {
             FuncDcls = new List<FuncDefNode>() {funcDefNode}
@@ -1158,8 +1158,6 @@ public class TypeCheckerTests {
     [Fact]
     public void FuncDefNode_IsTypeError_NotEnteredInSymbolTable() {
         // Arrange
-        _symbolTableMock.Setup(x => x.RetrieveSymbol("return"))
-            .Returns(new SymTableEntry() {Type = TypeVal.Boolean});
         var funcDefNode = new FuncDefNode() {
             Name = new IdNode() {Id = "Add2"},
             Stmts = new List<StmtNode>() {
@@ -1171,14 +1169,14 @@ public class TypeCheckerTests {
                     }
                 },
                 new RetNode() {
-                    Parent = new FuncDefNode(){ReturnType = new IdNode(){Type = new Type() {ActualType = TypeVal.Number}}},
+                    Parent = new FuncDefNode(){ReturnType = new Type() {ActualType = TypeVal.Number}},
                     RetVal = new IdNode(){Id = "a"}
                 }
             },
-            FormalParams = new Dictionary<IdNode, Type>() {
-                {new IdNode(){Id = "a"}, new Type() {ActualType = TypeVal.Number, IsArray = false}}
+            FormalParams = new List<IdNode>() {
+                new IdNode(){Id = "a", Type = new Type() {ActualType = TypeVal.Number, IsArray = false}}
             },
-            ReturnType = new IdNode() {Id = "return"}
+            ReturnType = new Type() {ActualType = TypeVal.Boolean}
         };
 
         // Act
@@ -1205,15 +1203,15 @@ public class TypeCheckerTests {
                     }
                 },
                 new RetNode() {
-                    Parent = new FuncDefNode(){ReturnType = new IdNode(){Type = new Type() {ActualType = TypeVal.Number}}},
+                    Parent = new FuncDefNode(){ReturnType = new Type() {ActualType = TypeVal.Number}},
                     RetVal = new IdNode(){Id = "return1", Type = new Type() {ActualType = TypeVal.Number}}
                 }
             },
-            FormalParams = new Dictionary<IdNode, Type>() {
-                {new IdNode(){Id = "b"}, new Type {ActualType = TypeVal.Digitalpin, IsArray = false}},
-                {new IdNode(){Id = "c"}, new Type {ActualType = TypeVal.Analogpin, IsArray = false}}
+            FormalParams = new List<IdNode>() {
+                new IdNode(){Id = "b", Type = new Type(){ActualType = TypeVal.Analogpin}},
+                new IdNode(){Id = "c", Type = new Type(){ActualType = TypeVal.Digitalpin}}
             },
-            ReturnType = new IdNode() {Id = "return2"}
+            ReturnType = new Type() {ActualType = TypeVal.Number}
         };
 
         // Act

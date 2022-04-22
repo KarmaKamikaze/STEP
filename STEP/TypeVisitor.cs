@@ -373,8 +373,7 @@ public class TypeVisitor : IVisitor {
         foreach (var stmtNode in n.Stmts) {
             stmtNode.Accept(this); // Should throw exception if return doesn't match type
         }
-        n.ReturnType.Accept(this);
-        n.Type.ActualType = n.ReturnType.Type.ActualType;
+        n.Type.ActualType = n.ReturnType.ActualType;
         _symbolTable.EnterSymbol(n);
         // bool typeMismatch = false;
         // RetNode offendingTypeRetNode = null;
