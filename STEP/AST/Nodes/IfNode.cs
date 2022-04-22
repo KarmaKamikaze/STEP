@@ -1,4 +1,6 @@
-﻿namespace STEP.AST.Nodes;
+﻿using System.Collections.Specialized;
+
+namespace STEP.AST.Nodes;
 
 public class IfNode : StmtNode
 {
