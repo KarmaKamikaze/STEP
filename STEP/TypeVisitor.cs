@@ -177,7 +177,7 @@ public class TypeVisitor : IVisitor {
         n.Array.Accept(this);
         n.Index.Accept(this);
         if (n.Index.Type.ActualType == TypeVal.Number) {
-            n.Type = n.Array.Type;
+            n.Type.ActualType = n.Array.Type.ActualType;
         }
         else {
             n.Type.ActualType = TypeVal.Error;
@@ -304,7 +304,7 @@ public class TypeVisitor : IVisitor {
 
     public void Visit(ParenNode n) {
         n.Left.Accept(this);
-        n.Type = n.Left.Type;
+        n.Type.ActualType = n.Left.Type.ActualType;
     }
 
     public void Visit(UMinusNode n) {
