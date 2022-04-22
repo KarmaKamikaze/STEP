@@ -9,4 +9,14 @@ public class ElseIfNode : StmtNode
     {
         v.Visit(this);
     }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is ElseIfNode other)
+        {
+            return Equals(other.Condition, Condition)
+                && Body.SequenceEqual(other.Body);
+        }
+        return false;
+    }
 }

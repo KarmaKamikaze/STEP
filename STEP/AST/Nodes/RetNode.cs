@@ -7,4 +7,14 @@ public class RetNode : StmtNode
     public override void Accept(IVisitor v) {
         v.Visit(this);
     }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is RetNode other)
+        {
+            return Equals(other.RetVal, RetVal)
+                && Equals(other.SurroundingFuncType, SurroundingFuncType);
+        }
+        return false;
+    }
 }

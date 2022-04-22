@@ -8,4 +8,15 @@ public class IdNode : ExprNode
     public override void Accept(IVisitor v) {
         v.Visit(this);
     }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is IdNode other)
+        {
+            return Equals(other.Id, Id)
+                && Equals(other.IsArray, IsArray)
+                && Equals(other.AttributesRef, AttributesRef);
+        }
+        return false;
+    }
 }

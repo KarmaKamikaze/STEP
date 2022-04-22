@@ -6,4 +6,10 @@ public class LoopNode : AstNode
     public override void Accept(IVisitor v) {
         v.Visit(this);
     }
+
+    public override bool Equals(object obj)
+    {
+        return obj is LoopNode other 
+            && other.Stmts.SequenceEqual(Stmts);
+    }
 }

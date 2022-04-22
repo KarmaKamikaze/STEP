@@ -7,4 +7,11 @@ public class WhileNode : StmtNode
     public override void Accept(IVisitor v) {
         v.Visit(this);
     }
+
+    public override bool Equals(object obj)
+    {
+        return obj is WhileNode other
+            && Equals(other.Condition, Condition)
+            && Body.SequenceEqual(other.Body);
+    }
 }

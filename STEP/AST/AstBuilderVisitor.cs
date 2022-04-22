@@ -633,11 +633,14 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
         
         // Get else clause
-        foreach (var stmt in context.elsestmt().stmt().Where(x => x != null))
+        if(context.elsestmt() != null)
         {
-            if (stmt.Accept(this) is StmtNode stmtNode)
+            foreach (var stmt in context.elsestmt().stmt())
             {
-                node.ElseClause.Add(stmtNode);
+                if (stmt.Accept(this) is StmtNode stmtNode)
+                {
+                    node.ElseClause.Add(stmtNode);
+                }
             }
         }
         return node;
