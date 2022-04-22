@@ -713,8 +713,25 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         node.SurroundingFuncType = TypeVal.Blank;
         return node;     
     }
-    
-    
-    
-    
+
+
+    public override StmtNode VisitFuncdcl([NotNull] STEPParser.FuncdclContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+        
+        FuncDefNode node = (FuncDefNode) NodeFactory.MakeNode(AstNodeType.FuncDefNode);
+        
+        IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
+        idNode.Id = context.ID().GetText();
+        node.Name = idNode;
+
+        node.Stmts = children.OfType<StmtNode>().ToList();
+        
+        
+    }
+
+
+
+
+
 }
