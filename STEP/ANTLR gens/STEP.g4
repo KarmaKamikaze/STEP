@@ -311,8 +311,8 @@ grammar STEP;
   NEG                           : '!';
   NL                            : LINE_TERMINATOR;
   COMMA                         : ',';
-  INTLITERAL                    : DIGIT+;
-  NUMLITERAL                    : (DIGIT+ ('.' DIGIT*)? | '.' DIGIT+);
+  INTLITERAL                    : ('0' | [1-9] DIGIT*);
+  NUMLITERAL                    : ('0' | [1-9] DIGIT*) ('.' DIGIT+)?;
   STRLITERAL                    : DBLQUOTE STRING_CONTENT* DBLQUOTE;
   BOOLLITERAL                   : NEG? ('true' | 'false');
 
