@@ -689,8 +689,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             }
             // TODO: REMEMBER TO TEST NL-ONLY STATEMENTS
             while (children[index] == null)
-            {   
-                Console.WriteLine("test");
+            {
                 index++; // Increment the index to skip the else terminal
             }
             

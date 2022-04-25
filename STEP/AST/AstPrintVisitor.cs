@@ -72,7 +72,7 @@ public class AstPrintVisitor : IVisitor
             {
                 Print("constant ");
             }
-            Print(node.Left.Type.ToString().ToLower() + " ");
+            Print(node.Left.Type.ActualType.ToString().ToLower() + " ");
             node.Left.Accept(this);
             Print(" = ");
             node.Right.Accept(this);
@@ -232,7 +232,7 @@ public class AstPrintVisitor : IVisitor
             {
                 Print("constant ");
             }
-            Print(n.Left.Type.ToString().ToLower() + $"[{n.Size}] ");
+            Print(n.Left.Type.ActualType.ToString().ToLower() + $"[{n.Size}] ");
             n.Left.Accept(this);
             Print(" = ");
             if (n.IsId)
