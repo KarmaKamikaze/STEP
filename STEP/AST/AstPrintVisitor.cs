@@ -86,7 +86,7 @@ public class AstPrintVisitor : IVisitor
         if (node != null)
         {
             Indent();
-            if(node.IsConstant)
+            if(node.Left.Type.IsConstant)
             {
                 Print("constant ");
             }
@@ -246,7 +246,7 @@ public class AstPrintVisitor : IVisitor
         if (n != null)
         {
             Indent();
-            if (n.IsConstant)
+            if (n.Left.Type.IsConstant)
             {
                 Print("constant ");
             }
