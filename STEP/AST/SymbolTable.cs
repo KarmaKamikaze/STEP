@@ -51,6 +51,9 @@ public class SymbolTable : ISymbolTable
                 break;
             }
         }
+
+        scopes.Reverse();
+        
         // adds the scope from scopes list back in to the scope stack
         foreach(var scope in scopes) 
         {

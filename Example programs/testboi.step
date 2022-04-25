@@ -1,25 +1,43 @@
 loop
-number[2] thisIsCursed = [1, 2, 3]
+#number[2] thisIsCursed = [1, 2, 3]
 end loop
 
 functions
-number function assfunc(string test, number assss)
-  number x = 10
+
+string function manass(string testes)
+  string asstits = "assmnasas"
+  repeat while(true)
+    if(true)
+      break
+    end if
+  end while
+  return testes
+end function
+
+number[] function assfunc(string test, number assss) 
 boolean ass = true
   if(ass)
-     return 1
+     return assss
   end if
-  return 10
+  return assss
 end function
 
 
-blank function asssdafunc(string test, number assss)
+blank function asssdafunc()
   number x = 10
   boolean ass = true
   if(ass)
-     return
   end if
-  return
+end function
+
+blank function ifelsefunc()
+  if(true)
+  else if(false)
+    if(true)
+    end if
+  end if
+
+
 end function
 
 end functions
