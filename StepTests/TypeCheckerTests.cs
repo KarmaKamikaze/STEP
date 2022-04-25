@@ -1092,10 +1092,10 @@ public class TypeCheckerTests {
     public void ArrDclNode_TypeMatch_IsTypeOk() {
         // Arrange
         var symbol = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number, IsArray = true}};
-        _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
+        _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
             .Returns(symbol);
         var arrDclNode = new ArrDclNode() {
-            Left = new IdNode() {Id = "left"},
+            Left = new IdNode() {Id = "left", Type = new Type(){ActualType = TypeVal.Number, IsArray = true}},
             Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}}
         };
         
