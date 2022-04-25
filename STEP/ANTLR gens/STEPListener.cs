@@ -531,6 +531,26 @@ public interface ISTEPListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitPindcl([NotNull] STEPParser.PindclContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.pinmode"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterPinmode([NotNull] STEPParser.PinmodeContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.pinmode"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitPinmode([NotNull] STEPParser.PinmodeContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.pintype"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterPintype([NotNull] STEPParser.PintypeContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.pintype"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitPintype([NotNull] STEPParser.PintypeContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.arrdcl"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

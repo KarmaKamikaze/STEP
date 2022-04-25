@@ -636,6 +636,30 @@ public partial class STEPBaseListener : ISTEPListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitPindcl([NotNull] STEPParser.PindclContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.pinmode"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPinmode([NotNull] STEPParser.PinmodeContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.pinmode"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPinmode([NotNull] STEPParser.PinmodeContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.pintype"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPintype([NotNull] STEPParser.PintypeContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.pintype"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPintype([NotNull] STEPParser.PintypeContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.arrdcl"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
