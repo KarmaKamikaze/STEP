@@ -723,11 +723,11 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         // Get then clause
         foreach (var stmt in context.loopifbody())
         {
-            if(stmt.BREAK != null)
+            if(stmt.BREAK() != null)
             {
                 node.ThenClause.Add((BreakNode) NodeFactory.MakeNode(AstNodeType.BreakNode));
             }
-            else if(stmt.CONTINUE != null)
+            else if(stmt.CONTINUE() != null)
             {
                 node.ThenClause.Add((ContNode)NodeFactory.MakeNode(AstNodeType.ContNode));
             }
@@ -738,9 +738,12 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
         
         // Get all else-if-clauses
-        foreach (var elseIf in context.loopelseifstmt())
+        if (context.loopelseifstmt() != null)
         {
-            node.ElseIfClauses.Add((ElseIfNode) elseIf.Accept(this));
+            foreach (var elseIf in context.loopelseifstmt())
+            {
+                node.ElseIfClauses.Add((ElseIfNode)elseIf.Accept(this));
+            }
         }
         
         // Get else clause
@@ -748,11 +751,11 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         {
             foreach (var stmt in context.loopelsestmt().loopifbody())
             {
-                if (stmt.BREAK != null)
+                if (stmt.BREAK() != null)
                 {
                     node.ElseClause.Add((BreakNode)NodeFactory.MakeNode(AstNodeType.BreakNode));
                 }
-                else if (stmt.CONTINUE != null)
+                else if (stmt.CONTINUE() != null)
                 {
                     node.ElseClause.Add((ContNode)NodeFactory.MakeNode(AstNodeType.ContNode));
                 }
@@ -773,11 +776,11 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         foreach (var stmt in context.loopifbody())
         {
-            if (stmt.BREAK != null)
+            if (stmt.BREAK() != null)
             {
                 node.Body.Add((BreakNode)NodeFactory.MakeNode(AstNodeType.BreakNode));
             }
-            else if (stmt.CONTINUE != null)
+            else if (stmt.CONTINUE() != null)
             {
                 node.Body.Add((ContNode)NodeFactory.MakeNode(AstNodeType.ContNode));
             }

@@ -9,7 +9,7 @@ public class NegNode : ExprNode {
     {
         if (obj is NegNode other)
         {
-            return Equals(other.Left, Left) && Equals(other.Right, Right);
+            return Equals(other.Left, Left);
         }
         return false;
     }

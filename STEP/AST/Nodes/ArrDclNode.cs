@@ -15,7 +15,8 @@ public class ArrDclNode : VarDclNode
         {
             return other.Size == Size
                 && other.IsId == IsId
-                && Equals(other.IdRight, IdRight);
+                && Equals(other.IdRight, IdRight)
+                && Equals(other.Right, Right);
         }
         return false;
     }

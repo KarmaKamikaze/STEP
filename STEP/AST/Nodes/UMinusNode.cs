@@ -9,7 +9,7 @@ public class UMinusNode : ExprNode {
     {
         if (obj is UMinusNode other)
         {
-            return Equals(other.Left, Left) && Equals(other.Right, Right);
+            return Equals(other.Left, Left);
         }
         return false;
     }

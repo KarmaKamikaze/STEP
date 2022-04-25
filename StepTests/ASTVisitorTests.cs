@@ -36,18 +36,20 @@ public class ASTVisitorTests
 
         var parseTree = GetParseTree(program);
 
-        var idNode = new IdNode() { Id = "x" };
-        var numNode = new NumberNode() { Value = 1 };
+        var idNode = new IdNode() { Id = "x", NodeType = AstNodeType.IdNode };
+        var numNode = new NumberNode() { Value = 1, NodeType = AstNodeType.NumberNode };
         var varDclNode = new VarDclNode() 
         {
             Left = idNode,
-            Right = numNode
+            Right = numNode,
+            NodeType = AstNodeType.VarDclNode
         };
         var setupNode = new SetupNode() 
         {
-            Stmts = new() { varDclNode }
+            Stmts = new() { varDclNode },
+            NodeType = AstNodeType.SetupNode
         };
-        var expectedAst = new ProgNode() { SetupBlock = setupNode };
+        var expectedAst = new ProgNode() { SetupBlock = setupNode, NodeType = AstNodeType.ProgNode };
 
         // Act
         // Get AST from the AstBuilderVisitor

@@ -17,7 +17,7 @@ public class ForNode : StmtNode
             return Equals(other.Initializer, Initializer)
                 && Equals(other.Limit, Limit)
                 && Equals(other.Update, Update)
-                && Body.SequenceEqual(Body);
+                && other.Body.SequenceEqual(Body);
         }
         return false;
     }
