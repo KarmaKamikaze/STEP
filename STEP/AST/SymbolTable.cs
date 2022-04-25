@@ -45,12 +45,15 @@ public class SymbolTable : ISymbolTable
             var scope = _scopeStack.Pop();
             // Save the scope so we can add it back onto the stack
             scopes.Add(scope);
-            if(scope.TryGetValue(id, out SymTableEntry value)) 
+            if(scope.TryGetValue(id, out SymTableEntry value))
             {
                 output = value;
                 break;
             }
         }
+
+        scopes.Reverse();
+        
         // adds the scope from scopes list back in to the scope stack
         foreach(var scope in scopes) 
         {

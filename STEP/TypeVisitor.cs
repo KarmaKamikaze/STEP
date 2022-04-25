@@ -374,11 +374,12 @@ public class TypeVisitor : IVisitor {
     
     // General nodes
 
-    public void Visit(FuncDefNode n) { 
+    public void Visit(FuncDefNode n) {
         if (_symbolTable.IsDeclaredLocally(n.Name.Id))
         {
             throw new DuplicateDeclarationException("An id of this name have already been declared", n.Name.Id);
         }
+
         _symbolTable.OpenScope();
         foreach (var param in n.FormalParams) {
             _symbolTable.EnterSymbol(param.Id, param.Type);
@@ -387,6 +388,7 @@ public class TypeVisitor : IVisitor {
             stmtNode.Accept(this); // Should throw exception if return doesn't match type
         }
         _symbolTable.CloseScope();
+
         n.Type = n.ReturnType;
         _symbolTable.EnterSymbol(n);
         // bool typeMismatch = false;
