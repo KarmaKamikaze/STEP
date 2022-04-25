@@ -2,6 +2,7 @@
 
 public enum TypeVal
 {
+    Error,
     Number,
     String,
     Boolean,
@@ -9,5 +10,4 @@ public enum TypeVal
     Digitalpin,
     Blank,
     Ok,
-    Error
 }
