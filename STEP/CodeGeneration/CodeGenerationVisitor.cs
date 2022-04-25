@@ -34,7 +34,19 @@ public class CodeGenerationVisitor : IVisitor
     private void EmitAppend(TypeVal typeVal)
     {
         // TODO: translate our types to Arduino types here
-        _stringBuilder.Append(typeVal.ToString()+" ");
+        switch(typeVal)
+        {
+            case TypeVal.String:
+                _stringBuilder.Append("String ");
+                break;
+            case TypeVal.Boolean:
+                _stringBuilder.Append("bool ");
+                break;
+            case TypeVal.Number:
+                _stringBuilder.Append("double ");
+                break;
+            default: break;
+        }
     }
     
     public void Visit(AndNode n)
@@ -117,12 +129,12 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(StringNode n)
     {
-        EmitAppend($"\"{n.Value}\"");
+        EmitAppend("\"" + n.Value + "\"");
     }
 
     public void Visit(BoolNode n)
     {
-        EmitAppend(n.Value.ToString());
+        EmitAppend(n.Value.ToString().ToLowerInvariant());
     }
 
     public void Visit(ArrDclNode n)
@@ -187,28 +199,25 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(PlusNode n)
     {
         // If the overall expression has type string, we must convert any non-string children to strings
-        if (n.Type.ActualType is TypeVal.String)
+        if (n.Type.ActualType is TypeVal.String && n.Left.Type.ActualType != TypeVal.String)
         {
-            if (n.Left.Type.ActualType is TypeVal.String && n.Right.Type.ActualType is not TypeVal.String)
-            {
-                // Convert right to string, using Arduino's built in String() class
-                n.Left.Accept(this);
-                EmitAppend(" + String(");
-                n.Right.Accept(this);
-                EmitAppend(")");
-            }
-            else if (n.Left.Type.ActualType is not TypeVal.String)
-            {
-                // Convert left to string
-                EmitAppend("String(");
-                n.Left.Accept(this);
-                EmitAppend(") + ");
-                n.Right.Accept(this);
-            }
+            // String(left) + right
+            EmitAppend("String(");
+            n.Left.Accept(this);
+            EmitAppend(") + ");
+            n.Right.Accept(this);
         }
-        else // Otherwise, it must be arithmetic addition
+        else if (n.Type.ActualType is TypeVal.String && n.Right.Type.ActualType != TypeVal.String)
         {
-            // expr1 + expr2
+            // left + String(right)
+            n.Left.Accept(this);
+            EmitAppend(" + String(");
+            n.Right.Accept(this);
+            EmitAppend(")");
+        }
+        else
+        {
+            // left + right
             n.Left.Accept(this);
             EmitAppend(" + ");
             n.Right.Accept(this);
