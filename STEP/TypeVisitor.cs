@@ -148,7 +148,8 @@ public class TypeVisitor : IVisitor {
     }
 
     public void Visit(ArrDclNode n) {
-        n.Left.Accept(this);
+        DclVisitor dclVisitor = new DclVisitor(_symbolTable);
+        n.Left.Accept(dclVisitor);
         n.Right.Accept(this);
         n.Type.ActualType = (n.Left.Type.ActualType != n.Right.Type.ActualType) 
             ? throw new TypeException(n.Left.Type.ActualType, n.Right.Type.ActualType)
@@ -368,8 +369,12 @@ public class TypeVisitor : IVisitor {
     
     // General nodes
 
-    public void Visit(FuncDefNode n) {
-        n.Name.Accept(this);
+    public void Visit(FuncDefNode n) { 
+        if (_symbolTable.IsDeclaredLocally(n.Name.Id))
+        {
+            throw new DuplicateDeclarationException("An id of this name have already been declared", n.Name.Id);
+        }
+        
         foreach (var stmtNode in n.Stmts) {
             stmtNode.Accept(this); // Should throw exception if return doesn't match type
         }
@@ -433,26 +438,21 @@ public class TypeVisitor : IVisitor {
     public void Visit(FuncsNode n) {
         foreach (var funcdcl in n.FuncDcls) {
             funcdcl.Accept(this);
-            _symbolTable.EnterSymbol(funcdcl.Name.Id, funcdcl.Type.ActualType);
         }
     }
 
     public void Visit(RetNode n) {
-        var parentFunc = n.Parent;
-        while (parentFunc is not FuncDefNode or null) {
-            parentFunc = parentFunc.Parent;
-        }
-        if (parentFunc.Type.ActualType == TypeVal.Blank) {
+        if (n.SurroundingFuncType.ActualType == TypeVal.Blank) {
             n.Type.ActualType = TypeVal.Ok;
         }
         else {
             n.RetVal.Accept(this);
-            if (parentFunc.Type.ActualType == n.RetVal.Type.ActualType) {
+            if (n.SurroundingFuncType.ActualType == n.RetVal.Type.ActualType) {
                 n.Type.ActualType = TypeVal.Ok;
             }
             else {
                 n.Type.ActualType = TypeVal.Error;
-                throw new TypeException($"Type mismatch, expected return value to be of type {parentFunc.Type.ActualType}, actual type is {n.RetVal.Type.ActualType}");
+                throw new TypeException($"Type mismatch, expected return value to be of type {n.SurroundingFuncType.ActualType}, actual type is {n.RetVal.Type.ActualType}");
             }
         }
     }

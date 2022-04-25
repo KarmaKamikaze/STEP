@@ -429,7 +429,53 @@ public class AstPrintVisitor : IVisitor
 
     public void Visit(FuncDefNode n)
     {
-        throw new NotImplementedException();
+        if (n != null)
+        {
+            Indent();
+            Print(n.ReturnType.ActualType.ToString().ToLower());
+            if (n.ReturnType.IsArray)
+            {
+                Print("[]");    
+            }
+            Print(" function " + n.Name.Id + "(");
+            if (n.FormalParams.Count != 0)
+            {
+                IdNode param = n.FormalParams[0];
+                Print(param.Type.ActualType.ToString().ToLower());
+                if (param.Type.IsArray)
+                {
+                    Print("[]");
+                }
+
+                Print(" " + param.Id);
+
+                for (int i = 1; i < n.FormalParams.Count; i++)
+                {
+                    param = n.FormalParams[i];
+                    Print(", " + param.Type.ActualType.ToString().ToLower());
+                    if (param.Type.IsArray)
+                    {
+                        Print("[]");
+                    }
+
+                    Print(" " + param.Id);
+                }
+            }
+
+            Print(")\n");
+
+            _ind++;
+            foreach (StmtNode stmt in n.Stmts)
+            {
+                stmt.Accept(this);
+                Print("\n");
+            }
+            _ind--;
+            
+            Indent();
+            Print("end function\n");
+            
+        }
     }
 
     public void Visit(FuncExprNode n)
@@ -470,7 +516,7 @@ public class AstPrintVisitor : IVisitor
         if (n != null)
         {
             Indent();
-            Print("return");
+            Print("return ");
             if (n.RetVal != null)
             {
                 n.RetVal.Accept(this);
