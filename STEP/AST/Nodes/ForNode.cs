@@ -2,6 +2,7 @@
 
 public class ForNode : StmtNode
 {
+    // VarDcl, AssNode, Identifier, ArrAccessNode
     public AstNode Initializer { get; set; }
     public ExprNode Limit { get; set; }
     public ExprNode Update { get; set; }
