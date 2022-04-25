@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from E:/Code/repos/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
+// Generated from C:/Users/Mikkel/Documents/Codebase/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -4330,7 +4330,7 @@ public partial class STEPParser : Parser {
 
 	public partial class ArrsizedclContext : ParserRuleContext {
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode LBRACK() { return GetToken(STEPParser.LBRACK, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode NUMLITERAL() { return GetToken(STEPParser.NUMLITERAL, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode INTLITERAL() { return GetToken(STEPParser.INTLITERAL, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode RBRACK() { return GetToken(STEPParser.RBRACK, 0); }
 		public ArrsizedclContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -4365,7 +4365,7 @@ public partial class STEPParser : Parser {
 			State = 593;
 			Match(LBRACK);
 			State = 594;
-			Match(NUMLITERAL);
+			Match(INTLITERAL);
 			State = 595;
 			Match(RBRACK);
 			}
@@ -4925,7 +4925,7 @@ public partial class STEPParser : Parser {
 		'\a', '\t', '\x2', '\x2', '\x251', '\x24B', '\x3', '\x2', '\x2', '\x2', 
 		'\x251', '\x24C', '\x3', '\x2', '\x2', '\x2', '\x252', 'i', '\x3', '\x2', 
 		'\x2', '\x2', '\x253', '\x254', '\a', '\b', '\x2', '\x2', '\x254', '\x255', 
-		'\a', '\x1A', '\x2', '\x2', '\x255', '\x256', '\a', '\t', '\x2', '\x2', 
+		'\a', '\x19', '\x2', '\x2', '\x255', '\x256', '\a', '\t', '\x2', '\x2', 
 		'\x256', 'k', '\x3', '\x2', '\x2', '\x2', '\x43', 'o', 's', 'w', '}', 
 		'\x84', '\x8B', '\x92', '\x95', '\x9B', '\xA4', '\xAD', '\xB4', '\xBA', 
 		'\xC0', '\xC7', '\xCC', '\xD4', '\xE3', '\xE9', '\xED', '\xF4', '\xFA', 
