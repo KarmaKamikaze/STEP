@@ -156,7 +156,8 @@ public class TypeVisitor : IVisitor {
     }
 
     public void Visit(ArrDclNode n) {
-        n.Left.Accept(this);
+        DclVisitor dclVisitor = new DclVisitor(_symbolTable);
+        n.Left.Accept(dclVisitor);
         n.Right.Accept(this);
         n.Type = (n.Left.Type != n.Right.Type)
             ? throw new TypeException($"Type mismatch, type of left: {n.Left.Type}, type of right: {n.Right.Type}")
@@ -483,6 +484,23 @@ public class TypeVisitor : IVisitor {
         _symbolTable.OpenScope();
         foreach (var node in n.ElseClause) {
             node.Accept(this);
+        }
+        _symbolTable.CloseScope();
+    }
+
+    public void Visit(ElseIfNode n)
+    {
+        n.Condition.Accept(this);
+        if (n.Condition.Type.ActualType != TypeVal.Boolean)
+        {
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Boolean, n.Condition.Type.ActualType);
+        }
+        n.Type.ActualType = TypeVal.Ok;
+        _symbolTable.OpenScope();
+        foreach (var stmt in n.Body)
+        {
+            stmt.Accept(this);
         }
         _symbolTable.CloseScope();
     }

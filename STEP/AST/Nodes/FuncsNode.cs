@@ -6,4 +6,13 @@ public class FuncsNode : AstNode
     public override void Accept(IVisitor v) {
         v.Visit(this);
     }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is FuncsNode other)
+        {
+            return FuncDcls.SequenceEqual(other.FuncDcls);
+        }
+        return false;
+    }
 }

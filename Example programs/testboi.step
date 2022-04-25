@@ -1,0 +1,25 @@
+loop
+number[2] thisIsCursed = [1, 2, 3]
+end loop
+
+functions
+number function assfunc(string test, number assss)
+  number x = 10
+boolean ass = true
+  if(ass)
+     return 1
+  end if
+  return 10
+end function
+
+
+blank function asssdafunc(string test, number assss)
+  number x = 10
+  boolean ass = true
+  if(ass)
+     return
+  end if
+  return
+end function
+
+end functions

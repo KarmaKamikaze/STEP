@@ -2,6 +2,7 @@
 using Antlr4.Runtime.Misc;
 using STEP.AST.Nodes;
 using System.Globalization;
+using System.Xml.Linq;
 
 namespace STEP.AST;
 
@@ -99,26 +100,30 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         return node;
     }
 
-    // public override VarDclNode VisitPindcl([NotNull] STEPParser.PindclContext context)
-    // {
-    //     VarDclNode node = (VarDclNode) NodeFactory.MakeNode(AstNodeType.VarDclNode);
-    //     
-    //     IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
-    //     idNode.Id = context.ID().GetText();
-    //     
-    //     if(context.ANALOGPIN != null)
-    //     {
-    //         idNode.Type.ActualType = TypeVal.Analogpin;
-    //     }
-    //     else
-    //     {
-    //         idNode.Type.ActualType = TypeVal.Digitalpin;
-    //     }
-    //     node.Left = idNode;
-    //     
-    //     
-    //     
-    // }
+    public override VarDclNode VisitPindcl([NotNull] STEPParser.PindclContext context)
+    {
+        VarDclNode node = (VarDclNode) NodeFactory.MakeNode(AstNodeType.VarDclNode);
+        
+        IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
+        idNode.Id = context.ID().GetText();
+        
+        if(context.ANALOGPIN() != null)
+        {
+            idNode.Type.ActualType = TypeVal.Analogpin;
+        }
+        else
+        {
+            idNode.Type.ActualType = TypeVal.Digitalpin;
+        }
+        node.Left = idNode;
+        
+        NumberNode numNode = (NumberNode) NodeFactory.MakeNode(AstNodeType.NumberNode);
+        numNode.Value = Int64.Parse(context.INTLITERAL().GetText(), new CultureInfo("en-US"));
+   
+        node.Right = numNode;
+        
+        return node;
+    }
 
     public override AstNode VisitVardcl([NotNull] STEPParser.VardclContext context)
     {
@@ -219,7 +224,9 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
 
         idNode.Id = context.ID().GetText();
-        idNode.IsArray = true;
+
+        idNode.Type.IsArray = true;
+
         node.Left = idNode;
 
         node.Size = Int32.Parse(context.arrsizedcl().GetText().Trim('[', ']'));
@@ -232,6 +239,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         else
         {
             node.Right = (ArrLiteralNode) children.First(child => child is ArrLiteralNode);
+            node.Right.Type.IsArray = true;
         }
 
         return node;
@@ -499,6 +507,14 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
             return numNode;
         }
+        else if (context.INTLITERAL() != null)
+        {
+            // TODO: Should this be a special IntNode/PinNode?
+            NumberNode numNode = (NumberNode)NodeFactory.MakeNode(AstNodeType.NumberNode);
+            numNode.Value = int.Parse(context.INTLITERAL().GetText(), new CultureInfo("en-US"));
+
+            return numNode;
+        }
         else if (context.STRLITERAL() != null)
         {
             StringNode node = (StringNode) NodeFactory.MakeNode(AstNodeType.StringNode);
@@ -656,23 +672,145 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
     public override IfNode VisitIfstmt([NotNull] STEPParser.IfstmtContext context)
     {
-        return IfNodeGenerator(context);       
+        IfNode node = (IfNode) NodeFactory.MakeNode(AstNodeType.IfNode);
+        // Get condition
+        node.Condition = (ExprNode) context.logicexpr().Accept(this);
+        
+        // Get then clause
+        foreach (var stmt in context.stmt())
+        {
+            // Ensure that we do not add empty statements (which are null)
+            if(stmt.Accept(this) is StmtNode stmtNode)
+            {
+                node.ThenClause.Add(stmtNode);
+            }
+        }
+        
+        // Get all else-if-clauses
+        foreach (var elseIf in context.elseifstmt())
+        {
+            node.ElseIfClauses.Add((ElseIfNode) elseIf.Accept(this));
+        }
+        
+        // Get else clause
+        if(context.elsestmt() != null)
+        {
+            foreach (var stmt in context.elsestmt().stmt())
+            {
+                if (stmt.Accept(this) is StmtNode stmtNode)
+                {
+                    node.ElseClause.Add(stmtNode);
+                }
+            }
+        }
+        return node;
+    }
+
+    public override ElseIfNode VisitElseifstmt([NotNull] STEPParser.ElseifstmtContext context)
+    {
+        var node = (ElseIfNode)NodeFactory.MakeNode(AstNodeType.ElseIfNode);
+        node.Condition = (ExprNode) context.logicexpr().Accept(this);
+        node.Body = new List<StmtNode>();
+        foreach (var stmt in context.stmt())
+        {
+            if (stmt.Accept(this) is StmtNode stmtNode)
+            { 
+                node.Body.Add(stmtNode);
+            }
+        }
+        return node;
     }
     
     public override IfNode VisitLoopifstmt([NotNull] STEPParser.LoopifstmtContext context)
     {
-        return IfNodeGenerator(context);
+        IfNode node = (IfNode) NodeFactory.MakeNode(AstNodeType.IfNode);
+        // Get condition
+        node.Condition = (ExprNode) context.logicexpr().Accept(this);
+        
+        // Get then clause
+        foreach (var stmt in context.loopifbody())
+        {
+            if(stmt.BREAK() != null)
+            {
+                node.ThenClause.Add((BreakNode) NodeFactory.MakeNode(AstNodeType.BreakNode));
+            }
+            else if(stmt.CONTINUE() != null)
+            {
+                node.ThenClause.Add((ContNode)NodeFactory.MakeNode(AstNodeType.ContNode));
+            }
+            else if (stmt.Accept(this) is StmtNode stmtNode)
+            {
+                node.ThenClause.Add(stmtNode);
+            }
+        }
+        
+        // Get all else-if-clauses
+        if (context.loopelseifstmt() != null)
+        {
+            foreach (var elseIf in context.loopelseifstmt())
+            {
+                node.ElseIfClauses.Add((ElseIfNode)elseIf.Accept(this));
+            }
+        }
+        
+        // Get else clause
+        if (context.loopelsestmt() != null)
+        {
+            foreach (var stmt in context.loopelsestmt().loopifbody())
+            {
+                if (stmt.BREAK() != null)
+                {
+                    node.ElseClause.Add((BreakNode)NodeFactory.MakeNode(AstNodeType.BreakNode));
+                }
+                else if (stmt.CONTINUE() != null)
+                {
+                    node.ElseClause.Add((ContNode)NodeFactory.MakeNode(AstNodeType.ContNode));
+                }
+                else if (stmt.Accept(this) is StmtNode stmtNode)
+                {
+                    node.ElseClause.Add(stmtNode);
+                }
+            }
+        }
+        return node;
+    }
+    
+    public override ElseIfNode VisitLoopelseifstmt([NotNull] STEPParser.LoopelseifstmtContext context)
+    {
+        var node = (ElseIfNode)NodeFactory.MakeNode(AstNodeType.ElseIfNode);
+        node.Condition = (ExprNode) context.logicexpr().Accept(this);
+        node.Body = new List<StmtNode>();
+
+        foreach (var stmt in context.loopifbody())
+        {
+            if (stmt.BREAK() != null)
+            {
+                node.Body.Add((BreakNode)NodeFactory.MakeNode(AstNodeType.BreakNode));
+            }
+            else if (stmt.CONTINUE() != null)
+            {
+                node.Body.Add((ContNode)NodeFactory.MakeNode(AstNodeType.ContNode));
+            }
+            else if (stmt.Accept(this) is StmtNode stmtNode)
+            {
+                node.Body.Add(stmtNode);
+            }
+        }
+        return node;
     }
 
     // The method only accepts either STEPParser.IfstmtContext or STEPParser.LoopifstmtContext type contexts.
+    [Obsolete("Should not be used after the inclusion of else-if clauses")]
     private IfNode IfNodeGenerator<T>(T context) where T: ParserRuleContext
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
         IfNode node = (IfNode) NodeFactory.MakeNode(AstNodeType.IfNode);
 
+        // Get condition
         node.Condition = (ExprNode)children.First(child => child is ExprNode);
-        if ((context as STEPParser.IfstmtContext)?.ELSE() != null ||
-            (context as STEPParser.LoopifstmtContext)?.ELSE() != null)
+        
+        if ((context as STEPParser.IfstmtContext)?.elsestmt() != null ||
+            (context as STEPParser.LoopifstmtContext)?.loopelsestmt() != null)
         {
             /* Find the first statement node in the list of children and use it to add all statements
              * (before the first null node) to the ThenClause.
@@ -685,8 +823,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             }
             // TODO: REMEMBER TO TEST NL-ONLY STATEMENTS
             while (children[index] == null)
-            {   
-                Console.WriteLine("test");
+            {
                 index++; // Increment the index to skip the else terminal
             }
             
@@ -695,13 +832,11 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             {
                 node.ElseClause.Add((StmtNode)children[index++]);
             }
-    
         }
         else
         {
             node.ThenClause = children.OfType<StmtNode>().ToList();
         }
-        
         return node;
     }
 
@@ -730,15 +865,23 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override StmtNode VisitRetstmt([NotNull] STEPParser.RetstmtContext context)
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
-        STEPParser.FuncdclContext parent = (STEPParser.FuncdclContext)context.Parent;
+        
+        RuleContext parent = context.Parent;
+        while (parent is not STEPParser.FuncdclContext)
+        {
+            parent = parent.Parent;
+        }
+
+        STEPParser.FuncdclContext funcParent = (STEPParser.FuncdclContext)parent;
+        
         RetNode node = (RetNode) NodeFactory.MakeNode(AstNodeType.RetNode);
-        if(parent.BLANK() == null)
+        if(funcParent.BLANK() == null)
         {
             node.RetVal = (ExprNode)children.First(child => child is ExprNode);
-            string type = parent.type().GetText().ToLower();
+            string type = funcParent.type().GetText().ToLower();
             node.SurroundingFuncType.ActualType = type == "number" ? TypeVal.Number :
                 type == "string" ? TypeVal.String : TypeVal.Boolean;
-            if(parent.brackets() != null)
+            if(funcParent.brackets() != null)
             {
                 node.SurroundingFuncType.IsArray = true;
             }
@@ -761,10 +904,10 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         node.Stmts = children.OfType<StmtNode>().ToList();
         
         NodesList nodesList = (NodesList) children.First(child => child is NodesList);
-          
-        foreach(AstNode astNode in nodesList.Nodes)
+
+        foreach (AstNode astNode in nodesList.Nodes)
         {
-             node.FormalParams.Add((IdNode) astNode);
+            node.FormalParams.Add((IdNode) astNode);
         }
         
         if(context.BLANK() == null)
@@ -781,6 +924,18 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         node.ReturnType.ActualType = TypeVal.Blank;
         return node; 
     }
+
+    public override NodesList VisitParams([NotNull] STEPParser.ParamsContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+
+        if (context.params_content() != null)
+        {
+            return (NodesList) children.First(child => child is NodesList);
+        }
+        return (NodesList) NodeFactory.MakeNode(AstNodeType.NodesList);
+    }
+
 
     public override NodesList VisitParams_content([NotNull] STEPParser.Params_contentContext context)
     {

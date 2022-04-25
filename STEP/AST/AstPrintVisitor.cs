@@ -19,7 +19,7 @@ public class AstPrintVisitor : IVisitor
             Console.Write("  ");
         }
     }
-
+    
     public void Visit(ProgNode node)
     {
         if (node != null)
@@ -28,6 +28,24 @@ public class AstPrintVisitor : IVisitor
             node.SetupBlock?.Accept(this);
             node.LoopBlock?.Accept(this);
             node.FuncsBlock?.Accept(this);
+        }
+    }
+
+    public void Visit(ElseIfNode node)
+    {
+        if (node != null)
+        {
+            Indent();
+            Print("else if(");
+            node.Condition.Accept(this);
+            Print(")\n");
+            _ind++;
+            foreach (StmtNode stmt in node.Body)
+            {
+                stmt.Accept(this);
+                Print("\n");
+            }
+            _ind--;
         }
     }
 
@@ -72,7 +90,7 @@ public class AstPrintVisitor : IVisitor
             {
                 Print("constant ");
             }
-            Print(node.Left.Type.ToString().ToLower() + " ");
+            Print(node.Left.Type.ActualType.ToString().ToLower() + " ");
             node.Left.Accept(this);
             Print(" = ");
             node.Right.Accept(this);
@@ -232,7 +250,7 @@ public class AstPrintVisitor : IVisitor
             {
                 Print("constant ");
             }
-            Print(n.Left.Type.ToString().ToLower() + $"[{n.Size}] ");
+            Print(n.Left.Type.ActualType.ToString().ToLower() + $"[{n.Size}] ");
             n.Left.Accept(this);
             Print(" = ");
             if (n.IsId)
@@ -429,7 +447,53 @@ public class AstPrintVisitor : IVisitor
 
     public void Visit(FuncDefNode n)
     {
-        throw new NotImplementedException();
+        if (n != null)
+        {
+            Indent();
+            Print(n.ReturnType.ActualType.ToString().ToLower());
+            if (n.ReturnType.IsArray)
+            {
+                Print("[]");    
+            }
+            Print(" function " + n.Name.Id + "(");
+            if (n.FormalParams.Count != 0)
+            {
+                IdNode param = n.FormalParams[0];
+                Print(param.Type.ActualType.ToString().ToLower());
+                if (param.Type.IsArray)
+                {
+                    Print("[]");
+                }
+
+                Print(" " + param.Id);
+
+                for (int i = 1; i < n.FormalParams.Count; i++)
+                {
+                    param = n.FormalParams[i];
+                    Print(", " + param.Type.ActualType.ToString().ToLower());
+                    if (param.Type.IsArray)
+                    {
+                        Print("[]");
+                    }
+
+                    Print(" " + param.Id);
+                }
+            }
+
+            Print(")\n");
+
+            _ind++;
+            foreach (StmtNode stmt in n.Stmts)
+            {
+                stmt.Accept(this);
+                Print("\n");
+            }
+            _ind--;
+            
+            Indent();
+            Print("end function\n");
+            
+        }
     }
 
     public void Visit(FuncExprNode n)
@@ -470,7 +534,7 @@ public class AstPrintVisitor : IVisitor
         if (n != null)
         {
             Indent();
-            Print("return");
+            Print("return ");
             if (n.RetVal != null)
             {
                 n.RetVal.Accept(this);
@@ -486,15 +550,19 @@ public class AstPrintVisitor : IVisitor
             Print("if(");
             n.Condition.Accept(this);
             Print(")\n");
-
             _ind++;
-
             foreach (StmtNode stmt in n.ThenClause)
             {
                 stmt.Accept(this);
                 Print("\n");
             }
             _ind--;
+            
+            foreach (ElseIfNode elseIf in n.ElseIfClauses)
+            {
+                elseIf.Accept(this);
+            }
+            
             Indent();
             Print("else\n");
             _ind++;

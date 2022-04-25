@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/Mikkel/Documents/Codebase/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
+// Generated from E:/Code/repos/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -36,7 +36,7 @@ public partial class STEPLexer : Lexer {
 		WHITESPACE=1, END_OF_LINE_COMMENT=2, MULTILINE_COMMENT=3, LPAREN=4, RPAREN=5, 
 		LBRACK=6, RBRACK=7, ASSIGN=8, PLUS=9, MINUS=10, DIVIDE=11, MULT=12, POW=13, 
 		GRTHAN=14, GRTHANEQ=15, LTHAN=16, LTHANEQ=17, EQ=18, NEQ=19, NEG=20, NL=21, 
-		COMMA=22, NUMLITERAL=23, INTLITERAL=24, STRLITERAL=25, BOOLLITERAL=26, 
+		COMMA=22, INTLITERAL=23, NUMLITERAL=24, STRLITERAL=25, BOOLLITERAL=26, 
 		SETUP=27, ENDSETUP=28, LOOP=29, ENDLOOP=30, FUNCTIONS=31, ENDFUNCTIONS=32, 
 		FUNCTION=33, ENDFUNCTION=34, VARIABLES=35, ENDVARIABLES=36, BLANK=37, 
 		NUMBER=38, STRING=39, BOOLEAN=40, ANALOGPIN=41, DIGITALPIN=42, IF=43, 
@@ -58,7 +58,7 @@ public partial class STEPLexer : Lexer {
 		"WHITESPACE", "END_OF_LINE_COMMENT", "MULTILINE_COMMENT", "LPAREN", "RPAREN", 
 		"LBRACK", "RBRACK", "ASSIGN", "PLUS", "MINUS", "DIVIDE", "MULT", "POW", 
 		"GRTHAN", "GRTHANEQ", "LTHAN", "LTHANEQ", "EQ", "NEQ", "NEG", "NL", "COMMA", 
-		"NUMLITERAL", "INTLITERAL", "STRLITERAL", "BOOLLITERAL", "SETUP", "ENDSETUP", 
+		"INTLITERAL", "NUMLITERAL", "STRLITERAL", "BOOLLITERAL", "SETUP", "ENDSETUP", 
 		"LOOP", "ENDLOOP", "FUNCTIONS", "ENDFUNCTIONS", "FUNCTION", "ENDFUNCTION", 
 		"VARIABLES", "ENDVARIABLES", "BLANK", "NUMBER", "STRING", "BOOLEAN", "ANALOGPIN", 
 		"DIGITALPIN", "IF", "ENDIF", "ELSE", "CONTINUE", "BREAK", "REPEATWHILE", 
@@ -92,7 +92,7 @@ public partial class STEPLexer : Lexer {
 		null, "WHITESPACE", "END_OF_LINE_COMMENT", "MULTILINE_COMMENT", "LPAREN", 
 		"RPAREN", "LBRACK", "RBRACK", "ASSIGN", "PLUS", "MINUS", "DIVIDE", "MULT", 
 		"POW", "GRTHAN", "GRTHANEQ", "LTHAN", "LTHANEQ", "EQ", "NEQ", "NEG", "NL", 
-		"COMMA", "NUMLITERAL", "INTLITERAL", "STRLITERAL", "BOOLLITERAL", "SETUP", 
+		"COMMA", "INTLITERAL", "NUMLITERAL", "STRLITERAL", "BOOLLITERAL", "SETUP", 
 		"ENDSETUP", "LOOP", "ENDLOOP", "FUNCTIONS", "ENDFUNCTIONS", "FUNCTION", 
 		"ENDFUNCTION", "VARIABLES", "ENDVARIABLES", "BLANK", "NUMBER", "STRING", 
 		"BOOLEAN", "ANALOGPIN", "DIGITALPIN", "IF", "ENDIF", "ELSE", "CONTINUE", 
@@ -178,9 +178,9 @@ public partial class STEPLexer : Lexer {
 		'\x1E', '\x3', '\x1E', '\x3', '\x1E', '\x3', '\x1F', '\x3', '\x1F', '\x3', 
 		'\x1F', '\x3', ' ', '\x3', ' ', '\x3', '!', '\x3', '!', '\x3', '\"', '\x3', 
 		'\"', '\x3', '#', '\x6', '#', '\x103', '\n', '#', '\r', '#', '\xE', '#', 
-		'\x104', '\x3', '#', '\x3', '#', '\a', '#', '\x109', '\n', '#', '\f', 
-		'#', '\xE', '#', '\x10C', '\v', '#', '\x5', '#', '\x10E', '\n', '#', '\x3', 
-		'$', '\x6', '$', '\x111', '\n', '$', '\r', '$', '\xE', '$', '\x112', '\x3', 
+		'\x104', '\x3', '$', '\x6', '$', '\x108', '\n', '$', '\r', '$', '\xE', 
+		'$', '\x109', '\x3', '$', '\x3', '$', '\a', '$', '\x10E', '\n', '$', '\f', 
+		'$', '\xE', '$', '\x111', '\v', '$', '\x5', '$', '\x113', '\n', '$', '\x3', 
 		'%', '\x3', '%', '\a', '%', '\x117', '\n', '%', '\f', '%', '\xE', '%', 
 		'\x11A', '\v', '%', '\x3', '%', '\x3', '%', '\x3', '&', '\x5', '&', '\x11F', 
 		'\n', '&', '\x3', '&', '\x3', '&', '\x3', '&', '\x3', '&', '\x3', '&', 
@@ -315,7 +315,7 @@ public partial class STEPLexer : Lexer {
 		'\xF5', '\x3', '\x2', '\x2', '\x2', '=', '\xF8', '\x3', '\x2', '\x2', 
 		'\x2', '?', '\xFB', '\x3', '\x2', '\x2', '\x2', '\x41', '\xFD', '\x3', 
 		'\x2', '\x2', '\x2', '\x43', '\xFF', '\x3', '\x2', '\x2', '\x2', '\x45', 
-		'\x102', '\x3', '\x2', '\x2', '\x2', 'G', '\x110', '\x3', '\x2', '\x2', 
+		'\x102', '\x3', '\x2', '\x2', '\x2', 'G', '\x107', '\x3', '\x2', '\x2', 
 		'\x2', 'I', '\x114', '\x3', '\x2', '\x2', '\x2', 'K', '\x11E', '\x3', 
 		'\x2', '\x2', '\x2', 'M', '\x12B', '\x3', '\x2', '\x2', '\x2', 'O', '\x131', 
 		'\x3', '\x2', '\x2', '\x2', 'Q', '\x13B', '\x3', '\x2', '\x2', '\x2', 
@@ -409,16 +409,16 @@ public partial class STEPLexer : Lexer {
 		'\x103', '\x5', '\xF', '\b', '\x2', '\x102', '\x101', '\x3', '\x2', '\x2', 
 		'\x2', '\x103', '\x104', '\x3', '\x2', '\x2', '\x2', '\x104', '\x102', 
 		'\x3', '\x2', '\x2', '\x2', '\x104', '\x105', '\x3', '\x2', '\x2', '\x2', 
-		'\x105', '\x10D', '\x3', '\x2', '\x2', '\x2', '\x106', '\x10A', '\a', 
-		'\x30', '\x2', '\x2', '\x107', '\x109', '\x5', '\xF', '\b', '\x2', '\x108', 
-		'\x107', '\x3', '\x2', '\x2', '\x2', '\x109', '\x10C', '\x3', '\x2', '\x2', 
-		'\x2', '\x10A', '\x108', '\x3', '\x2', '\x2', '\x2', '\x10A', '\x10B', 
-		'\x3', '\x2', '\x2', '\x2', '\x10B', '\x10E', '\x3', '\x2', '\x2', '\x2', 
-		'\x10C', '\x10A', '\x3', '\x2', '\x2', '\x2', '\x10D', '\x106', '\x3', 
-		'\x2', '\x2', '\x2', '\x10D', '\x10E', '\x3', '\x2', '\x2', '\x2', '\x10E', 
-		'\x46', '\x3', '\x2', '\x2', '\x2', '\x10F', '\x111', '\x5', '\xF', '\b', 
-		'\x2', '\x110', '\x10F', '\x3', '\x2', '\x2', '\x2', '\x111', '\x112', 
-		'\x3', '\x2', '\x2', '\x2', '\x112', '\x110', '\x3', '\x2', '\x2', '\x2', 
+		'\x105', '\x46', '\x3', '\x2', '\x2', '\x2', '\x106', '\x108', '\x5', 
+		'\xF', '\b', '\x2', '\x107', '\x106', '\x3', '\x2', '\x2', '\x2', '\x108', 
+		'\x109', '\x3', '\x2', '\x2', '\x2', '\x109', '\x107', '\x3', '\x2', '\x2', 
+		'\x2', '\x109', '\x10A', '\x3', '\x2', '\x2', '\x2', '\x10A', '\x112', 
+		'\x3', '\x2', '\x2', '\x2', '\x10B', '\x10F', '\a', '\x30', '\x2', '\x2', 
+		'\x10C', '\x10E', '\x5', '\xF', '\b', '\x2', '\x10D', '\x10C', '\x3', 
+		'\x2', '\x2', '\x2', '\x10E', '\x111', '\x3', '\x2', '\x2', '\x2', '\x10F', 
+		'\x10D', '\x3', '\x2', '\x2', '\x2', '\x10F', '\x110', '\x3', '\x2', '\x2', 
+		'\x2', '\x110', '\x113', '\x3', '\x2', '\x2', '\x2', '\x111', '\x10F', 
+		'\x3', '\x2', '\x2', '\x2', '\x112', '\x10B', '\x3', '\x2', '\x2', '\x2', 
 		'\x112', '\x113', '\x3', '\x2', '\x2', '\x2', '\x113', 'H', '\x3', '\x2', 
 		'\x2', '\x2', '\x114', '\x118', '\x5', '\x5', '\x3', '\x2', '\x115', '\x117', 
 		'\x5', '\x13', '\n', '\x2', '\x116', '\x115', '\x3', '\x2', '\x2', '\x2', 
@@ -625,7 +625,7 @@ public partial class STEPLexer : Lexer {
 		'\x263', '\x261', '\x3', '\x2', '\x2', '\x2', '\x263', '\x264', '\x3', 
 		'\x2', '\x2', '\x2', '\x264', '\x98', '\x3', '\x2', '\x2', '\x2', '\x265', 
 		'\x263', '\x3', '\x2', '\x2', '\x2', '\x12', '\x2', '\x9A', '\x9E', '\xAA', 
-		'\xB1', '\xC1', '\xC5', '\xCF', '\x104', '\x10A', '\x10D', '\x112', '\x118', 
+		'\xB1', '\xC1', '\xC5', '\xCF', '\x104', '\x109', '\x10F', '\x112', '\x118', 
 		'\x11E', '\x129', '\x263', '\x3', '\b', '\x2', '\x2',
 	};
 

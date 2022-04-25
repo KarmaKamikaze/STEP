@@ -88,7 +88,7 @@ grammar STEP;
         : loop_stmts? NL
         ;
         
-  loop_stmts 
+  loop_stmts
         : loopifstmt 
         | whilestmt 
         | forstmt 
@@ -104,16 +104,34 @@ grammar STEP;
         | BREAK NL
         ;
   
-  ifstmt 
-        : IF LPAREN logicexpr RPAREN stmt* ENDIF
-        | IF LPAREN logicexpr RPAREN stmt* ELSE stmt* ENDIF
-        ;
-  
-  loopifstmt 
-        : IF LPAREN logicexpr RPAREN loopifbody* ENDIF 
-        | IF LPAREN logicexpr RPAREN loopifbody* ELSE loopifbody* ENDIF
-        ;
-  
+  ifstmt
+        : IF LPAREN logicexpr RPAREN stmt* elseifstmt* elsestmt? ENDIF;
+
+  elseifstmt
+        : ELSE IF LPAREN logicexpr RPAREN stmt*;
+
+  elsestmt
+        : ELSE stmt*;
+
+  loopifstmt
+        : IF LPAREN logicexpr RPAREN loopifbody* loopelseifstmt* loopelsestmt? ENDIF;
+
+  loopelseifstmt
+        : ELSE IF LPAREN logicexpr RPAREN loopifbody*;
+
+  loopelsestmt
+        : ELSE loopifbody*;
+
+//  ifstmt 
+//        : IF LPAREN logicexpr RPAREN stmt* ENDIF
+//        | IF LPAREN logicexpr RPAREN stmt* ELSE stmt* ENDIF
+//        ;
+//  
+//  loopifstmt 
+//        : IF LPAREN logicexpr RPAREN loopifbody* ENDIF 
+//        | IF LPAREN logicexpr RPAREN loopifbody* ELSE loopifbody* ENDIF
+//        ;
+
   whilestmt 
         : REPEATWHILE LPAREN logicexpr RPAREN loop_stmt* ENDWHILE
         ;
@@ -292,8 +310,8 @@ grammar STEP;
   NEG                           : '!';
   NL                            : LINE_TERMINATOR;
   COMMA                         : ',';
-  INTLITERAL                    : DIGIT+;
-  NUMLITERAL                    : DIGIT+ ('.' DIGIT*)?;
+  INTLITERAL                    : ('0' | [1-9] DIGIT*);
+  NUMLITERAL                    : ('0' | [1-9] DIGIT*) ('.' DIGIT+)?;
   STRLITERAL                    : DBLQUOTE STRING_CONTENT* DBLQUOTE;
   BOOLLITERAL                   : NEG? ('true' | 'false');
 
