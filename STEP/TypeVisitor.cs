@@ -177,6 +177,7 @@ public class TypeVisitor : IVisitor {
             throw new TypeException(firstType!.ActualType, expr.Type.ActualType); // Type will never be null here
         }
         n.Type = firstType;
+        n.Type.IsArray = true;
     }
 
     public void Visit(ArrayAccessNode n) {

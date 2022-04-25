@@ -239,7 +239,6 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         else
         {
             node.Right = (ArrLiteralNode) children.First(child => child is ArrLiteralNode);
-            node.Right.Type.IsArray = true;
         }
 
         return node;

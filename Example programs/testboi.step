@@ -1,5 +1,5 @@
 loop
-#number[2] thisIsCursed = [1, 2, 3]
+number[2] thisIsCursed = [1, 2, 3]
 end loop
 
 functions
@@ -14,7 +14,7 @@ string function manass(string testes)
   return testes
 end function
 
-number[] function assfunc(string test, number assss) 
+number[] function assfunc(string test, number[] assss) 
 boolean ass = true
   if(ass)
      return assss
