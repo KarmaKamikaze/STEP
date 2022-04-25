@@ -8,6 +8,11 @@ namespace STEP;
 
 public class ArduinoCompiler
 {
+    /// <summary>
+    /// The Upload method requires the avr-gcc compiler to be present at the host machine.
+    /// It first compiles the STEP compiler's output to avr, then converts this output to Intel HEX format.
+    /// The .hex file is then uploaded directly to the connected Arduino Uno board.
+    /// </summary>
     public void Upload()
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
