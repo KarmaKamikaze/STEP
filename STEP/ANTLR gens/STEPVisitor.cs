@@ -332,6 +332,18 @@ public interface ISTEPVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitPindcl([NotNull] STEPParser.PindclContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="STEPParser.pinmode"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitPinmode([NotNull] STEPParser.PinmodeContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="STEPParser.pintype"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitPintype([NotNull] STEPParser.PintypeContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="STEPParser.arrdcl"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

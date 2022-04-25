@@ -257,8 +257,17 @@ grammar STEP;
         ;
         
   pindcl
-        : ANALOGPIN ID ASSIGN INTLITERAL
-        | DIGITALPIN ID ASSIGN INTLITERAL
+        : pinmode pintype ID ASSIGN INTLITERAL
+        ;
+        
+  pinmode
+        : INPUT
+        | OUTPUT
+        ;
+        
+  pintype
+        : ANALOGPIN
+        | DIGITALPIN
         ;
   
   arrdcl 
@@ -353,4 +362,6 @@ grammar STEP;
   AND                           : 'and';
   OR                            : 'or';
   CONSTANT                      : 'constant';
+  INPUT                         : 'input';
+  OUTPUT                        : 'output';
   ID                            : LETTER ID_BODY*;
