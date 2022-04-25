@@ -478,6 +478,23 @@ public class TypeVisitor : IVisitor {
         _symbolTable.CloseScope();
     }
 
+    public void Visit(ElseIfNode n)
+    {
+        n.Condition.Accept(this);
+        if (n.Condition.Type.ActualType != TypeVal.Boolean)
+        {
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(TypeVal.Boolean, n.Condition.Type.ActualType);
+        }
+        n.Type.ActualType = TypeVal.Ok;
+        _symbolTable.OpenScope();
+        foreach (var stmt in n.Body)
+        {
+            stmt.Accept(this);
+        }
+        _symbolTable.CloseScope();
+    }
+
     public void Visit(VarsNode n) {
         foreach (var node in n.Dcls) {
             node.Accept(this);

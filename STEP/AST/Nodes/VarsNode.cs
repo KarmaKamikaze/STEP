@@ -6,4 +6,10 @@ public class VarsNode : AstNode
         v.Visit(this);
     }
     public List<VarDclNode> Dcls { get; set; }
+
+    public override bool Equals(object obj)
+    {
+        return obj is VarsNode other
+            && other.Dcls.SequenceEqual(Dcls);
+    }
 }

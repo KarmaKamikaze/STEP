@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/Mikkel/Documents/Codebase/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
+// Generated from E:/Code/repos/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -152,11 +152,35 @@ public interface ISTEPVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitIfstmt([NotNull] STEPParser.IfstmtContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="STEPParser.elseifstmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitElseifstmt([NotNull] STEPParser.ElseifstmtContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="STEPParser.elsestmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitElsestmt([NotNull] STEPParser.ElsestmtContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="STEPParser.loopifstmt"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitLoopifstmt([NotNull] STEPParser.LoopifstmtContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="STEPParser.loopelseifstmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitLoopelseifstmt([NotNull] STEPParser.LoopelseifstmtContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="STEPParser.loopelsestmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitLoopelsestmt([NotNull] STEPParser.LoopelsestmtContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="STEPParser.whilestmt"/>.
 	/// </summary>

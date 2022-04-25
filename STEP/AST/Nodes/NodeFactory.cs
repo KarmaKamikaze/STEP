@@ -71,6 +71,8 @@ public static class NodeFactory
                 return new ForNode() {NodeType = AstNodeType.ForNode};
             case AstNodeType.IfNode:
                 return new IfNode() {NodeType = AstNodeType.IfNode};
+            case AstNodeType.ElseIfNode:
+                return new ElseIfNode() {NodeType = AstNodeType.ElseIfNode};
             case AstNodeType.RetNode:
                 return new RetNode() {NodeType = AstNodeType.RetNode};
             case AstNodeType.ContNode:
