@@ -1,3 +1,5 @@
 setup
     number a = (2 ^ 5 * 3 + 2) / 2 + (3 - 5)
+    string ass = "hej"
+    string a = "hej"
 end setup

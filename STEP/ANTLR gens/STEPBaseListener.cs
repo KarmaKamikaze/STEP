@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from D:/Documents/Programming/STEP/STEP\STEP.g4 by ANTLR 4.9.2
+// Generated from C:/Users/Mikkel/Documents/Codebase/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -19,7 +19,6 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
-namespace STEP {
 
 using Antlr4.Runtime.Misc;
 using IErrorNode = Antlr4.Runtime.Tree.IErrorNode;
@@ -277,6 +276,30 @@ public partial class STEPBaseListener : ISTEPListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitIfstmt([NotNull] STEPParser.IfstmtContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.elseifstmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterElseifstmt([NotNull] STEPParser.ElseifstmtContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.elseifstmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitElseifstmt([NotNull] STEPParser.ElseifstmtContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.elsestmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterElsestmt([NotNull] STEPParser.ElsestmtContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.elsestmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitElsestmt([NotNull] STEPParser.ElsestmtContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.loopifstmt"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -288,6 +311,30 @@ public partial class STEPBaseListener : ISTEPListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitLoopifstmt([NotNull] STEPParser.LoopifstmtContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.loopelseifstmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterLoopelseifstmt([NotNull] STEPParser.LoopelseifstmtContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.loopelseifstmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitLoopelseifstmt([NotNull] STEPParser.LoopelseifstmtContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.loopelsestmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterLoopelsestmt([NotNull] STEPParser.LoopelsestmtContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.loopelsestmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitLoopelsestmt([NotNull] STEPParser.LoopelsestmtContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.whilestmt"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -577,6 +624,18 @@ public partial class STEPBaseListener : ISTEPListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitBooldcl([NotNull] STEPParser.BooldclContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.pindcl"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPindcl([NotNull] STEPParser.PindclContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.pindcl"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPindcl([NotNull] STEPParser.PindclContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.arrdcl"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -626,4 +685,3 @@ public partial class STEPBaseListener : ISTEPListener {
 	/// <remarks>The default implementation does nothing.</remarks>
 	public virtual void VisitErrorNode([NotNull] IErrorNode node) { }
 }
-} // namespace STEP

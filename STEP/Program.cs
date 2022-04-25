@@ -1,5 +1,9 @@
-﻿using Antlr4.Runtime;
+﻿using System.Reflection.Metadata.Ecma335;
+using System.Threading.Channels;
+using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using STEP.AST;
+using STEP.AST.Nodes;
 
 namespace STEP;
 
@@ -24,18 +28,28 @@ class Program
             
         // Parse the source code
         STEPParser parser = new STEPParser(tokenStream);
-        
+
         try
         {
-            STEPParser.ProgramContext ast = parser.program(); // Parse the input starting at the "program" rule.
+            STEPParser.ProgramContext tree = parser.program(); // Parse the input starting at the "program" rule.
             
             if (args.Length > 1 && args.Contains("-pp"))
             {
-                // Print AST
+                // Print parse tree
                 PrettyPrinter listener = new PrettyPrinter();
                 ParseTreeWalker treeWalker = new ParseTreeWalker();
-                treeWalker.Walk(listener, ast);
+                treeWalker.Walk(listener, tree);
             }
+
+            // Build AST
+            AstBuilderVisitor astBuilder = new AstBuilderVisitor();
+            AstNode root = astBuilder.Build(tree);
+            TypeVisitor typeVisitor = new();
+            root.Accept(typeVisitor);
+            AstPrintVisitor printer = new AstPrintVisitor();
+            root.Accept(printer);
+           
+
         }
         catch (Exception e)
         {

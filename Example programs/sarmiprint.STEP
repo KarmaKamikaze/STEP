@@ -1,0 +1,44 @@
+variables
+  number a = b
+  string ass = "hej" + tits[index]
+  boolean test = true
+  boolean test2 = (10 <= 12) or -2+f(10,2,2+1,ass,f(1,2,3,4))
+  number test3 = 10*2-3/(2*1)
+  string[10] str = arr
+  number[2] arrtest = [2,1,1+2,f(10,2),ass]
+end variables
+
+setup
+as = 10
+sss = "das"
+booty = false
+repeat while(a<10)
+  as=10
+  deez="hej"
+  repeat while(true)
+    asss=false
+  end while
+end while
+repeat for(ass[1] to 10, change by 23+1)
+  as=10
+  string asss = "asda"
+  f(10,12)
+  repeat while(true)
+    asss=false
+  end while
+  repeat for(aee to 10, change by -1)
+    repeat while(ass)
+	number tess = 10
+    end while
+  end for
+end for
+if(a)
+  number ass = 10
+  tits = 1
+  boob = true
+else
+  number assss = 1
+  titits = 10
+  asada = "hej"
+end if
+end setup
