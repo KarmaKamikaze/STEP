@@ -4,6 +4,7 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using STEP.AST;
 using STEP.AST.Nodes;
+using STEP.CodeGeneration;
 
 namespace STEP;
 
@@ -15,7 +16,7 @@ class Program
     private static void Main(string[] args)
     {
         if (args.Length < 1)
-            Exit("Usage: STEP.exe filename [Optional: -pp]");
+            Exit("Usage: STEP.exe filename [Optional: -pp] [Optional: -up]");
 
         // Stream reader opens source file
         AntlrFileStream streamReader = new AntlrFileStream(args[0]);
@@ -33,23 +34,31 @@ class Program
         {
             STEPParser.ProgramContext tree = parser.program(); // Parse the input starting at the "program" rule.
             
-            if (args.Length > 1 && args.Contains("-pp"))
-            {
-                // Print parse tree
-                PrettyPrinter listener = new PrettyPrinter();
-                ParseTreeWalker treeWalker = new ParseTreeWalker();
-                treeWalker.Walk(listener, tree);
-            }
-
             // Build AST
             AstBuilderVisitor astBuilder = new AstBuilderVisitor();
             AstNode root = astBuilder.Build(tree);
+            // Decorate the AST
             TypeVisitor typeVisitor = new();
             root.Accept(typeVisitor);
-            AstPrintVisitor printer = new AstPrintVisitor();
-            root.Accept(printer);
-           
-
+            
+            if (args.Length > 1 && args.Contains("-pp"))
+            {
+                // Print AST
+                AstPrintVisitor printer = new AstPrintVisitor();
+                root.Accept(printer);
+            }
+            
+            // Generate code and output to .c file
+            CodeGenerationVisitor codeGen = new CodeGenerationVisitor();
+            root.Accept(codeGen);
+            codeGen.OutputToBaseFile();
+            
+            if (args.Length > 1 && args.Contains("-up"))
+            {
+                // Upload compiled hex program to Arduino board
+                ArduinoCompiler arduinoCompiler = new ArduinoCompiler();
+                arduinoCompiler.Upload();
+            }
         }
         catch (Exception e)
         {
