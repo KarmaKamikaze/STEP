@@ -261,11 +261,6 @@ grammar STEP;
         | DIGITALPIN ID ASSIGN INTLITERAL
         ;
   
-    pindcl
-        : ANALOGPIN ID ASSIGN INTLITERAL
-        | DIGITALPIN ID ASSIGN INTLITERAL
-        ;
-
   arrdcl 
         : type arrsizedcl ID ASSIGN arr_id_or_lit
         ;

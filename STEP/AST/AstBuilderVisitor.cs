@@ -224,7 +224,6 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
 
         idNode.Id = context.ID().GetText();
-        idNode.IsArray = true;
         node.Left = idNode;
 
         node.Size = Int32.Parse(context.arrsizedcl().GetText().Trim('[', ']'));
