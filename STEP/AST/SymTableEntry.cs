@@ -5,5 +5,5 @@ namespace STEP.AST;
 public class SymTableEntry
 {
     public string Name { get; set; }
-    public TypeVal Type { get; set; }
+    public Type Type { get; set; }
 }

@@ -30,7 +30,8 @@ public class TypeVisitor : IVisitor {
     public void Visit(AndNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type.ActualType == TypeVal.Boolean && n.Right.Type.ActualType == TypeVal.Boolean) {
+        var expectedType = new Type() {ActualType = TypeVal.Boolean};
+        if (n.Left.Type == expectedType && n.Right.Type == expectedType) {
             n.Type.ActualType = TypeVal.Boolean;
         }
         else {
@@ -42,9 +43,11 @@ public class TypeVisitor : IVisitor {
     public void Visit(OrNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type.ActualType == TypeVal.Boolean && n.Right.Type.ActualType == TypeVal.Boolean) {
-                n.Type.ActualType = TypeVal.Boolean;
-        } else {
+        var expectedType = new Type() {ActualType = TypeVal.Boolean};
+        if (n.Left.Type == expectedType && n.Right.Type == expectedType) {
+            n.Type.ActualType = TypeVal.Boolean;
+        } 
+        else {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException(TypeVal.Boolean, n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
@@ -53,7 +56,7 @@ public class TypeVisitor : IVisitor {
     public void Visit(EqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type.ActualType == n.Right.Type.ActualType) {
+        if (n.Left.Type == n.Right.Type && !n.Left.Type.IsArray) {
             n.Type.ActualType = TypeVal.Boolean;
         }
         else {
@@ -65,7 +68,7 @@ public class TypeVisitor : IVisitor {
     public void Visit(NeqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type.ActualType == n.Right.Type.ActualType) {
+        if (n.Left.Type == n.Right.Type && !n.Left.Type.IsArray) {
             n.Type.ActualType = TypeVal.Boolean;
         }
         else {
@@ -77,7 +80,8 @@ public class TypeVisitor : IVisitor {
     public void Visit(GThanNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type.ActualType == TypeVal.Number && n.Right.Type.ActualType == TypeVal.Number) {
+        var expectedType = new Type() {ActualType = TypeVal.Number};
+        if (n.Left.Type == expectedType && n.Right.Type == expectedType) {
             n.Type.ActualType = TypeVal.Boolean;
         }
         else {
@@ -89,7 +93,8 @@ public class TypeVisitor : IVisitor {
     public void Visit(GThanEqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type.ActualType == TypeVal.Number && n.Right.Type.ActualType == TypeVal.Number) {
+        var expectedType = new Type() {ActualType = TypeVal.Number};
+        if (n.Left.Type == expectedType && n.Right.Type == expectedType) {
             n.Type.ActualType = TypeVal.Boolean;
         }
         else {
@@ -101,7 +106,8 @@ public class TypeVisitor : IVisitor {
     public void Visit(LThanNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type.ActualType == TypeVal.Number && n.Right.Type.ActualType == TypeVal.Number) {
+        var expectedType = new Type() {ActualType = TypeVal.Number};
+        if (n.Left.Type == expectedType && n.Right.Type == expectedType) {
             n.Type.ActualType = TypeVal.Boolean;
         }
         else {
@@ -113,7 +119,8 @@ public class TypeVisitor : IVisitor {
     public void Visit(LThanEqNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        if (n.Left.Type.ActualType == TypeVal.Number && n.Right.Type.ActualType == TypeVal.Number) {
+        var expectedType = new Type() {ActualType = TypeVal.Number};
+        if (n.Left.Type == expectedType && n.Right.Type == expectedType) {
             n.Type.ActualType = TypeVal.Boolean;
         }
         else {
@@ -124,7 +131,8 @@ public class TypeVisitor : IVisitor {
 
     public void Visit(NegNode n) {
         n.Left.Accept(this);
-        if (n.Left.Type.ActualType == TypeVal.Boolean) {
+        var expectedType = new Type() {ActualType = TypeVal.Boolean};
+        if (n.Left.Type == expectedType) {
             n.Type.ActualType = TypeVal.Boolean;
         }
         else {
@@ -150,38 +158,35 @@ public class TypeVisitor : IVisitor {
     public void Visit(ArrDclNode n) {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        n.Type.ActualType = (n.Left.Type.ActualType != n.Right.Type.ActualType) 
-            ? throw new TypeException(n.Left.Type.ActualType, n.Right.Type.ActualType)
-            : n.Left.Type.ActualType;
+        n.Type = (n.Left.Type != n.Right.Type)
+            ? throw new TypeException($"Type mismatch, type of left: {n.Left.Type}, type of right: {n.Right.Type}")
+            : n.Left.Type;
     }
 
     public void Visit(ArrLiteralNode n)
     {
         // Check if all elements have the same type
         n.Elements.FirstOrDefault()?.Accept(this);
-        var firstType = n.Elements.FirstOrDefault()?.Type.ActualType;
+        var firstType = n.Elements.FirstOrDefault()?.Type;
         foreach (var expr in n.Elements.Skip(1))
         {
             expr.Accept(this);
-            if (expr.Type.ActualType != firstType)
-            {
-                n.Type.ActualType = TypeVal.Error;
-                throw new TypeException(firstType!.Value, expr.Type.ActualType);
-            }
+            if (expr.Type == firstType) continue;
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(firstType!.ActualType, expr.Type.ActualType); // Type will never be null here
         }
-
-        n.Type.ActualType = (TypeVal) firstType; // Hmm
+        n.Type = firstType;
     }
 
     public void Visit(ArrayAccessNode n) {
         n.Array.Accept(this);
         n.Index.Accept(this);
         if (n.Index.Type.ActualType == TypeVal.Number) {
-            n.Type.ActualType = n.Array.Type.ActualType;
+            n.Type = n.Array.Type;
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException($"Type mismatch, expected array index to be of type {TypeVal.Number}, actual type is {n.Index.Type.ActualType}");
+            throw new TypeException($"Type mismatch, expected array index to be of type {TypeVal.Number}, actual type is {n.Index.Type}");
         }
         // Index is expression node, should we "calculate" the expression if possible to check if
         // index is >= 0 and < ArrSize?
@@ -204,7 +209,7 @@ public class TypeVisitor : IVisitor {
             }
         }
         else {
-            if (n.Left.Type.ActualType == n.Right.Type.ActualType) {
+            if (n.Left.Type == n.Right.Type) {
                 n.Type.ActualType = TypeVal.Ok;
             }
             else {
@@ -235,7 +240,7 @@ public class TypeVisitor : IVisitor {
 
     public virtual void Visit(IdNode n) {
         var symbol = _symbolTable.RetrieveSymbol(n.Id);
-        n.Type.ActualType = symbol?.Type ?? throw new SymbolNotDeclaredException(n.Id);
+        n.Type = symbol?.Type ?? throw new SymbolNotDeclaredException(n.Id);
     }
 
     public void Visit(PlusNode n) {
@@ -368,12 +373,20 @@ public class TypeVisitor : IVisitor {
     
     // General nodes
 
-    public void Visit(FuncDefNode n) {
-        n.Name.Accept(this);
+    public void Visit(FuncDefNode n) { 
+        if (_symbolTable.IsDeclaredLocally(n.Name.Id))
+        {
+            throw new DuplicateDeclarationException("An id of this name have already been declared", n.Name.Id);
+        }
+        _symbolTable.OpenScope();
+        foreach (var param in n.FormalParams) {
+            _symbolTable.EnterSymbol(param.Id, param.Type);
+        }
         foreach (var stmtNode in n.Stmts) {
             stmtNode.Accept(this); // Should throw exception if return doesn't match type
         }
-        n.Type.ActualType = n.ReturnType.ActualType;
+        _symbolTable.CloseScope();
+        n.Type = n.ReturnType;
         _symbolTable.EnterSymbol(n);
         // bool typeMismatch = false;
         // RetNode offendingTypeRetNode = null;
@@ -399,7 +412,7 @@ public class TypeVisitor : IVisitor {
         if (symbol is null) { // Should this be here?
             throw new NoNullAllowedException("The retrieved symbol was not a function symbol table entry");
         }
-        n.Type.ActualType = symbol.Type;
+        n.Type = symbol.Type;
         var parameterTypes = symbol.Parameters.Values.ToArray();
         int i = 0;
         foreach (var param in n.Params) {
@@ -417,7 +430,7 @@ public class TypeVisitor : IVisitor {
         if (symbol is null) { // Should this be here?
             throw new NoNullAllowedException("The retrieved symbol was not a function symbol table entry");
         }
-        n.Type.ActualType = symbol.Type;
+        n.Type = symbol.Type;
         var parameterTypes = symbol.Parameters.Values.ToArray();
         int i = 0;
         foreach (var param in n.Params) {
@@ -433,38 +446,34 @@ public class TypeVisitor : IVisitor {
     public void Visit(FuncsNode n) {
         foreach (var funcdcl in n.FuncDcls) {
             funcdcl.Accept(this);
-            _symbolTable.EnterSymbol(funcdcl.Name.Id, funcdcl.Type.ActualType);
         }
     }
 
     public void Visit(RetNode n) {
-        var parentFunc = n.Parent;
-        while (parentFunc is not FuncDefNode or null) {
-            parentFunc = parentFunc.Parent;
-        }
-        if (parentFunc.Type.ActualType == TypeVal.Blank) {
+        if (n.SurroundingFuncType.ActualType == TypeVal.Blank) {
             n.Type.ActualType = TypeVal.Ok;
         }
         else {
             n.RetVal.Accept(this);
-            if (parentFunc.Type.ActualType == n.RetVal.Type.ActualType) {
+            if (n.SurroundingFuncType.ActualType == n.RetVal.Type.ActualType) {
                 n.Type.ActualType = TypeVal.Ok;
             }
             else {
                 n.Type.ActualType = TypeVal.Error;
-                throw new TypeException($"Type mismatch, expected return value to be of type {parentFunc.Type.ActualType}, actual type is {n.RetVal.Type.ActualType}");
+                throw new TypeException($"Type mismatch, expected return value to be of type {n.SurroundingFuncType.ActualType}, actual type is {n.RetVal.Type.ActualType}");
             }
         }
     }
 
     public void Visit(IfNode n) {
         n.Condition.Accept(this);
-        if (n.Condition.Type.ActualType == TypeVal.Boolean) {
+        var expectedType = new Type() {ActualType = TypeVal.Boolean};
+        if (n.Condition.Type == expectedType) {
             n.Type.ActualType = TypeVal.Ok;
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException($"Type mismatch, expected condition to be of type {TypeVal.Boolean}, actual type is {n.Condition.Type.ActualType}");
+            throw new TypeException($"Type mismatch, expected condition to be of type {TypeVal.Boolean}, actual type is {n.Condition.Type}");
         }
         _symbolTable.OpenScope();
         foreach (var node in n.ThenClause) {
@@ -481,7 +490,7 @@ public class TypeVisitor : IVisitor {
     public void Visit(VarsNode n) {
         foreach (var node in n.Dcls) {
             node.Accept(this);
-            _symbolTable.EnterSymbol(node.Left.Id, node.Type.ActualType);
+            _symbolTable.EnterSymbol(node.Left.Id, node.Type);
         }
     }
 

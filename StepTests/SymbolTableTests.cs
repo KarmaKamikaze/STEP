@@ -1,3 +1,4 @@
+using STEP;
 using STEP.AST;
 using STEP.AST.Nodes;
 using Xunit;
@@ -18,7 +19,7 @@ public class SymbolTableTests
     {
         // Arrange
         string expectedName = "Teststring";
-        TypeVal expectedType = TypeVal.String;
+        Type expectedType = new Type(){ActualType = TypeVal.String};
         symbolTable.EnterSymbol(expectedName, expectedType);
         
         // Act / Assert
@@ -33,7 +34,7 @@ public class SymbolTableTests
     {
         // Arrange
         string expectedName = "Teststring";
-        TypeVal expectedType = TypeVal.String;
+        Type expectedType = new Type() {ActualType = TypeVal.String};
         symbolTable.EnterSymbol(expectedName, expectedType);
         symbolTable.OpenScope();
         
@@ -50,16 +51,16 @@ public class SymbolTableTests
     {
         // Arrange
         string expectedName = "Teststring";
-        TypeVal type = TypeVal.Boolean;
+        Type type = new Type() {ActualType = TypeVal.Boolean};
         symbolTable.EnterSymbol(expectedName, type);
         symbolTable.OpenScope();
         
         // Redeclaration of Teststring with another type
-        TypeVal expectedType = TypeVal.Number;
+        Type expectedType = new Type() {ActualType = TypeVal.Number};
         symbolTable.EnterSymbol(expectedName, expectedType);
 
         // Act
-        TypeVal actual = symbolTable.RetrieveSymbol(expectedName).Type;
+        Type actual = symbolTable.RetrieveSymbol(expectedName).Type;
         
         // Assert
         Assert.Equal(expectedType, actual);
@@ -71,7 +72,7 @@ public class SymbolTableTests
         // Arrange
         symbolTable.OpenScope();
         string expectedName = "Teststring";
-        TypeVal expectedType = TypeVal.String;
+        Type expectedType = new Type() {ActualType = TypeVal.String};
         symbolTable.EnterSymbol(expectedName, expectedType);
         symbolTable.CloseScope();
         symbolTable.OpenScope();

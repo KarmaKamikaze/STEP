@@ -59,7 +59,7 @@ public class SymbolTable : ISymbolTable
         return output;
     }
     
-    public void EnterSymbol(string name, TypeVal type)
+    public void EnterSymbol(string name, Type type)
     {
         //exception to check if a symbol is declared locally more than once
         if(IsDeclaredLocally(name))
@@ -94,7 +94,7 @@ public class SymbolTable : ISymbolTable
         var symbolEntry = new FunctionSymTableEntry() 
         {
             Name = name,
-            Type = node.Type.ActualType,
+            Type = node.Type,
             Parameters = parameters
         };
         // Add the symbol to the innermost scope (top of the scopeStack)
