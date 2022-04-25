@@ -224,6 +224,9 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
 
         idNode.Id = context.ID().GetText();
+
+        idNode.Type.IsArray = true;
+
         node.Left = idNode;
 
         node.Size = Int32.Parse(context.arrsizedcl().GetText().Trim('[', ']'));
@@ -236,6 +239,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         else
         {
             node.Right = (ArrLiteralNode) children.First(child => child is ArrLiteralNode);
+            node.Right.Type.IsArray = true;
         }
 
         return node;
@@ -861,15 +865,23 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override StmtNode VisitRetstmt([NotNull] STEPParser.RetstmtContext context)
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
-        STEPParser.FuncdclContext parent = (STEPParser.FuncdclContext)context.Parent;
+        
+        RuleContext parent = context.Parent;
+        while (parent is not STEPParser.FuncdclContext)
+        {
+            parent = parent.Parent;
+        }
+
+        STEPParser.FuncdclContext funcParent = (STEPParser.FuncdclContext)parent;
+        
         RetNode node = (RetNode) NodeFactory.MakeNode(AstNodeType.RetNode);
-        if(parent.BLANK() == null)
+        if(funcParent.BLANK() == null)
         {
             node.RetVal = (ExprNode)children.First(child => child is ExprNode);
-            string type = parent.type().GetText().ToLower();
+            string type = funcParent.type().GetText().ToLower();
             node.SurroundingFuncType.ActualType = type == "number" ? TypeVal.Number :
                 type == "string" ? TypeVal.String : TypeVal.Boolean;
-            if(parent.brackets() != null)
+            if(funcParent.brackets() != null)
             {
                 node.SurroundingFuncType.IsArray = true;
             }
@@ -892,10 +904,10 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         node.Stmts = children.OfType<StmtNode>().ToList();
         
         NodesList nodesList = (NodesList) children.First(child => child is NodesList);
-          
-        foreach(AstNode astNode in nodesList.Nodes)
+
+        foreach (AstNode astNode in nodesList.Nodes)
         {
-             node.FormalParams.Add((IdNode) astNode);
+            node.FormalParams.Add((IdNode) astNode);
         }
         
         if(context.BLANK() == null)
@@ -912,6 +924,18 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         node.ReturnType.ActualType = TypeVal.Blank;
         return node; 
     }
+
+    public override NodesList VisitParams([NotNull] STEPParser.ParamsContext context)
+    {
+        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+
+        if (context.params_content() != null)
+        {
+            return (NodesList) children.First(child => child is NodesList);
+        }
+        return (NodesList) NodeFactory.MakeNode(AstNodeType.NodesList);
+    }
+
 
     public override NodesList VisitParams_content([NotNull] STEPParser.Params_contentContext context)
     {
