@@ -7,4 +7,14 @@ public class FuncExprNode : ExprNode
     public override void Accept(IVisitor v) {
         v.Visit(this);
     }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is FuncExprNode other)
+        {
+            return Equals(other.Id, Id)
+                && Params.SequenceEqual(other.Params);
+        }
+        return false;
+    }
 }

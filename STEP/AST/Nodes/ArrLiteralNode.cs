@@ -8,4 +8,13 @@ public class ArrLiteralNode : ExprNode
     {
         v.Visit(this);
     }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is ArrLiteralNode other)
+        {
+            return Elements.SequenceEqual(other.Elements);
+        }
+        return false;
+    }
 }

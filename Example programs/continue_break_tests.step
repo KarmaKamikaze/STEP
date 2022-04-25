@@ -1,0 +1,11 @@
+setup
+  number i = 0
+  repeat while(true)
+    i = i+1
+    if(isEven(i) and i > 10)
+      break
+    else if (isOdd(i))
+      continue
+    end if
+  end while
+end setup

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from C:/Users/Mikkel/Documents/Codebase/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
+// Generated from E:/Code/repos/STEP/STEP/ANTLR gens\STEP.g4 by ANTLR 4.9.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -231,6 +231,26 @@ public interface ISTEPListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitIfstmt([NotNull] STEPParser.IfstmtContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.elseifstmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterElseifstmt([NotNull] STEPParser.ElseifstmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.elseifstmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitElseifstmt([NotNull] STEPParser.ElseifstmtContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.elsestmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterElsestmt([NotNull] STEPParser.ElsestmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.elsestmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitElsestmt([NotNull] STEPParser.ElsestmtContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.loopifstmt"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -240,6 +260,26 @@ public interface ISTEPListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitLoopifstmt([NotNull] STEPParser.LoopifstmtContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.loopelseifstmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterLoopelseifstmt([NotNull] STEPParser.LoopelseifstmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.loopelseifstmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitLoopelseifstmt([NotNull] STEPParser.LoopelseifstmtContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.loopelsestmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterLoopelsestmt([NotNull] STEPParser.LoopelsestmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.loopelsestmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitLoopelsestmt([NotNull] STEPParser.LoopelsestmtContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.whilestmt"/>.
 	/// </summary>

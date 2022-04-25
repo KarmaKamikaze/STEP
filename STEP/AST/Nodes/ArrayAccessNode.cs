@@ -7,4 +7,13 @@ public class ArrayAccessNode : ExprNode
     public override void Accept(IVisitor v) {
         v.Visit(this);
     }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is ArrayAccessNode other)
+        {
+            return Equals(other.Array, Array) && Equals(other.Index, Index);
+        }
+        return false;
+    }
 }
