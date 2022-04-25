@@ -116,7 +116,7 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(ArrDclNode n)
     {
         // Type id[size] = { elements };
-        EmitAppend(n.Type);
+        EmitAppend(n.Type.ActualType);
         n.Left.Accept(this);
         EmitAppend(" = ");
         n.Right.Accept(this);
@@ -150,7 +150,7 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(VarDclNode n)
     {
         // Type id = expr;
-        EmitAppend(n.Type);
+        EmitAppend(n.Type.ActualType);
         n.Left.Accept(this);
         EmitAppend(" = ");
         n.Right.Accept(this);
@@ -175,9 +175,9 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(PlusNode n)
     {
         // TODO: String concatenation, maybe use strcat(str1, str2) in C
-        if (n.Type is TypeVal.String)
+        if (n.Type.ActualType is TypeVal.String)
         {
-            if (n.Left.Type is TypeVal.String && n.Right.Type is not TypeVal.String)
+            if (n.Left.Type.ActualType is TypeVal.String && n.Right.Type.ActualType is not TypeVal.String)
             {
                 // Convert right to string
                 // Use Arduino's built in String() class
@@ -185,7 +185,7 @@ public class CodeGenerationVisitor : IVisitor
                 n.Right.Accept(this);
                 EmitAppend(")");
             }
-            else if (n.Left.Type is not TypeVal.String)
+            else if (n.Left.Type.ActualType is not TypeVal.String)
             {
                 // Convert left to string
             }
@@ -286,15 +286,15 @@ public class CodeGenerationVisitor : IVisitor
          *   statements
          * }
          */
-        EmitAppend(n.ReturnType.Type);
+        EmitAppend(n.ReturnType.ActualType);
         n.Name.Accept(this);
         EmitAppend("(");
         // TODO: maybe this can be made prettier in a traditional for-loop!
         int i = 0;
         foreach (var param in n.FormalParams)
         {
-            EmitAppend(param.Value.Item1); // Type 
-            param.Key.Accept(this); // Id
+            //EmitAppend(param.Value.Item1); // Type 
+            //param.Key.Accept(this); // Id
             if (i < n.FormalParams.Count - 1)
             {
                 EmitAppend(", ");
@@ -445,6 +445,18 @@ public class CodeGenerationVisitor : IVisitor
     {
         EmitLine("void loop() {");
         foreach(var stmt in n.Stmts) {
+            stmt.Accept(this);
+        }
+        EmitLine("}");
+    }
+
+    public void Visit(ElseIfNode n)
+    {
+        EmitAppend("else if(");
+        n.Condition.Accept(this);
+        EmitLine(") {");
+        foreach(var stmt in n.Body)
+        {
             stmt.Accept(this);
         }
         EmitLine("}");
