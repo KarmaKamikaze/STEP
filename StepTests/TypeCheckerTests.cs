@@ -82,8 +82,8 @@ public class TypeCheckerTests {
         
         // Intercept symbol table entry request, save locally
        SymTableEntry symbolTableEntry = new();
-        _symbolTableMock.Setup(x => x.EnterSymbol(It.IsAny<string>(), It.IsAny<TypeVal>()))
-            .Callback<string, TypeVal>((a, b) => symbolTableEntry = new SymTableEntry(){ Name = a, Type = b});
+        _symbolTableMock.Setup(x => x.EnterSymbol(It.IsAny<string>(), It.IsAny<Type>()))
+            .Callback<string, Type>((a, b) => symbolTableEntry = new SymTableEntry(){ Name = a, Type = b});
         
         var dclNode = new VarDclNode()
         {
@@ -116,6 +116,44 @@ public class TypeCheckerTests {
         // Assert
         Assert.Equal(exprNode.Type.ActualType, parenNode.Type.ActualType);
     }
+
+    [Fact]
+    public void TypeEquals_SameProperties_IsTrue() {
+        // Arrange
+        Type type1 = new Type() {
+            ActualType = TypeVal.Number,
+            IsArray = false
+        };
+        Type type2 = new Type() {
+            ActualType = TypeVal.Number,
+            IsArray = false
+        };
+
+        // Act
+        var test = type1 == type2;
+
+        // Assert
+        Assert.True(test);
+    }
+
+    [Fact]
+    public void TypeEquals_OneIsArray_IsFalse() {
+        // Arrange
+        var type1 = new Type() {
+            ActualType = TypeVal.Number,
+            IsArray = false
+        };
+        var type2 = new Type() {
+            ActualType = TypeVal.Number,
+            IsArray = true
+        };
+
+        // Act
+        var test = type1 == type2;
+
+        // Assert
+        Assert.False(test);
+    }
     
     [Fact]
     public void UMinusNode_LeftIsNumber_IsTypeNumber()
@@ -138,7 +176,7 @@ public class TypeCheckerTests {
     public void UMinusNode_LeftIsNotNumber_ThrowsTypeException(TypeVal type)
     {
         // Arrange
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var exprNode = new IdNode() {Id = "val"};
@@ -186,7 +224,7 @@ public class TypeCheckerTests {
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var multNode = new MultNode()
@@ -228,7 +266,7 @@ public class TypeCheckerTests {
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var divNode = new DivNode()
@@ -270,7 +308,7 @@ public class TypeCheckerTests {
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var powNode = new PowNode()
@@ -312,7 +350,7 @@ public class TypeCheckerTests {
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var minusNode = new MinusNode()
@@ -432,7 +470,7 @@ public class TypeCheckerTests {
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var andNode = new AndNode()
@@ -474,7 +512,7 @@ public class TypeCheckerTests {
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var orNode = new OrNode()
@@ -498,7 +536,7 @@ public class TypeCheckerTests {
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var eqNode = new EqNode()
@@ -539,7 +577,7 @@ public class TypeCheckerTests {
     {
         // Arrange
         // Set up a symbol table mock which always returns a SymTableEntry with the specified type.
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var neqNode = new NeqNode()
@@ -578,7 +616,7 @@ public class TypeCheckerTests {
     public void GThanNode_TypeMismatch_ThrowsTypeException(TypeVal type)
     {
         // Arrange
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var gThanNode = new GThanNode() {
@@ -595,7 +633,7 @@ public class TypeCheckerTests {
     public void GThanNode_TypeMismatch_IsTypeBoolean()
     {
         // Arrange
-        var symbol = new SymTableEntry() {Type = TypeVal.Number};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var gThanNode = new GThanNode() {
@@ -614,7 +652,7 @@ public class TypeCheckerTests {
     public void GThanEqNode_TypeMismatch_ThrowsTypeException(TypeVal type)
     {
         // Arrange
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var gThanEqNode = new GThanEqNode() {
@@ -631,7 +669,7 @@ public class TypeCheckerTests {
     public void GThanEqNode_TypeMismatch_IsTypeBoolean()
     {
         // Arrange
-        var symbol = new SymTableEntry() {Type = TypeVal.Number};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var gThanEqNode = new GThanEqNode() {
@@ -650,7 +688,7 @@ public class TypeCheckerTests {
     public void LThanNode_WrongTypes_ThrowsTypeException(TypeVal type)
     {
         // Arrange
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var lThanNode = new LThanNode() {
@@ -669,7 +707,7 @@ public class TypeCheckerTests {
     public void LThanNode_BothNumbers_IsTypeBoolean()
     {
         // Arrange
-        var symbol = new SymTableEntry() {Type = TypeVal.Number};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var lThanNode = new LThanNode() {
@@ -690,7 +728,7 @@ public class TypeCheckerTests {
     public void LThanEqNode_WrongTypes_ThrowsTypeException(TypeVal type)
     {
         // Arrange
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var lThanEqNode = new LThanEqNode() {
@@ -709,7 +747,7 @@ public class TypeCheckerTests {
     public void LThanEqNode_BothNumbers_IsTypeBoolean()
     {
         // Arrange
-        var symbol = new SymTableEntry() {Type = TypeVal.Number};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var lThanEqNode = new LThanEqNode() {
@@ -730,10 +768,10 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Boolean)]
     public void ArrayAccessNode_IndexIsNumber_AssignsArrayType(TypeVal type) {
         // Arrange
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("array"))
             .Returns(symbol);
-        var symbol2 = new SymTableEntry() {Type = TypeVal.Number};
+        var symbol2 = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("index"))
             .Returns(symbol2);
         var arrAccNode = new ArrayAccessNode() {
@@ -753,10 +791,10 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Error)]
     public void ArrayAccessNode_IndexIsNotNumber_ThrowsTypeException(TypeVal type) {
         // Arrange
-        var symbol = new SymTableEntry() {Type = TypeVal.Number};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("array"))
             .Returns(symbol);
-        var symbol2 = new SymTableEntry() {Type = type};
+        var symbol2 = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("index"))
             .Returns(symbol2);
         var arrAccNode = new ArrayAccessNode() {
@@ -777,7 +815,7 @@ public class TypeCheckerTests {
     public void FuncExprNode_ParamsMatch_IsTypeMatch(TypeVal type) {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
-            Type = type,
+            Type =  new Type(){ActualType = type},
             Parameters = new Dictionary<string, TypeVal>() {
                 {"a", TypeVal.Number},
                 {"b", TypeVal.String},
@@ -787,11 +825,11 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
             .Returns(symbol);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("a"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Number});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Number}});
         _symbolTableMock.Setup(x => x.RetrieveSymbol("b"))
-            .Returns(new SymTableEntry(){Type = TypeVal.String});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.String}});
         _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Boolean});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Boolean}});
         var funcExprNode = new FuncExprNode() {
             Id = new IdNode() {Id = "func"},
             Params = new List<ExprNode>() {
@@ -815,7 +853,7 @@ public class TypeCheckerTests {
     public void FuncExprNode_ParamsMismatch_ThrowsTypeException(TypeVal type) {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
-            Type = type,
+            Type =  new Type(){ActualType = type},
             Parameters = new Dictionary<string, TypeVal>() {
                 {"a", TypeVal.Number},
                 {"b", TypeVal.String},
@@ -825,11 +863,11 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
             .Returns(symbol);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("a"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Number});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Number}});
         _symbolTableMock.Setup(x => x.RetrieveSymbol("b"))
-            .Returns(new SymTableEntry(){Type = TypeVal.String});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.String}});
         _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Boolean});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Boolean}});
         var funcExprNode = new FuncExprNode() {
             Id = new IdNode() {Id = "func"},
             Params = new List<ExprNode>() {
@@ -849,7 +887,7 @@ public class TypeCheckerTests {
     [Fact]
     public void FuncExprNode_IsNotFunc_ThrowsException() {
         // Arrange
-        var symbol = new SymTableEntry() {Type = TypeVal.Number};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
             .Returns(symbol);
         var funcExprNode = new FuncExprNode() {
@@ -867,7 +905,7 @@ public class TypeCheckerTests {
     public void FuncExprNode_ParamsHasPinAndMatches_IsTypeMatch() {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
-            Type = TypeVal.Number,
+            Type = new Type(){ActualType = TypeVal.Number},
             Parameters = new Dictionary<string, TypeVal>() {
                 {"a", TypeVal.Analogpin},
                 {"b", TypeVal.Digitalpin},
@@ -877,11 +915,11 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
             .Returns(symbol);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("a"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Analogpin});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Analogpin}});
         _symbolTableMock.Setup(x => x.RetrieveSymbol("b"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Digitalpin});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Digitalpin}});
         _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Boolean});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Boolean}});
         var funcExprNode = new FuncExprNode() {
             Id = new IdNode() {Id = "func"},
             Params = new List<ExprNode>() {
@@ -902,7 +940,7 @@ public class TypeCheckerTests {
     public void FuncExprNode_ParamsHasPinMismatch_ThrowsTypeException() {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
-            Type = TypeVal.Number,
+            Type = new Type(){ActualType = TypeVal.Number},
             Parameters = new Dictionary<string, TypeVal>() {
                 {"a", TypeVal.Digitalpin},
                 {"b", TypeVal.Analogpin},
@@ -912,11 +950,11 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
             .Returns(symbol);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("a"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Analogpin});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Analogpin}});
         _symbolTableMock.Setup(x => x.RetrieveSymbol("b"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Digitalpin});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Digitalpin}});
         _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Boolean});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Boolean}});
         var funcExprNode = new FuncExprNode() {
             Id = new IdNode() {Id = "func"},
             Params = new List<ExprNode>() {
@@ -939,7 +977,7 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Boolean)]
     public void ArrLiteralNode_TypeMatch_IsCorrectType(TypeVal type) {
         // Arrange
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var arrLiteralNode = new ArrLiteralNode() {
@@ -982,7 +1020,7 @@ public class TypeCheckerTests {
     public void VarDclNode_TypeMatch_IsTypeOk(TypeVal type)
     {
     //Arrange
-    var symbol = new SymTableEntry() {Type = type};
+    var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
     _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
         .Returns(symbol);
     var varDclNode = new VarDclNode {
@@ -1007,7 +1045,7 @@ public class TypeCheckerTests {
     public void VarDclNode_TypeMismatch_ThrowsTypeException(TypeVal type1, TypeVal type2)
     {
         //Arrange
-        var symbol = new SymTableEntry() {Type = type2};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type2}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
             .Returns(symbol);
         var varDclNode = new VarDclNode {
@@ -1032,7 +1070,7 @@ public class TypeCheckerTests {
     public void VarDclNode_ExprHasError_ThrowsTypeException(TypeVal type)
     {
         //Arrange
-        var symbol2 = new SymTableEntry() {Type = TypeVal.Error};
+        var symbol2 = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Error}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
             .Returns(symbol2);
         var varDclNode = new VarDclNode {
@@ -1053,7 +1091,7 @@ public class TypeCheckerTests {
     [Fact]
     public void ArrDclNode_TypeMatch_IsTypeOk() {
         // Arrange
-        var symbol = new SymTableEntry() {Type = TypeVal.Number};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number, IsArray = true}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var arrDclNode = new ArrDclNode() {
@@ -1075,8 +1113,8 @@ public class TypeCheckerTests {
     public void ArrDclNode_TypeMismatch_ThrowsTypeException(TypeVal type1, TypeVal type2)
     {
         //Arrange
-        var symbol1 = new SymTableEntry() {Type = type1};
-        var symbol2 = new SymTableEntry() {Type = type2};
+        var symbol1 = new SymTableEntry() {Type = new Type(){ActualType = type1, IsArray = true}};
+        var symbol2 = new SymTableEntry() {Type = new Type(){ActualType = type2, IsArray = true}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("left"))
             .Returns(symbol1);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
@@ -1100,8 +1138,8 @@ public class TypeCheckerTests {
     public void ArrDclNode_ExprHasError_ThrowsTypeException(TypeVal type)
     {
         //Arrange
-        var symbol1 = new SymTableEntry() {Type = type};
-        var symbol2 = new SymTableEntry() {Type = TypeVal.Error};
+        var symbol1 = new SymTableEntry() {Type = new Type(){ActualType = type, IsArray = true}};
+        var symbol2 = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Error, IsArray = true}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("left"))
             .Returns(symbol1);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
@@ -1122,7 +1160,7 @@ public class TypeCheckerTests {
     public void FuncDefNode_IsTypeOk_CorrectlyEnteredInSymbolTable() {
         // Arrange
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
-            .Returns(new SymTableEntry() {Type = TypeVal.Number});
+            .Returns(new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number}});
         var funcDefNode = new FuncDefNode() {
             Name = new IdNode() {Id = "Add2"},
             Stmts = new List<StmtNode>() {
@@ -1156,7 +1194,7 @@ public class TypeCheckerTests {
     }
     
     [Fact]
-    public void FuncDefNode_IsTypeError_NotEnteredInSymbolTable() {
+    public void FuncDefNode_ReturnMismatch_NotEnteredInSymbolTable() {
         // Arrange
         var funcDefNode = new FuncDefNode() {
             Name = new IdNode() {Id = "Add2"},
@@ -1170,7 +1208,8 @@ public class TypeCheckerTests {
                 },
                 new RetNode() {
                     Parent = new FuncDefNode(){ReturnType = new Type() {ActualType = TypeVal.Number}},
-                    RetVal = new IdNode(){Id = "a"}
+                    RetVal = new IdNode(){Id = "a"},
+                    SurroundingFuncType = new Type() {ActualType = TypeVal.Boolean}
                 }
             },
             FormalParams = new List<IdNode>() {
@@ -1191,7 +1230,7 @@ public class TypeCheckerTests {
     public void FuncDefNode_HasPinParams_CorrectlyEnteredInSymbolTable() {
         // Arrange
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
-            .Returns(new SymTableEntry() {Type = TypeVal.Number});
+            .Returns(new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number}});
         var funcDefNode = new FuncDefNode() {
             Name = new IdNode() {Id = "Add2"},
             Stmts = new List<StmtNode>() {
@@ -1322,7 +1361,7 @@ public class TypeCheckerTests {
     public void IfNode_ConditionTypeMismatch_ThrowsTypeException(TypeVal type)
     {
         //Arrange
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("bool"))
             .Returns(symbol);
         var ifNode = new IfNode {
@@ -1342,7 +1381,7 @@ public class TypeCheckerTests {
     public void IfNode_ConditionIsBool_DoesNotThrow()
     {
         // Arrange
-        var symbol = new SymTableEntry() {Type = TypeVal.Boolean};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Boolean}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("bool"))
             .Returns(symbol);
         var ifNode = new IfNode {
@@ -1366,7 +1405,7 @@ public class TypeCheckerTests {
     public void WhileNode_ConditionTypeMismatch_ThrowsTypeException(TypeVal type)
     {
         //Arrange
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("cond"))
             .Returns(symbol);
         var whileNode = new WhileNode{
@@ -1385,7 +1424,7 @@ public class TypeCheckerTests {
     public void WhileNode_ConditionIsBool_DoesNotThrow()
     {
         //Arrange
-        var symbol = new SymTableEntry() {Type = TypeVal.Boolean};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Boolean}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("cond"))
             .Returns(symbol);
         var whileNode = new WhileNode{
@@ -1407,9 +1446,9 @@ public class TypeCheckerTests {
     public void ForNode_TypeMismatch_ThrowsTypeException(TypeVal type1, TypeVal type2, TypeVal type3)
     {
         //Arrange
-        var symbol1 = new SymTableEntry() {Type = type1};
-        var symbol2 = new SymTableEntry() {Type = type2};
-        var symbol3 = new SymTableEntry() {Type = type3};
+        var symbol1 = new SymTableEntry() {Type = new Type(){ActualType = type1}};
+        var symbol2 = new SymTableEntry() {Type = new Type(){ActualType = type2}};
+        var symbol3 = new SymTableEntry() {Type = new Type(){ActualType = type3}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("init"))
             .Returns(symbol1);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("limit"))
@@ -1434,7 +1473,7 @@ public class TypeCheckerTests {
     public void ForNode_TypesAreNumber_DoesNotThrow()
     {
         //Arrange
-        var symbol1 = new SymTableEntry() {Type = TypeVal.Number};
+        var symbol1 = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol1);
         var forNode = new ForNode{
@@ -1459,7 +1498,7 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Boolean)]
     public void AssNode_TypeMatch_IsTypeOk(TypeVal type) {
         // Arrange
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var assNode = new AssNode() {
@@ -1484,8 +1523,8 @@ public class TypeCheckerTests {
     public void AssNode_TypeMismatch_ThrowsTypeException(TypeVal type1, TypeVal type2)
     {
         //Arrange
-        var symbol1 = new SymTableEntry() {Type = type1};
-        var symbol2 = new SymTableEntry() {Type = type2};
+        var symbol1 = new SymTableEntry() {Type = new Type(){ActualType = type1}};
+        var symbol2 = new SymTableEntry() {Type = new Type(){ActualType = type2}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("left"))
             .Returns(symbol1);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
@@ -1507,7 +1546,7 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Digitalpin)]
     public void AssNode_LHSIsPin_ThrowsTypeException(TypeVal type) {
         // Arrange
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("id"))
             .Returns(symbol);
         var assNode = new AssNode() {
@@ -1528,15 +1567,12 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Boolean)]
     public void RetNode_TypeMatch_IsTypeOk(TypeVal type) {
         // Arrange
-        var symbol = new SymTableEntry() {Type = type};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var retNode = new RetNode() {
-            Parent = new IfNode() {
-                Parent = new FuncDefNode() {Type = new Type() {ActualType = type}},
-                
-            },
-            RetVal = new IdNode() {Id = "type"}
+            RetVal = new IdNode() {Id = "type"},
+            SurroundingFuncType = new Type(){ActualType = type}
         };
         
         // Act
@@ -1552,12 +1588,12 @@ public class TypeCheckerTests {
     [InlineData(TypeVal.Boolean, TypeVal.String)]
     public void RetNode_TypeMismatch_ThrowsTypeException(TypeVal type1, TypeVal type2) {
         // Arrange
-        var symbol = new SymTableEntry() {Type = type2};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = type2}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var retNode = new RetNode() {
-            Parent = new FuncDefNode() {Type = new Type() {ActualType = type1}},
-            RetVal = new IdNode() {Id = "type2"}
+            RetVal = new IdNode() {Id = "type2"},
+            SurroundingFuncType = new Type(){ActualType = type1}
         };
         
         // Act
@@ -1572,7 +1608,8 @@ public class TypeCheckerTests {
         // Arrange
         var retNode = new RetNode() {
             Parent = new FuncDefNode() {Type = new Type() {ActualType = TypeVal.Blank}},
-            RetVal = null
+            RetVal = null,
+            SurroundingFuncType = new Type(){ActualType = TypeVal.Blank}
         };
         
         // Act
@@ -1586,7 +1623,7 @@ public class TypeCheckerTests {
     public void FuncStmtNode_ParamsMatch_IsTypeMatch() {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
-            Type = TypeVal.Blank,
+            Type =  new Type(){ActualType =TypeVal.Blank},
             Parameters = new Dictionary<string, TypeVal>() {
                 {"a", TypeVal.Number},
                 {"b", TypeVal.String},
@@ -1596,11 +1633,11 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
             .Returns(symbol);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("a"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Number});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Number}});
         _symbolTableMock.Setup(x => x.RetrieveSymbol("b"))
-            .Returns(new SymTableEntry(){Type = TypeVal.String});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.String}});
         _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Boolean});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Boolean}});
         var funcExprNode = new FuncStmtNode() {
             Id = new IdNode() {Id = "func"},
             Params = new List<ExprNode>() {
@@ -1621,7 +1658,7 @@ public class TypeCheckerTests {
     public void FuncStmtNode_ParamsMismatch_ThrowsTypeException() {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
-            Type = TypeVal.Blank,
+            Type =  new Type(){ActualType =TypeVal.Blank},
             Parameters = new Dictionary<string, TypeVal>() {
                 {"a", TypeVal.Number},
                 {"b", TypeVal.String},
@@ -1631,11 +1668,11 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
             .Returns(symbol);
         _symbolTableMock.Setup(x => x.RetrieveSymbol("a"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Number});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Number}});
         _symbolTableMock.Setup(x => x.RetrieveSymbol("b"))
-            .Returns(new SymTableEntry(){Type = TypeVal.String});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.String}});
         _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
-            .Returns(new SymTableEntry(){Type = TypeVal.Boolean});
+            .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Boolean}});
         var funcExprNode = new FuncStmtNode() {
             Id = new IdNode() {Id = "func"},
             Params = new List<ExprNode>() {
@@ -1655,7 +1692,7 @@ public class TypeCheckerTests {
     [Fact]
     public void FuncsTMTNode_IsNotFunc_ThrowsException() {
         // Arrange
-        var symbol = new SymTableEntry() {Type = TypeVal.Number};
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
             .Returns(symbol);
         var funcExprNode = new FuncStmtNode() {
@@ -1676,7 +1713,7 @@ public class TypeCheckerTests {
     [Fact]
     public void ASTTraversalTest() {
         // Arrange
-        var symbol = new SymTableEntry() {Name = "b", Type = TypeVal.Number};
+        var symbol = new SymTableEntry() {Name = "b", Type = new Type(){ActualType = TypeVal.Number}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(symbol.Name)) 
             .Returns(symbol); // Simulate existing number b
         var exprNode = new PlusNode() {

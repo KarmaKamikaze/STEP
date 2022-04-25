@@ -275,7 +275,6 @@ grammar STEP;
         ;
 
 // Fragments
-
   fragment LINE_TERMINATOR      : ('\r'? '\n' | '\r');
   fragment DBLQUOTE             : '"';
   fragment HASHTAG              : '#';
