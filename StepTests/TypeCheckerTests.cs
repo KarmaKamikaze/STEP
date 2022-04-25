@@ -816,10 +816,10 @@ public class TypeCheckerTests {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
             Type =  new Type(){ActualType = type},
-            Parameters = new Dictionary<string, TypeVal>() {
-                {"a", TypeVal.Number},
-                {"b", TypeVal.String},
-                {"c", TypeVal.Boolean}
+            Parameters = new Dictionary<string, Type>() {
+                {"a", new Type() {ActualType = TypeVal.Number}},
+                {"b", new Type() {ActualType = TypeVal.String}},
+                {"c", new Type() {ActualType = TypeVal.Boolean}}
             }
         };
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
@@ -854,10 +854,10 @@ public class TypeCheckerTests {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
             Type =  new Type(){ActualType = type},
-            Parameters = new Dictionary<string, TypeVal>() {
-                {"a", TypeVal.Number},
-                {"b", TypeVal.String},
-                {"c", TypeVal.Boolean}
+            Parameters = new Dictionary<string, Type>() {
+                {"a", new Type() {ActualType = TypeVal.Number}},
+                {"b", new Type() {ActualType = TypeVal.String}},
+                {"c", new Type() {ActualType = TypeVal.Boolean}}
             }
         };
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
@@ -906,10 +906,10 @@ public class TypeCheckerTests {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
             Type = new Type(){ActualType = TypeVal.Number},
-            Parameters = new Dictionary<string, TypeVal>() {
-                {"a", TypeVal.Analogpin},
-                {"b", TypeVal.Digitalpin},
-                {"c", TypeVal.Boolean}
+            Parameters = new Dictionary<string, Type>() {
+                {"a", new Type() {ActualType = TypeVal.Analogpin}},
+                {"b", new Type() {ActualType = TypeVal.Digitalpin}},
+                {"c", new Type() {ActualType = TypeVal.Boolean}}
             }
         };
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
@@ -941,10 +941,10 @@ public class TypeCheckerTests {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
             Type = new Type(){ActualType = TypeVal.Number},
-            Parameters = new Dictionary<string, TypeVal>() {
-                {"a", TypeVal.Digitalpin},
-                {"b", TypeVal.Analogpin},
-                {"c", TypeVal.Boolean}
+            Parameters = new Dictionary<string, Type>() {
+                {"a", new Type() {ActualType = TypeVal.Digitalpin}},
+                {"b", new Type() {ActualType = TypeVal.Analogpin}},
+                {"c", new Type() {ActualType = TypeVal.Boolean}}
             }
         };
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
@@ -1172,8 +1172,8 @@ public class TypeCheckerTests {
                     }
                 },
                 new RetNode() {
-                    Parent = new FuncDefNode(){ReturnType = new Type() {ActualType = TypeVal.Number}},
-                    RetVal = new IdNode(){Id = "return1", Type = new Type() {ActualType = TypeVal.Number}}
+                    RetVal = new IdNode(){Id = "return1", Type = new Type() {ActualType = TypeVal.Number}},
+                    SurroundingFuncType = new Type(){ActualType = TypeVal.Number}
                 }
             },
             FormalParams = new List<IdNode>() {
@@ -1207,7 +1207,6 @@ public class TypeCheckerTests {
                     }
                 },
                 new RetNode() {
-                    Parent = new FuncDefNode(){ReturnType = new Type() {ActualType = TypeVal.Number}},
                     RetVal = new IdNode(){Id = "a"},
                     SurroundingFuncType = new Type() {ActualType = TypeVal.Boolean}
                 }
@@ -1242,8 +1241,8 @@ public class TypeCheckerTests {
                     }
                 },
                 new RetNode() {
-                    Parent = new FuncDefNode(){ReturnType = new Type() {ActualType = TypeVal.Number}},
-                    RetVal = new IdNode(){Id = "return1", Type = new Type() {ActualType = TypeVal.Number}}
+                    RetVal = new IdNode(){Id = "return1", Type = new Type() {ActualType = TypeVal.Number}},
+                    SurroundingFuncType = new Type() {ActualType = TypeVal.Number}
                 }
             },
             FormalParams = new List<IdNode>() {
@@ -1607,7 +1606,6 @@ public class TypeCheckerTests {
     public void RetNode_NullExprParentIsBlank_IsTypeOk() {
         // Arrange
         var retNode = new RetNode() {
-            Parent = new FuncDefNode() {Type = new Type() {ActualType = TypeVal.Blank}},
             RetVal = null,
             SurroundingFuncType = new Type(){ActualType = TypeVal.Blank}
         };
@@ -1624,10 +1622,10 @@ public class TypeCheckerTests {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
             Type =  new Type(){ActualType =TypeVal.Blank},
-            Parameters = new Dictionary<string, TypeVal>() {
-                {"a", TypeVal.Number},
-                {"b", TypeVal.String},
-                {"c", TypeVal.Boolean}
+            Parameters = new Dictionary<string, Type>() {
+                {"a", new Type() {ActualType = TypeVal.Number}},
+                {"b", new Type() {ActualType = TypeVal.String}},
+                {"c", new Type() {ActualType = TypeVal.Boolean}}
             }
         };
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
@@ -1659,10 +1657,10 @@ public class TypeCheckerTests {
         // Arrange
         var symbol = new FunctionSymTableEntry() {
             Type =  new Type(){ActualType =TypeVal.Blank},
-            Parameters = new Dictionary<string, TypeVal>() {
-                {"a", TypeVal.Number},
-                {"b", TypeVal.String},
-                {"c", TypeVal.Boolean}
+            Parameters = new Dictionary<string, Type>() {
+                {"a", new Type() {ActualType = TypeVal.Number}},
+                {"b", new Type() {ActualType = TypeVal.String}},
+                {"c", new Type() {ActualType = TypeVal.Boolean}}
             }
         };
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))

@@ -88,10 +88,10 @@ public class SymbolTable : ISymbolTable
         }
 
         // Convert formal parameters into a dictionary of strings and TypeVals
-        var parameters = new Dictionary<string, TypeVal>();
+        var parameters = new Dictionary<string, Type>();
         foreach (var param in node.FormalParams)
         {
-            parameters.Add(param.Id, param.Type.ActualType);
+            parameters.Add(param.Id, param.Type);
         }
         
         var symbolEntry = new FunctionSymTableEntry() 

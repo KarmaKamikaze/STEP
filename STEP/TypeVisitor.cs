@@ -421,7 +421,7 @@ public class TypeVisitor : IVisitor {
         int i = 0;
         foreach (var param in n.Params) {
             param.Accept(this);
-            if (param.Type.ActualType != parameterTypes[i] || param.Type.ActualType == TypeVal.Error) {
+            if (param.Type != parameterTypes[i] || param.Type.ActualType == TypeVal.Error) {
                 n.Type.ActualType = TypeVal.Error;
                 throw new TypeException($"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, actual type is {param.Type.ActualType}");
             }
@@ -439,7 +439,7 @@ public class TypeVisitor : IVisitor {
         int i = 0;
         foreach (var param in n.Params) {
             param.Accept(this);
-            if (param.Type.ActualType != parameterTypes[i] || param.Type.ActualType == TypeVal.Error) {
+            if (param.Type != parameterTypes[i] || param.Type.ActualType == TypeVal.Error) {
                 n.Type.ActualType = TypeVal.Error;
                 throw new TypeException($"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, actual type is {param.Type.ActualType}");
             }
@@ -459,12 +459,12 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.RetVal.Accept(this);
-            if (n.SurroundingFuncType.ActualType == n.RetVal.Type.ActualType) {
+            if (n.SurroundingFuncType == n.RetVal.Type) {
                 n.Type.ActualType = TypeVal.Ok;
             }
             else {
                 n.Type.ActualType = TypeVal.Error;
-                throw new TypeException($"Type mismatch, expected return value to be of type {n.SurroundingFuncType.ActualType}, actual type is {n.RetVal.Type.ActualType}");
+                throw new TypeException($"Type mismatch, expected return value to be of type {n.SurroundingFuncType}, actual type is {n.RetVal.Type}");
             }
         }
     }
