@@ -56,17 +56,22 @@ grammar STEP;
         ;
         
   params_content 
-        : type brackets? ID params_multi*
+        : paramstype brackets? ID params_multi*
         ;
         
   params_multi 
-        : COMMA type brackets? ID
+        : COMMA paramstype brackets? ID
         ;
-        
+  
   type 
         : NUMBER 
         | STRING 
         | BOOLEAN
+        ;
+        
+  paramstype
+        : pintype
+        | type
         ;
   
   // Statements

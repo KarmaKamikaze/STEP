@@ -106,15 +106,22 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Id = context.ID().GetText();
-        
-        if(context.ANALOGPIN() != null)
+        idNode.Type = new PinType();
+        if(context.pintype().ANALOGPIN() != null) 
         {
             idNode.Type.ActualType = TypeVal.Analogpin;
         }
-        else
-        {
+        else {
             idNode.Type.ActualType = TypeVal.Digitalpin;
         }
+
+        if (context.pinmode().INPUT() != null) {
+            ((PinType) idNode.Type).Mode = PinMode.INPUT;
+        }
+        else {
+            ((PinType) idNode.Type).Mode = PinMode.OUTPUT;
+        }
+        
         node.Left = idNode;
         
         NumberNode numNode = (NumberNode) NodeFactory.MakeNode(AstNodeType.NumberNode);
