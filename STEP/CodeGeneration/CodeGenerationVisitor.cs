@@ -15,6 +15,8 @@ public class CodeGenerationVisitor : IVisitor
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         File.WriteAllText(directoryPath + "/compiled.c", Output);
     }
+
+    public string OutputToString() => _stringBuilder.ToString();
     
     private void EmitLine(string line)
     {
@@ -29,7 +31,14 @@ public class CodeGenerationVisitor : IVisitor
     private void EmitAppend(TypeVal typeVal)
     {
         // TODO: translate our types to Arduino types here
-        _stringBuilder.Append(typeVal.ToString()+" ");
+        switch (typeVal)
+        {
+            case TypeVal.Number:
+                EmitAppend("double ");
+                break;
+            default:
+                break;
+        }
     }
     
     public void Visit(AndNode n)
@@ -296,20 +305,17 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend(n.ReturnType.ActualType);
         n.Name.Accept(this);
         EmitAppend("(");
-        // TODO: maybe this can be made prettier in a traditional for-loop!
-        int i = 0;
-        foreach (var param in n.FormalParams)
+        for (int i = 0; i < n.FormalParams.Count; i++)
         {
-            //EmitAppend(param.Value.Item1); // Type 
-            //param.Key.Accept(this); // Id
+            var param = n.FormalParams[i];
+            EmitAppend(param.Type.ActualType);
+            param.Accept(this);
             if (i < n.FormalParams.Count - 1)
             {
                 EmitAppend(", ");
             }
-            i++;
         }
-        EmitLine(")");
-        
+        EmitLine(") {");
         // Body
         foreach (StmtNode stmt in n.Stmts)
         {
