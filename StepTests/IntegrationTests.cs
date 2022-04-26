@@ -66,7 +66,7 @@ public class IntegrationTests
         {
             new string[]
             {
-                "IntegrationTestPrograms/test.step" , "IntegrationTestPrograms/test2.step"  
+                "IntegrationTestPrograms/printArraySource.step" , "IntegrationTestPrograms/printArrayExpected.step"  
             }
             
         };

@@ -180,7 +180,7 @@ public class TypeVisitor : IVisitor {
         n.Array.Accept(this);
         n.Index.Accept(this);
         if (n.Index.Type.ActualType == TypeVal.Number) {
-            n.Type = n.Array.Type;
+            n.Type.ActualType = n.Array.Type.ActualType;
         }
         else {
             n.Type.ActualType = TypeVal.Error;

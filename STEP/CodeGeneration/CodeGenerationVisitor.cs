@@ -194,7 +194,7 @@ public class CodeGenerationVisitor : IVisitor
     private void VarDclNodeGen(VarDclNode n)
     {
         // Type id = expr;
-        EmitAppend(n.Type);
+        EmitAppend(n.Left.Type);
 
         n.Left.Accept(this);
         EmitAppend(" = ");
@@ -418,6 +418,10 @@ public class CodeGenerationVisitor : IVisitor
             var param = n.FormalParams[i];
             EmitAppend(param.Type);
             param.Accept(this);
+            if (param.Type.IsArray)
+            {
+                EmitAppend("[]");
+            }
             if (i < n.FormalParams.Count - 1)
             {
                 EmitAppend(", ");

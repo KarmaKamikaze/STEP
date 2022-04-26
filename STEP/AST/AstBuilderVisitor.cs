@@ -963,7 +963,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
         
         List<IdNode> paramsChildren = children.OfType<IdNode>().ToList();
-        paramsChildren.Add(node);
+        paramsChildren.Insert(0,node);
         
         NodesList nodesList = (NodesList) NodeFactory.MakeNode(AstNodeType.NodesList);
         
