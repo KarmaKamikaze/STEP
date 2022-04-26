@@ -4,9 +4,9 @@ namespace STEP;
 
 public class Type : IEquatable<Type>
 {
-    public bool IsConstant { get; set; }
     public TypeVal ActualType { get; set; }
     public Boolean IsArray { get; set; }
+    public Boolean IsConstant { get; set; }
     public bool Equals(Type other) {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;

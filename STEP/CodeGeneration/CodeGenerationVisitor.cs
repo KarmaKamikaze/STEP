@@ -16,6 +16,11 @@ public class CodeGenerationVisitor : IVisitor
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         File.WriteAllText(directoryPath + "/compiled.c", Output);
     }
+
+    public string OutputToString()
+    {
+        return Output;
+    }
     
     private void EmitLine(string line)
     {
@@ -118,8 +123,7 @@ public class CodeGenerationVisitor : IVisitor
         // not x -> ! x
         // not (x == y) -> !(x==y)
         EmitAppend("!");
-        // TODO: Is this the right child?!?!?!
-        n.Right.Accept(this);
+        n.Left.Accept(this);
     }
 
     public virtual void Visit(NumberNode n)
@@ -129,21 +133,30 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(StringNode n)
     {
-        EmitAppend(n.Value);
+        EmitAppend("\"" + n.Value + "\"");
     }
 
     public void Visit(BoolNode n)
     {
-        EmitAppend(n.Value.ToString());
+        EmitAppend(n.Value.ToString().ToLowerInvariant());
     }
-
+    
     public void Visit(ArrDclNode n)
     {
         // Type id[size] = { elements };
         EmitAppend(n.Type);
+
         n.Left.Accept(this);
-        EmitAppend(" = ");
-        n.Right.Accept(this);
+        EmitAppend($"[{n.Size}] = ");
+        if (n.IsId)
+        {
+            n.IdRight.Accept(this);
+        }
+        else
+        {
+            n.Right.Accept(this);
+        }
+
         EmitLine(";");
     }
 
@@ -173,24 +186,41 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(VarDclNode n)
     {
-        // Type id = expr;
-        EmitAppend(n.Type);
-        n.Left.Accept(this);
-        EmitAppend(" = ");
-        n.Right.Accept(this);
+        VarDclNodeGen(n);
         EmitLine(";");
     }
 
+    private void VarDclNodeGen(VarDclNode n)
+    {
+        // Type id = expr;
+        EmitAppend(n.Type);
+
+        n.Left.Accept(this);
+        EmitAppend(" = ");
+        n.Right.Accept(this);
+    }
+    
     public void Visit(AssNode n)
+    {
+        AssNodeGen(n);
+        EmitLine(";");
+    }
+
+    private void AssNodeGen(AssNode n)
     {
         // id = expr;
         // TODO: if assignments can be used in expressions, this must be redone
         n.Id.Accept(this);
+        if (n.ArrIndex != null)
+        {
+            EmitAppend("[");
+            n.ArrIndex.Accept(this);
+            EmitAppend("]");
+        }
         EmitAppend(" = ");
         n.Expr.Accept(this);
-        EmitLine(";");
     }
-
+    
     public void Visit(IdNode n)
     {
         EmitAppend(n.Id);
@@ -198,27 +228,30 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(PlusNode n)
     {
-        // TODO: String concatenation, maybe use strcat(str1, str2) in C
-        if (n.Type.ActualType is TypeVal.String)
+        // If the overall expression has type string, we must convert any non-string children to strings
+        if (n.Type.ActualType is TypeVal.String && n.Left.Type.ActualType != TypeVal.String)
         {
-            if (n.Left.Type.ActualType is TypeVal.String && n.Right.Type.ActualType is not TypeVal.String)
-            {
-                // Convert right to string
-                // Use Arduino's built in String() class
-                EmitAppend("String(");
-                n.Right.Accept(this);
-                EmitAppend(")");
-            }
-            else if (n.Left.Type.ActualType is not TypeVal.String)
-            {
-                // Convert left to string
-            }
+            // String(left) + right
+            EmitAppend("String(");
+            n.Left.Accept(this);
+            EmitAppend(") + ");
+            n.Right.Accept(this);
         }
-        
-        // expr1 + expr2
-        n.Left.Accept(this);
-        EmitAppend(" + ");
-        n.Right.Accept(this);
+        else if (n.Type.ActualType is TypeVal.String && n.Right.Type.ActualType != TypeVal.String)
+        {
+            // left + String(right)
+            n.Left.Accept(this);
+            EmitAppend(" + String(");
+            n.Right.Accept(this);
+            EmitAppend(")");
+        }
+        else
+        {
+            // left + right
+            n.Left.Accept(this);
+            EmitAppend(" + ");
+            n.Right.Accept(this);
+        }
     }
 
     public void Visit(MinusNode n)
@@ -266,7 +299,7 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(UMinusNode n)
     {
-        // - expr
+        // -expr
         EmitAppend("-");
         n.Left.Accept(this);
     }
@@ -290,10 +323,76 @@ public class CodeGenerationVisitor : IVisitor
         // for(int x = 0; i < n; i++)
         // VarDcl, AssNode, Identifier, ArrAccessNode
         EmitAppend("for(");
-        n.Initializer.Accept(this);
-        EmitAppend("; ");
+        
+        //Each if-statement creates the for-loop header with the relevant type of initializer
+        if (n.Initializer is VarDclNode varInit)
+        {
+            VarDclNodeGen(varInit);
+            ForNodeHelper(varInit.Left, n);
+        }
+        else if (n.Initializer is AssNode assInit)
+        {
+            AssNodeGen(assInit);
+            ForNodeHelperAssNode(assInit, n);
+        }
+        else
+        {
+            n.Initializer.Accept(this);
+            ForNodeHelper(n.Initializer, n);
+        }
+        
+        n.Update.Accept(this);
+        
+        EmitLine(") {");
+        foreach (StmtNode statement in n.Body)
+        {
+            statement.Accept(this);
+        }
+        EmitLine("}");
+        
     }
 
+    private void ForNodeHelper(AstNode node, ForNode n)
+    {
+        EmitAppend("; ");
+        //Generate Limit Condition
+        node.Accept(this);
+        EmitAppend(" <= ");
+        n.Limit.Accept(this);
+        EmitAppend("; ");
+        //Generate part of the Update Condition
+        node.Accept(this);
+        EmitAppend(" = ");
+        node.Accept(this);
+        EmitAppend(" + ");
+    }
+
+    private void ForNodeHelperAssNode(AssNode node, ForNode n)
+    {
+        EmitAppend("; ");
+        //Generate Limit Condition
+        ForNodeHelperAssNodeHelper(node);
+        EmitAppend(" <= ");
+        n.Limit.Accept(this);
+        EmitAppend("; ");
+        //Generate part of the Update Condition
+        ForNodeHelperAssNodeHelper(node);
+        EmitAppend(" = ");
+        ForNodeHelperAssNodeHelper(node);
+        EmitAppend(" + ");
+    }
+
+    private void ForNodeHelperAssNodeHelper(AssNode node)
+    {
+        node.Id.Accept(this);
+        if (node.ArrIndex != null)
+        {
+            EmitAppend("[");
+            node.ArrIndex.Accept(this);
+            EmitAppend("]");
+        }
+    }
+    
     public void Visit(ContNode n)
     {
         EmitLine("continue;");
@@ -313,20 +412,17 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend(n.ReturnType);
         n.Name.Accept(this);
         EmitAppend("(");
-        // TODO: maybe this can be made prettier in a traditional for-loop!
-        int i = 0;
-        foreach (var param in n.FormalParams)
+        for (int i = 0; i < n.FormalParams.Count; i++)
         {
-            //EmitAppend(param.Value.Item1); // Type 
-            //param.Key.Accept(this); // Id
+            var param = n.FormalParams[i];
+            EmitAppend(param.Type);
+            param.Accept(this);
             if (i < n.FormalParams.Count - 1)
             {
                 EmitAppend(", ");
             }
-            i++;
         }
-        EmitLine(")");
-        
+        EmitLine(") {");
         // Body
         foreach (StmtNode stmt in n.Stmts)
         {
@@ -384,6 +480,7 @@ public class CodeGenerationVisitor : IVisitor
         else {
             EmitAppend("return ");
             n.RetVal.Accept(this);
+            EmitLine(";");
         }
     }
 
@@ -391,6 +488,9 @@ public class CodeGenerationVisitor : IVisitor
     {
         /* if(condition) {
          *   ThenClause
+         * }
+         * else if(condition) {
+         *   ElseIfClause
          * }
          * else {
          *   ElseClause
@@ -404,7 +504,16 @@ public class CodeGenerationVisitor : IVisitor
             stmt.Accept(this);
         }
         EmitLine("}");
-        if (n.ElseClause != null)
+        
+        if (n.ElseIfClauses?.Count > 0)
+        {
+            foreach (var elseIf in n.ElseIfClauses)
+            {
+                elseIf.Accept(this);
+            }
+        }
+        
+        if (n.ElseClause?.Count > 0)
         {
             EmitLine("else {");
             foreach (var stmt in n.ElseClause)
@@ -413,31 +522,6 @@ public class CodeGenerationVisitor : IVisitor
             }
             EmitLine("}");
         }
-        
-        /* if (expr1)
-         *   statements1
-         * else 
-         *   if (expr1)
-         *     statements2
-         *   end if
-         * end if
-         *
-         * if (expr1)
-         *   statements
-         * end if
-         * if (expr2)
-         *   statements
-         * end if
-         *
-         * TODO: Det her er ikke muligt i STEP
-         * if (expr1)
-         *   statements1
-         * else if (expr2)
-         *   statements2
-         * else
-         *   statements3
-         * end if
-         */
     }
 
     public void Visit(VarsNode n)
@@ -480,14 +564,17 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ElseIfNode n)
     {
-        EmitAppend("else if(");
-        n.Condition.Accept(this);
-        EmitLine(") {");
-        foreach(var stmt in n.Body)
+        if (n.Body?.Count > 0)
         {
-            stmt.Accept(this);
+            EmitAppend("else if(");
+            n.Condition.Accept(this);
+            EmitLine(") {");
+            foreach(var stmt in n.Body)
+            {
+                stmt.Accept(this);
+            }
+            EmitLine("}");
         }
-        EmitLine("}");
     }
 
     public void Visit(PinDclNode n)

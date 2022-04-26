@@ -10,7 +10,9 @@ public class VarDclNode : StmtNode
 
     public override bool Equals(object obj)
     {
-        if (obj is VarDclNode other) {
+        if (obj is VarDclNode other)
+        {
+
             return Equals(other.Left, Left)
                    && Equals(other.Right, Right);
         }

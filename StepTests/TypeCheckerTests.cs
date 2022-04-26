@@ -981,6 +981,7 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var arrLiteralNode = new ArrLiteralNode() {
+            Type = new Type() {ActualType = type, IsArray = true},
             Elements = new List<ExprNode>() {
                 new IdNode(){Id = "a"},
                 new IdNode(){Id = "b"}
@@ -1138,14 +1139,11 @@ public class TypeCheckerTests {
     public void ArrDclNode_ExprHasError_ThrowsTypeException(TypeVal type)
     {
         //Arrange
-        var symbol1 = new SymTableEntry() {Type = new Type(){ActualType = type, IsArray = true}};
-        var symbol2 = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Error, IsArray = true}};
-        _symbolTableMock.Setup(x => x.RetrieveSymbol("left"))
-            .Returns(symbol1);
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Error, IsArray = true}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
-            .Returns(symbol2);
+            .Returns(symbol);
         var arrDclNode = new ArrDclNode {
-            Left = new IdNode() {Id = "left"},
+            Left = new IdNode() {Id = "left", Type = new Type(){ActualType = type, IsArray = true}},
             Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}}
         };
 
