@@ -496,7 +496,6 @@ public class TypeVisitor : IVisitor {
     public void Visit(VarsNode n) {
         foreach (var node in n.Dcls) {
             node.Accept(this);
-            _symbolTable.EnterSymbol(node.Left.Id, node.Type);
         }
     }
 
