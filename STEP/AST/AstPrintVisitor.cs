@@ -102,7 +102,7 @@ public class AstPrintVisitor : IVisitor
         if (node != null)
         {
             Indent();
-            Print(node.PinType.Mode.ToString().ToLower() + " ");
+            Print(((PinType)node.Type).Mode.ToString().ToLower() + " ");
             Print(node.Left.Type.ActualType.ToString().ToLower() + " "); // Print Id node's type (analogpin or digitalpin)
             node.Left.Accept(this);
             Print(" = ");

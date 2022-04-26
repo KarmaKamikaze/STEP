@@ -116,12 +116,13 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
 
         if (context.pinmode().INPUT() != null) {
-            node.PinType.Mode = PinMode.INPUT;
+            node.Type = new PinType() {Mode = PinMode.INPUT};
         }
-        else {
-            node.PinType.Mode = PinMode.OUTPUT;
+        else
+        {
+            node.Type = new PinType() {Mode = PinMode.OUTPUT};
         }
-        
+
         node.Left = idNode;
         
         NumberNode numNode = (NumberNode) NodeFactory.MakeNode(AstNodeType.NumberNode);

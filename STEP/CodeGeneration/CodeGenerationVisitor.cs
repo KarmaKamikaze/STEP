@@ -587,7 +587,7 @@ public class CodeGenerationVisitor : IVisitor
         _pinSetup.Append("pinMode(");
         n.Left.Accept(pinVisitor);
         _pinSetup.Append(pinVisitor.GetPinCode());
-        switch (n.PinType.Mode)
+        switch (((PinType)n.Type).Mode)
         {
             case PinMode.INPUT:
                 _pinSetup.Append("INPUT");
