@@ -4,6 +4,7 @@ namespace STEP;
 
 public class Type : IEquatable<Type>
 {
+    public bool IsConstant { get; set; }
     public TypeVal ActualType { get; set; }
     public Boolean IsArray { get; set; }
     public bool Equals(Type other) {
