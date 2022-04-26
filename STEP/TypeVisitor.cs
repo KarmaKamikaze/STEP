@@ -36,7 +36,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(TypeVal.Boolean, n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, new Type(){ActualType = TypeVal.Boolean}, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -49,7 +49,7 @@ public class TypeVisitor : IVisitor {
         } 
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(TypeVal.Boolean, n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Boolean}, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -61,7 +61,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -73,7 +73,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -86,7 +86,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Number}, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -99,7 +99,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Number}, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -112,7 +112,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Number}, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -125,7 +125,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Number}, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -137,7 +137,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(TypeVal.Boolean, n.Left.Type.ActualType);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Boolean}, n.Left.Type);
         }
     }
     
@@ -158,26 +158,22 @@ public class TypeVisitor : IVisitor {
     public void Visit(ArrDclNode n) {
         DclVisitor dclVisitor = new DclVisitor(_symbolTable);
         n.Left.Accept(dclVisitor);
+        n.Right.Type = n.Left.Type;
         n.Right.Accept(this);
         n.Type = (n.Left.Type != n.Right.Type)
-            ? throw new TypeException($"Type mismatch, type of left: {n.Left.Type}, type of right: {n.Right.Type}")
+            ? throw new TypeException(n, $"Type mismatch, type of left: {n.Left.Type}, type of right: {n.Right.Type}")
             : n.Left.Type;
     }
 
-    public void Visit(ArrLiteralNode n)
-    {
+    public void Visit(ArrLiteralNode n) {
         // Check if all elements have the same type
-        n.Elements.FirstOrDefault()?.Accept(this);
-        var firstType = n.Elements.FirstOrDefault()?.Type;
-        foreach (var expr in n.Elements.Skip(1))
-        {
+        if (!n.Elements.Any()) return;
+        foreach (var expr in n.Elements) {
             expr.Accept(this);
-            if (expr.Type == firstType) continue;
+            if (expr.Type.ActualType == n.Type.ActualType) continue;
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(firstType!.ActualType, expr.Type.ActualType); // Type will never be null here
+            throw new TypeException(n, $"Type mismatch, Array type is {n.Type.ActualType}, element type was {expr.Type.ActualType}"); // Type will never be null here
         }
-        n.Type = firstType;
-        n.Type.IsArray = true;
     }
 
     public void Visit(ArrayAccessNode n) {
@@ -188,7 +184,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException($"Type mismatch, expected array index to be of type {TypeVal.Number}, actual type is {n.Index.Type}");
+            throw new TypeException(n, $"Type mismatch, expected array index to be of type {TypeVal.Number}, actual type is {n.Index.Type}");
         }
         // Index is expression node, should we "calculate" the expression if possible to check if
         // index is >= 0 and < ArrSize?
@@ -216,7 +212,7 @@ public class TypeVisitor : IVisitor {
             }
             else {
                 n.Type.ActualType = TypeVal.Error;
-                throw new TypeException(n.Left.Type.ActualType, n.Right.Type.ActualType);
+                throw new TypeException(n, n.Left.Type, n.Right.Type);
             }
         }
     }
@@ -226,16 +222,16 @@ public class TypeVisitor : IVisitor {
         n.Id.Accept(assVisitor);
         n.Expr.Accept(this);
         if (n.Id.Type.ActualType is TypeVal.Analogpin or TypeVal.Digitalpin) {
-            throw new TypeException("Cannot reassign values to pin variables");
+            throw new TypeException(n, "Cannot reassign values to pin variables");
         } if (n.Id.Type.IsConstant) { 
-            throw new TypeException("Cannot reassign values to constant variables");
+            throw new TypeException(n, "Cannot reassign values to constant variables");
         }
         if (n.Id.Type.ActualType == n.Expr.Type.ActualType) {
             n.Type.ActualType = TypeVal.Ok;
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(n.Id.Type.ActualType, n.Expr.Type.ActualType);
+            throw new TypeException(n, n.Id.Type, n.Expr.Type);
         }
     }
 
@@ -256,7 +252,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, TypeVal.String, n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Number}, new Type() {ActualType = TypeVal.String}, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -268,7 +264,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Number}, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -280,7 +276,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Number}, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -292,7 +288,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Number}, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -304,7 +300,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(TypeVal.Number, n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Number}, n.Left.Type, n.Right.Type);
         }
     }
 
@@ -320,7 +316,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException($"Type mismatch, expected value to be of type {TypeVal.Number}, actual type is {n.Left.Type.ActualType}");
+            throw new TypeException(n, $"Type mismatch, expected value to be of type {TypeVal.Number}, actual type is {n.Left.Type.ActualType}");
         }
     }
     
@@ -334,10 +330,10 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException($"Type mismatch, expected condition to be of type {TypeVal.Boolean}, actual type is {n.Condition.Type.ActualType}");
+            throw new TypeException(n, $"Type mismatch, expected condition to be of type {TypeVal.Boolean}, actual type is {n.Condition.Type.ActualType}");
         }
         foreach (var stmtNode in n.Body) {
-            stmtNode.Accept(this); // i sure hope dynamic dispatch works monkaW
+            stmtNode.Accept(this);
         }
         _symbolTable.CloseScope();
     }
@@ -347,12 +343,17 @@ public class TypeVisitor : IVisitor {
         n.Initializer.Accept(this);
         n.Limit.Accept(this);
         n.Update.Accept(this);
-        if (n.Initializer.Type.ActualType == TypeVal.Number && n.Limit.Type.ActualType == TypeVal.Number && n.Update.Type.ActualType == TypeVal.Number) { // If it's a literal, it's number.. If it's vardcl, it's Ok??? 
+        var expectedType = new Type() {ActualType = TypeVal.Number};
+        var initNode = n.Initializer;
+        if (initNode is VarDclNode vn) { // VarDclNodes will have Type OK if they do not have errors - In this case, grab type from the Id
+            initNode = vn.Left;
+        }
+        if (initNode.Type == expectedType && n.Limit.Type == expectedType && n.Update.Type == expectedType) {
             n.Type.ActualType = TypeVal.Ok;
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException($"Type mismatch, expected for-parameters to be of types (Number, Number, Number), actual types are ({n.Initializer.Type.ActualType}, {n.Limit.Type.ActualType}, {n.Update.Type.ActualType})");
+            throw new TypeException(n, $"Type mismatch, expected for-parameters to be of types (Number, Number, Number), actual types are ({n.Initializer.Type.ActualType}, {n.Limit.Type.ActualType}, {n.Update.Type.ActualType})");
         }
         foreach (var stmtNode in n.Body) {
             stmtNode.Accept(this);
@@ -390,23 +391,6 @@ public class TypeVisitor : IVisitor {
 
         n.Type = n.ReturnType;
         _symbolTable.EnterSymbol(n);
-        // bool typeMismatch = false;
-        // RetNode offendingTypeRetNode = null;
-        // foreach (var retNode in n.Stmts.OfType<RetNode>()) { // Doesn't check nested returns
-        //     if (retNode.RetVal.Type.ActualType != n.ReturnType.Type.ActualType) {
-        //         typeMismatch = true;
-        //         offendingTypeRetNode = retNode;
-        //     }
-        // }
-        //
-        // if (!typeMismatch) {
-        //     n.Type = n.ReturnType.Type.ActualType;
-        //     _symbolTable.EnterSymbol(n);
-        // }
-        // else {
-        //     n.Type = TypeVal.Error;
-        //     throw new TypeException($"Type mismatch, expected returns to be of type {n.ReturnType.ActualType}, actual type is {offendingTypeRetNode.Type.ActualType}");
-        // }
     }
 
     public void Visit(FuncExprNode n) {
@@ -421,7 +405,7 @@ public class TypeVisitor : IVisitor {
             param.Accept(this);
             if (param.Type != parameterTypes[i] || param.Type.ActualType == TypeVal.Error) {
                 n.Type.ActualType = TypeVal.Error;
-                throw new TypeException($"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, actual type is {param.Type.ActualType}");
+                throw new TypeException(n, $"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, actual type is {param.Type.ActualType}");
             }
             i++;
         }
@@ -439,15 +423,15 @@ public class TypeVisitor : IVisitor {
             param.Accept(this);
             if (param.Type != parameterTypes[i] || param.Type.ActualType == TypeVal.Error) {
                 n.Type.ActualType = TypeVal.Error;
-                throw new TypeException($"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, actual type is {param.Type.ActualType}");
+                throw new TypeException(n, $"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, actual type is {param.Type.ActualType}");
             }
             i++;
         }
     }
 
     public void Visit(FuncsNode n) {
-        foreach (var funcdcl in n.FuncDcls) {
-            funcdcl.Accept(this);
+        foreach (var funcDcl in n.FuncDcls) {
+            funcDcl.Accept(this);
         }
     }
 
@@ -462,7 +446,7 @@ public class TypeVisitor : IVisitor {
             }
             else {
                 n.Type.ActualType = TypeVal.Error;
-                throw new TypeException($"Type mismatch, expected return value to be of type {n.SurroundingFuncType}, actual type is {n.RetVal.Type}");
+                throw new TypeException(n,$"Type mismatch, expected return value to be of type {n.SurroundingFuncType}, actual type is {n.RetVal.Type}");
             }
         }
     }
@@ -475,7 +459,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException($"Type mismatch, expected condition to be of type {TypeVal.Boolean}, actual type is {n.Condition.Type}");
+            throw new TypeException(n, $"Type mismatch, expected condition to be of type {TypeVal.Boolean}, actual type is {n.Condition.Type}");
         }
         _symbolTable.OpenScope();
         foreach (var node in n.ThenClause) {
@@ -495,7 +479,7 @@ public class TypeVisitor : IVisitor {
         if (n.Condition.Type.ActualType != TypeVal.Boolean)
         {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(TypeVal.Boolean, n.Condition.Type.ActualType);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Boolean}, n.Condition.Type);
         }
         n.Type.ActualType = TypeVal.Ok;
         _symbolTable.OpenScope();
