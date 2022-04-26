@@ -14,6 +14,16 @@ public class SymbolTable : ISymbolTable
     {
         // Push the global scope onto the stack 
         _scopeStack.Push(new Dictionary<string, SymTableEntry>());
+        AddStandardEnvironment();
+    }
+
+    private void EnterSymbol(SymTableEntry symbol) => _scopeStack.Peek().Add(symbol.Name, symbol);
+
+    private void AddStandardEnvironment()
+    {
+        EnterSymbol(StandardEnvironment.High);
+        EnterSymbol(StandardEnvironment.Low);
+        EnterSymbol(StandardEnvironment.DigitalRead);
     }
     
     public void OpenScope()
