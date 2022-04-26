@@ -199,7 +199,7 @@ public class TypeVisitor : IVisitor {
         }
         else {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(n.Left.Type.ActualType, n.Right.Type.ActualType);
+            throw new TypeException(n, n.Left.Type, n.Right.Type);
         }
     }
     
