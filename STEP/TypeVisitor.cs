@@ -211,11 +211,14 @@ public class TypeVisitor : IVisitor {
         int pinVal = (int) ((NumberNode) n.Right).Value;
         switch (n.Left.Type.ActualType) {
             case TypeVal.Analogpin when pinVal is < 0 or > 5:
+                n.Type.ActualType = TypeVal.Error;
                 throw new ArgumentOutOfRangeException(nameof(pinVal), "Analog pins must be in range 0-5");
             case TypeVal.Digitalpin when pinVal is < 0 or > 13:
+                n.Type.ActualType = TypeVal.Error;
                 throw new ArgumentOutOfRangeException(nameof(pinVal), "Digital pins must be in range 0-13");
             default:
                 _pinTable.RegisterPin(n.Left.Type.ActualType, pinVal);
+                n.Type.ActualType = TypeVal.Ok;
                 break;
         }
     }
