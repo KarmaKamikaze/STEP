@@ -116,6 +116,12 @@ public interface ISTEPVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitType([NotNull] STEPParser.TypeContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="STEPParser.paramstype"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitParamstype([NotNull] STEPParser.ParamstypeContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="STEPParser.stmt"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

@@ -204,6 +204,18 @@ public partial class STEPBaseListener : ISTEPListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitType([NotNull] STEPParser.TypeContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.paramstype"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterParamstype([NotNull] STEPParser.ParamstypeContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.paramstype"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitParamstype([NotNull] STEPParser.ParamstypeContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.stmt"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

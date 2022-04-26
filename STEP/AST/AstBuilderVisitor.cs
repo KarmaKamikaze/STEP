@@ -950,7 +950,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         IdNode node = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         node.Id = context.ID().GetText();
         
-        string type = context.type().GetText().ToLower();
+        string type = context.paramstype().GetText().ToLower();
         node.Type.ActualType = type == "number" ? TypeVal.Number :
             type == "string" ? TypeVal.String : TypeVal.Boolean;
         
@@ -977,7 +977,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         IdNode node = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         node.Id = context.ID().GetText();
         
-        string type = context.type().GetText().ToLower();
+        string type = context.paramstype().GetText().ToLower();
         node.Type.ActualType = type == "number" ? TypeVal.Number :
             type == "string" ? TypeVal.String : TypeVal.Boolean;
         
