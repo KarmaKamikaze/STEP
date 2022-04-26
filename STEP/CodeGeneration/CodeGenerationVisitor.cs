@@ -411,20 +411,17 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend(n.ReturnType);
         n.Name.Accept(this);
         EmitAppend("(");
-        // TODO: maybe this can be made prettier in a traditional for-loop!
-        int i = 0;
-        foreach (var param in n.FormalParams)
+        for (int i = 0; i < n.FormalParams.Count; i++)
         {
-            //EmitAppend(param.Value.Item1); // Type 
-            //param.Key.Accept(this); // Id
+            var param = n.FormalParams[i];
+            EmitAppend(param.Type);
+            param.Accept(this);
             if (i < n.FormalParams.Count - 1)
             {
                 EmitAppend(", ");
             }
-            i++;
         }
-        EmitLine(")");
-        
+        EmitLine(") {");
         // Body
         foreach (StmtNode stmt in n.Stmts)
         {
@@ -482,6 +479,7 @@ public class CodeGenerationVisitor : IVisitor
         else {
             EmitAppend("return ");
             n.RetVal.Accept(this);
+            EmitLine(";");
         }
     }
 
@@ -489,6 +487,9 @@ public class CodeGenerationVisitor : IVisitor
     {
         /* if(condition) {
          *   ThenClause
+         * }
+         * else if(condition) {
+         *   ElseIfClause
          * }
          * else {
          *   ElseClause
@@ -502,7 +503,16 @@ public class CodeGenerationVisitor : IVisitor
             stmt.Accept(this);
         }
         EmitLine("}");
-        if (n.ElseClause != null)
+        
+        if (n.ElseIfClauses?.Count > 0)
+        {
+            foreach (var elseIf in n.ElseIfClauses)
+            {
+                elseIf.Accept(this);
+            }
+        }
+        
+        if (n.ElseClause?.Count > 0)
         {
             EmitLine("else {");
             foreach (var stmt in n.ElseClause)
@@ -511,31 +521,6 @@ public class CodeGenerationVisitor : IVisitor
             }
             EmitLine("}");
         }
-        
-        /* if (expr1)
-         *   statements1
-         * else 
-         *   if (expr1)
-         *     statements2
-         *   end if
-         * end if
-         *
-         * if (expr1)
-         *   statements
-         * end if
-         * if (expr2)
-         *   statements
-         * end if
-         *
-         * TODO: Det her er ikke muligt i STEP
-         * if (expr1)
-         *   statements1
-         * else if (expr2)
-         *   statements2
-         * else
-         *   statements3
-         * end if
-         */
     }
 
     public void Visit(VarsNode n)
@@ -574,13 +559,16 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ElseIfNode n)
     {
-        EmitAppend("else if(");
-        n.Condition.Accept(this);
-        EmitLine(") {");
-        foreach(var stmt in n.Body)
+        if (n.Body?.Count > 0)
         {
-            stmt.Accept(this);
+            EmitAppend("else if(");
+            n.Condition.Accept(this);
+            EmitLine(") {");
+            foreach(var stmt in n.Body)
+            {
+                stmt.Accept(this);
+            }
+            EmitLine("}");
         }
-        EmitLine("}");
     }
 }

@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using STEP;
+
 using STEP.AST.Nodes;
 using Xunit;
 
@@ -14,6 +16,68 @@ public class CodeGenerationVisitorTests
 {
     private readonly CodeGenerationVisitor _visitor = new();
 
+    #region FuncDefNode
+    [Fact]
+    public void FuncDefNode_WithMultipleParameters_OutputsCorrectCode()
+    {
+        /* number function x(number a, number b)
+         * end function
+         * 
+         * double x(double a, double b) {
+         * }
+         */
+        
+        // Arrange
+        const string expected = "double x(double a, double b) {\r\n}\r\n";
+        var param1 = new IdNode {Id = "a", Type = new STEP.Type {ActualType = TypeVal.Number}};
+        var param2 = new IdNode {Id = "b", Type = new STEP.Type {ActualType = TypeVal.Number}};
+        var funcId = new IdNode {Id = "x", Type = new STEP.Type {ActualType = TypeVal.Number}};
+        var funcDcl = new FuncDefNode
+        {
+            Name = funcId, 
+            Stmts = new List<StmtNode>(), 
+            FormalParams = new List<IdNode> {param1, param2},
+            ReturnType = new STEP.Type {ActualType = TypeVal.Number}
+        };
+        
+        // Act
+        _visitor.Visit(funcDcl);
+        string actual = _visitor.OutputToString();
+
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+    
+    [Fact]
+    public void FuncDefNode_NoParameters_OutputsCorrectCode()
+    {
+        /* number function x()
+         * end function
+         * 
+         * double x() {
+         * }
+         */
+        
+        // Arrange
+        const string expected = "double x() {\r\n}\r\n";
+        var funcId = new IdNode {Id = "x", Type = new STEP.Type {ActualType = TypeVal.Number}};
+        var funcDcl = new FuncDefNode
+        {
+            Name = funcId, 
+            Stmts = new List<StmtNode>(), 
+            FormalParams = new List<IdNode>(),
+            ReturnType = new STEP.Type {ActualType = TypeVal.Number}
+        };
+
+        // Act
+        _visitor.Visit(funcDcl);
+        string actual = _visitor.OutputToString();
+
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+    #endregion
+    
     #region String concatenation
 
     [Fact]
@@ -50,7 +114,7 @@ public class CodeGenerationVisitorTests
         {
             Left = id,
             Right = concatExpr,
-            Type = new STEP.Type() {ActualType = TypeVal.String}
+            Type = new STEP.Type() { ActualType = TypeVal.String, IsConstant = false}
         };
         // Act
         _visitor.Visit(varDcl);
@@ -188,6 +252,212 @@ public class CodeGenerationVisitorTests
 
     #endregion
 
+
+ 
+    #region IfNode, ElseIfNode
+    [Fact]
+    public void IfNode_OnlyThenClause_OutputsOnlyThenClause()
+    {
+        /* if(true)
+         * end if
+         *
+         * if(true) {
+         * }
+         */
+        
+        // Arrange
+        const string expected = "if(true) {\r\n}\r\n";
+        var condition = new BoolNode {Value = true, Type = new STEP.Type {ActualType = TypeVal.Boolean}};
+        var ifStmt = new IfNode {Condition = condition, ThenClause = new List<StmtNode>()};
+
+        // Act
+        _visitor.Visit(ifStmt);
+        string actual = _visitor.OutputToString();
+
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+    
+    
+      
+    [Fact]
+    public void IfNode_ThenAndElseClause_OutputsBothClauses()
+    {
+        /* if(true)
+         *   return a
+         * else
+         *   return b
+         * end if
+         *
+         * if(true) {
+         *   return a;
+         * }
+         * else {
+         *   return b;
+         * }
+         */
+        
+        // Arrange
+        const string expected = "if(true) {\r\nreturn a;\r\n}\r\nelse {\r\nreturn b;\r\n}\r\n";
+        var condition = new BoolNode {Value = true, Type = new STEP.Type {ActualType = TypeVal.Boolean}};
+        var a = new IdNode {Id = "a"};
+        var retStmt1 = new RetNode {RetVal = a};
+        var b = new IdNode {Id = "b"};
+        var retStmt2 = new RetNode {RetVal = b};
+        var ifStmt = new IfNode
+        {
+            Condition = condition, 
+            ThenClause = new List<StmtNode> {retStmt1},
+            ElseClause = new List<StmtNode> {retStmt2}
+        };
+
+        // Act
+        _visitor.Visit(ifStmt);
+        string actual = _visitor.OutputToString();
+
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+    
+    [Fact]
+    public void IfNode_ThenAndTwoElseIfClauses_OutputsAllThreeClauses()
+    {
+        /* if(x)
+         *   return x
+         * else if(y)
+         *   return y
+         * else if(z)
+         *   return z
+         * end if
+         *
+         * if(x) {
+         *   return x;
+         * }
+         * else if(y) {
+         *   return y;
+         * }
+         * else if(z) {
+         *   return z;
+         * }
+         */
+        
+        // Arrange
+        const string expected = "if(x) {\r\nreturn x;\r\n}\r\nelse if(y) {\r\nreturn y;\r\n}\r\nelse if(z) {\r\nreturn z;\r\n}\r\n";
+        var x = new IdNode {Id = "x"};
+        var retx = new RetNode {RetVal = x};
+        var y = new IdNode {Id = "y"};
+        var rety = new RetNode {RetVal = y};
+        var elseIf1 = new ElseIfNode {Condition = y, Body = new List<StmtNode> {rety}};
+        var z = new IdNode {Id = "z"};
+        var retz = new RetNode {RetVal = z};
+        var elseIf2 = new ElseIfNode {Condition = z, Body = new List<StmtNode> {retz}};
+        var ifStmt = new IfNode
+        {
+            Condition = x, 
+            ThenClause = new List<StmtNode> {retx},
+            ElseIfClauses = new List<ElseIfNode> {elseIf1, elseIf2}
+        };
+
+        // Act
+        _visitor.Visit(ifStmt);
+        string actual = _visitor.OutputToString();
+
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+    
+    [Fact]
+    public void IfNode_HasAllClauses_OutputsAllClauses()
+    {
+        /* if(x)
+         *   return x
+         * else if(y)
+         *   return y
+         * else if(z)
+         *   return z
+         * else
+         *   return q
+         * end if
+         *
+         * if(x) {
+         *   return x;
+         * }
+         * else if(y) {
+         *   return y;
+         * }
+         * else if(z) {
+         *   return z;
+         * }
+         * else {
+         *   return q;
+         * }
+         */
+        
+        // Arrange
+        const string expected = "if(x) {\r\nreturn x;\r\n}\r\nelse if(y) {\r\nreturn y;\r\n}\r\nelse if(z) {\r\nreturn z;\r\n}\r\nelse {\r\nreturn q;\r\n}\r\n";
+        var x = new IdNode {Id = "x"};
+        var retx = new RetNode {RetVal = x};
+        var y = new IdNode {Id = "y"};
+        var rety = new RetNode {RetVal = y};
+        var elseIf1 = new ElseIfNode {Condition = y, Body = new List<StmtNode> {rety}};
+        var z = new IdNode {Id = "z"};
+        var retz = new RetNode {RetVal = z};
+        var elseIf2 = new ElseIfNode {Condition = z, Body = new List<StmtNode> {retz}};
+        var q = new IdNode {Id = "q"};
+        var retq = new RetNode {RetVal = q};
+        var ifStmt = new IfNode
+        {
+            Condition = x, 
+            ThenClause = new List<StmtNode> {retx},
+            ElseIfClauses = new List<ElseIfNode> {elseIf1, elseIf2},
+            ElseClause = new List<StmtNode> {retq}
+        };
+
+        // Act
+        _visitor.Visit(ifStmt);
+        string actual = _visitor.OutputToString();
+
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+    
+  [Fact]
+    public void IfNode_EmptyElseIfClause_ShouldNotGenerateCode()
+    {
+        // This is kind of an optimization - if a clause is empty, there is no point in generating code for it.
+        /* if(x)
+         *   return x
+         * else if(y)
+         * end if
+         *
+         * if(x) {
+         *   return x;
+         * }
+         */
+        
+        // Arrange
+        const string expected = "if(x) {\r\nreturn x;\r\n}\r\n";
+        var x = new IdNode {Id = "x"};
+        var retx = new RetNode {RetVal = x};
+        var y = new IdNode {Id = "y"};
+        var elseIf1 = new ElseIfNode {Condition = y, Body = new List<StmtNode>()};
+        var ifStmt = new IfNode
+        {
+            Condition = x, 
+            ThenClause = new List<StmtNode> {retx},
+            ElseIfClauses = new List<ElseIfNode> {elseIf1},
+        };
+
+        // Act
+        _visitor.Visit(ifStmt);
+        string actual = _visitor.OutputToString();
+
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+  
+    #endregion
+    
     #region ForNode
 
     [Fact]
@@ -211,8 +481,8 @@ public class CodeGenerationVisitorTests
         //Assert
         Assert.Equal(expected, actual);
     }
-    
-    [Fact]
+
+  [Fact]
     public void ForNodeIdAssNodeInitializerIsCreatedCorrectly()
     {
         //Arrange
@@ -276,7 +546,7 @@ public class CodeGenerationVisitorTests
         //Assert
         Assert.Equal(expected, actual);
     }
-    
+  
     [Fact]
     public void ForNodeArrAccInitializerIsCreatedCorrectly()
     {
@@ -299,7 +569,7 @@ public class CodeGenerationVisitorTests
         //Assert
         Assert.Equal(expected, actual);
     }
-    
+  
     [Fact]
     public void ForNodeBodyIsCreatedCorrectly()
     {
@@ -320,10 +590,8 @@ public class CodeGenerationVisitorTests
         //Assert
         Assert.Equal(expected, actual);
     }
-    
-    
+
     #endregion
-    
 }
 
 
