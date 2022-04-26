@@ -12,6 +12,7 @@ public class VarDclNode : StmtNode
     {
         if (obj is VarDclNode other)
         {
+
             return Equals(other.Left, Left)
                    && Equals(other.Right, Right);
         }

@@ -13,5 +13,12 @@ public class CodeGenerationVisitorTests
     private readonly CodeGenerationVisitor _visitor = new();
 
 
+    [Fact]
+    public void ForNodeInitializerIsCreatedCorrectly()
+    {
+        const string expected = "for()";
+
+    }
+    
 }
 
