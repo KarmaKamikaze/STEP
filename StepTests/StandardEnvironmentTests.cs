@@ -94,4 +94,46 @@ public class StandardEnvironmentTests
         // Assert
         Assert.Throws<TypeException>(test);
     }
+
+    [Fact]
+    public void DigitalWrite_ValidParameters_ThrowsNoException()
+    {
+        /*
+         * blank function x()
+         *   input digitalpin p = 1
+         *   digitalWrite(p, LOW)
+         * end function
+         */
+
+        // Arrange
+        var digitalWrite = new FuncStmtNode
+        {
+            Id = new IdNode { Id = "digitalWrite" },
+            Params = new List<ExprNode> { new IdNode { Id = "p" }, new IdNode { Id = "LOW" } }
+        };
+        var pinDcl = new PinDclNode
+        {
+            Left = new IdNode
+            {
+                Id = "p",
+                Type = new PinType
+                {
+                    ActualType = TypeVal.Digitalpin,
+                    IsConstant = true,
+                    Mode = PinMode.INPUT
+                }
+            },
+            Right = new NumberNode { Value = 1 }
+        };
+        var funcDcl = new FuncDefNode
+        {
+            Name = new IdNode { Id = "x" },
+            Stmts = new List<StmtNode> { pinDcl, digitalWrite },
+            FormalParams = new List<IdNode>(),
+            ReturnType = new Type { ActualType = TypeVal.Blank }
+        };
+
+        // Act, assert
+        _typeVisitor.Visit(funcDcl);
+    }
 }

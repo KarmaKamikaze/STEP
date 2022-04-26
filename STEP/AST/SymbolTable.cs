@@ -24,6 +24,7 @@ public class SymbolTable : ISymbolTable
         EnterSymbol(StandardEnvironment.High);
         EnterSymbol(StandardEnvironment.Low);
         EnterSymbol(StandardEnvironment.DigitalRead);
+        EnterSymbol(StandardEnvironment.DigitalWrite);
     }
     
     public void OpenScope()
