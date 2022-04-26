@@ -56,17 +56,22 @@ grammar STEP;
         ;
         
   params_content 
-        : type brackets? ID params_multi*
+        : paramstype brackets? ID params_multi*
         ;
         
   params_multi 
-        : COMMA type brackets? ID
+        : COMMA paramstype brackets? ID
         ;
-        
+  
   type 
         : NUMBER 
         | STRING 
         | BOOLEAN
+        ;
+        
+  paramstype
+        : pintype
+        | type
         ;
   
   // Statements
@@ -257,8 +262,17 @@ grammar STEP;
         ;
         
   pindcl
-        : ANALOGPIN ID ASSIGN INTLITERAL
-        | DIGITALPIN ID ASSIGN INTLITERAL
+        : pinmode pintype ID ASSIGN INTLITERAL
+        ;
+        
+  pinmode
+        : INPUT
+        | OUTPUT
+        ;
+        
+  pintype
+        : ANALOGPIN
+        | DIGITALPIN
         ;
   
   arrdcl 
@@ -353,4 +367,6 @@ grammar STEP;
   AND                           : 'and';
   OR                            : 'or';
   CONSTANT                      : 'constant';
+  INPUT                         : 'input';
+  OUTPUT                        : 'output';
   ID                            : LETTER ID_BODY*;

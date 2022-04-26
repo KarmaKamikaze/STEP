@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Reflection;
 using System.Text;
 using STEP.AST.Nodes;
 
@@ -7,7 +8,13 @@ namespace STEP.CodeGeneration;
 public class CodeGenerationVisitor : IVisitor
 {
     private readonly StringBuilder _stringBuilder = new();
-    public string Output => _stringBuilder.ToString();
+    private string Output => _stringBuilder.ToString();
+    
+    public void OutputToBaseFile()
+    {
+        string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        File.WriteAllText(directoryPath + "/compiled.c", Output);
+    }
     
     private void EmitLine(string line)
     {
