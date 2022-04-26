@@ -162,8 +162,9 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ArrLiteralNode n)
     {
-        EmitAppend("{");
         int count = n.Elements.Count;
+        if (count == 0) return;
+        EmitAppend("{");
         for (int i = 0; i < count; i++)
         {
             n.Elements[i].Accept(this);

@@ -280,11 +280,13 @@ public class AstPrintVisitor : IVisitor
     public void Visit(ArrLiteralNode n)
     {
         Print("[");
-        n.Elements[0].Accept(this);
-        for(int i = 1; i<n.Elements.Count; i++)
-        {
-            Print(", ");
-            n.Elements[i].Accept(this);                
+        if (n.Elements.Any()) {
+            n.Elements[0].Accept(this);
+            for(int i = 1; i<n.Elements.Count; i++)
+            {
+                Print(", ");
+                n.Elements[i].Accept(this);                
+            }
         }
         Print("]");
     }

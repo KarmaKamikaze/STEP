@@ -276,10 +276,12 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
         
         ArrLiteralNode node = (ArrLiteralNode) NodeFactory.MakeNode(AstNodeType.ArrayLiteralNode);
-        NodesList nodesList = ((NodesList)children.First(child => child is NodesList));
-        foreach(AstNode astNode in nodesList.Nodes)
-        {
-            node.Elements.Add((ExprNode) astNode);
+        NodesList nodesList = (NodesList)children.FirstOrDefault(child => child is NodesList);
+        if (nodesList is not null) {
+            foreach(AstNode astNode in nodesList.Nodes)
+            {
+                node.Elements.Add((ExprNode) astNode);
+            }
         }
         return node;
     }

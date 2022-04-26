@@ -4,13 +4,13 @@ constant number inch_per_cm = 0.3937 # this is a constant value
 end variables
 
 setup
+    number[7] a = []
     print("Centimeter to inch converter\n")
     print("  CM  |  INCH  \n")
     repeat for(number i = 1 to 100, change by 1) # 100 steps, 1 to 100
         printLine(i + "     " + cmToInch(i))
     end for
-
-        a[2 + 5] = a[3 - 2 - 1]
+    a[2 + 4] = a[3 - 2 - 1]
 end setup
 
 ##  this is a multiline comment
@@ -19,6 +19,12 @@ end setup
 functions
     number function cmToInch(number cm)
         return cm * inch_per_cm
+    end function
+    blank function printLine(string s)
+        return
+    end function
+    blank function print(string s)
+        return
     end function
 end functions
 
