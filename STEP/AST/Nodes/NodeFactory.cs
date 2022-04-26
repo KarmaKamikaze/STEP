@@ -58,6 +58,8 @@ public static class NodeFactory
                 return new ArrDclNode() {NodeType = AstNodeType.ArrDclNode};
             case AstNodeType.VarDclNode:
                 return new VarDclNode() {NodeType = AstNodeType.VarDclNode};
+            case AstNodeType.PinDclNode:
+                return new PinDclNode() {NodeType = AstNodeType.PinDclNode};
             case AstNodeType.VarsNode:
                 return new VarsNode() {NodeType = AstNodeType.VarsNode};
             // Statements

@@ -9,7 +9,8 @@ public class CodeGenerationVisitor : IVisitor
 {
     private readonly StringBuilder _stringBuilder = new();
     private string Output => _stringBuilder.ToString();
-    
+    private readonly StringBuilder _pinSetup = new();
+
     public void OutputToBaseFile()
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -125,7 +126,7 @@ public class CodeGenerationVisitor : IVisitor
         n.Left.Accept(this);
     }
 
-    public void Visit(NumberNode n)
+    public virtual void Visit(NumberNode n)
     {
         EmitAppend(n.Value.ToString(CultureInfo.InvariantCulture));
     }
@@ -161,8 +162,9 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ArrLiteralNode n)
     {
-        EmitAppend("{");
         int count = n.Elements.Count;
+        if (count == 0) return;
+        EmitAppend("{");
         for (int i = 0; i < count; i++)
         {
             n.Elements[i].Accept(this);
@@ -542,6 +544,10 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(SetupNode n)
     {
         EmitLine("void setup() {");
+        // Add declared pinModes from variables scope
+        if (_pinSetup.ToString() != String.Empty)
+            EmitLine(_pinSetup.ToString());
+        
         foreach(var stmt in n.Stmts) {
             stmt.Accept(this);
         }
@@ -570,5 +576,27 @@ public class CodeGenerationVisitor : IVisitor
             }
             EmitLine("}");
         }
+    }
+
+    public void Visit(PinDclNode n)
+    {
+        PinCodeVisitor pinVisitor = new PinCodeVisitor();
+        /* The emitted code will be stored in a temporary variable. If any pins are declared, we know
+         * it must be declared in the variables scope, which is always visited first. Once the code generation
+         * reaches the Setup scope, the temporary variables will be used to insert this code in the correct place.
+         */
+        _pinSetup.Append("pinMode(");
+        n.Left.Accept(pinVisitor);
+        _pinSetup.Append(pinVisitor.GetPinCode());
+        switch (((PinType)n.Type).Mode)
+        {
+            case PinMode.INPUT:
+                _pinSetup.Append("INPUT");
+                break;
+            case PinMode.OUTPUT:
+                _pinSetup.Append("OUTPUT");
+                break;
+        }
+        _pinSetup.Append(");\n");
     }
 }
