@@ -198,32 +198,30 @@ public class TypeVisitor : IVisitor {
         DclVisitor dclVisitor = new DclVisitor(_symbolTable);
         n.Left.Accept(dclVisitor);
         n.Right.Accept(this);
-        if (n.Left.Type.ActualType is TypeVal.Analogpin or TypeVal.Digitalpin) { // Should this be a separate method or PinVisitor?
-            int pinVal = (int) ((NumberNode) n.Right).Value;
-            switch (n.Left.Type.ActualType) {
-                case TypeVal.Analogpin when pinVal is < 0 or > 5:
-                    throw new ArgumentOutOfRangeException(nameof(pinVal), "Analog pins must be in range 0-5");
-                case TypeVal.Digitalpin when pinVal is < 0 or > 13:
-                    throw new ArgumentOutOfRangeException(nameof(pinVal), "Digital pins must be in range 0-13");
-                default:
-                    _pinTable.RegisterPin(n.Left.Type.ActualType, pinVal);
-                    break;
-            }
+        if (n.Left.Type == n.Right.Type) {
+            n.Type.ActualType = TypeVal.Ok;
         }
         else {
-            if (n.Left.Type == n.Right.Type) {
-                n.Type.ActualType = TypeVal.Ok;
-            }
-            else {
-                n.Type.ActualType = TypeVal.Error;
-                throw new TypeException(n.Left.Type.ActualType, n.Right.Type.ActualType);
-            }
+            n.Type.ActualType = TypeVal.Error;
+            throw new TypeException(n.Left.Type.ActualType, n.Right.Type.ActualType);
         }
     }
-
+    
     public void Visit(PinDclNode n)
     {
-        throw new NotImplementedException();
+        DclVisitor dclVisitor = new DclVisitor(_symbolTable);
+        n.Left.Accept(dclVisitor);
+        n.Right.Accept(this);
+        int pinVal = (int) ((NumberNode) n.Right).Value;
+        switch (n.Left.Type.ActualType) {
+            case TypeVal.Analogpin when pinVal is < 0 or > 5:
+                throw new ArgumentOutOfRangeException(nameof(pinVal), "Analog pins must be in range 0-5");
+            case TypeVal.Digitalpin when pinVal is < 0 or > 13:
+                throw new ArgumentOutOfRangeException(nameof(pinVal), "Digital pins must be in range 0-13");
+            default:
+                _pinTable.RegisterPin(n.Left.Type.ActualType, pinVal);
+                break;
+        }
     }
 
     public void Visit(AssNode n) { // Add constant check, needs to be in ST (i think)

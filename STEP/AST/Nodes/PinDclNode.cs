@@ -3,7 +3,9 @@
 public class PinDclNode : VarDclNode
 {
     public PinType PinType { get; set; }
-    
+    public override void Accept(IVisitor v) {
+        v.Visit(this);
+    }
     public override bool Equals(object obj)
     {
         if (obj is PinDclNode other) {
