@@ -981,6 +981,7 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var arrLiteralNode = new ArrLiteralNode() {
+            Type = new Type() {ActualType = type, IsArray = true},
             Elements = new List<ExprNode>() {
                 new IdNode(){Id = "a"},
                 new IdNode(){Id = "b"}
@@ -1138,14 +1139,11 @@ public class TypeCheckerTests {
     public void ArrDclNode_ExprHasError_ThrowsTypeException(TypeVal type)
     {
         //Arrange
-        var symbol1 = new SymTableEntry() {Type = new Type(){ActualType = type, IsArray = true}};
-        var symbol2 = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Error, IsArray = true}};
-        _symbolTableMock.Setup(x => x.RetrieveSymbol("left"))
-            .Returns(symbol1);
+        var symbol = new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Error, IsArray = true}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
-            .Returns(symbol2);
+            .Returns(symbol);
         var arrDclNode = new ArrDclNode {
-            Left = new IdNode() {Id = "left"},
+            Left = new IdNode() {Id = "left", Type = new Type(){ActualType = type, IsArray = true}},
             Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}}
         };
 
@@ -1264,13 +1262,13 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(TypeVal.Analogpin)]
     [InlineData(TypeVal.Digitalpin)]
-    public void VarDclNode_PinAlreadyDeclared_ThrowsDuplicateDeclarationException(TypeVal type) { 
+    public void PinDclNode_PinAlreadyDeclared_ThrowsDuplicateDeclarationException(TypeVal type) { 
     // Arrange
-    var pinDclNode1 = new VarDclNode() {
+    var pinDclNode1 = new PinDclNode() {
         Left = new IdNode() {Id = "a", Type = new Type() {ActualType = type}},
         Right = new NumberNode() {Value = 5}
     };
-    var pinDclNode2 = new VarDclNode() {
+    var pinDclNode2 = new PinDclNode() {
         Left = new IdNode() {Id = "b", Type = new Type() {ActualType = type}},
         Right = new NumberNode() {Value = 5}
     };
@@ -1291,13 +1289,13 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(TypeVal.Analogpin)]
     [InlineData(TypeVal.Digitalpin)]
-    public void VarDclNode_PinNotDeclared_DoesNotThrowException(TypeVal type) {
+    public void PinDclNode_PinNotDeclared_DoesNotThrowException(TypeVal type) {
         // Arrange
-        var pinDclNode1 = new VarDclNode() {
+        var pinDclNode1 = new PinDclNode() {
             Left = new IdNode() {Id = "a", Type = new Type() {ActualType = type}},
             Right = new NumberNode() {Value = 4}
         };
-        var pinDclNode2 = new VarDclNode() {
+        var pinDclNode2 = new PinDclNode() {
             Left = new IdNode() {Id = "b", Type = new Type() {ActualType = type}},
             Right = new NumberNode() {Value = 5}
         };
@@ -1320,9 +1318,9 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(-1)]
     [InlineData(6)]
-    public void VarDclNode_AnalogPinOutOfRange(int pinVal) {
+    public void PinDclNode_AnalogPinOutOfRange(int pinVal) {
         // Arrange
-        var pinDclNode = new VarDclNode() {
+        var pinDclNode = new PinDclNode() {
             Left = new IdNode() {Id = "a", Type = new Type() {ActualType = TypeVal.Analogpin}},
             Right = new NumberNode() {Value = pinVal}
         };
@@ -1337,9 +1335,9 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(-1)]
     [InlineData(14)]
-    public void VarDclNode_DigitalPinOutOfRange(int pinVal) {
+    public void PinDclNode_DigitalPinOutOfRange(int pinVal) {
         // Arrange
-        var pinDclNode = new VarDclNode() {
+        var pinDclNode = new PinDclNode() {
             Left = new IdNode() {Id = "a", Type = new Type() {ActualType = TypeVal.Digitalpin}},
             Right = new NumberNode() {Value = pinVal}
         };

@@ -13,7 +13,8 @@ public class IdNode : ExprNode
         if (obj is IdNode other)
         {
             return Equals(other.Id, Id)
-                && Equals(other.AttributesRef, AttributesRef);
+                && Equals(other.AttributesRef, AttributesRef)
+                && Equals(other.Type, Type);
         }
         return false;
     }
