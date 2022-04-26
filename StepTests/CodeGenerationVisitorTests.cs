@@ -46,10 +46,9 @@ public class CodeGenerationVisitorTests
         var id = new IdNode() { Id = "x", Type = new STEP.Type() { ActualType = TypeVal.String } };
         var varDcl = new VarDclNode()
         {
-            IsConstant = false,
             Left = id,
             Right = concatExpr,
-            Type = new STEP.Type() { ActualType = TypeVal.String }
+            Type = new STEP.Type() { ActualType = TypeVal.String, IsConstant = false}
         };
 
         // Act

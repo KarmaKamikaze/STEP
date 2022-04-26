@@ -344,10 +344,6 @@ public class TypeVisitor : IVisitor {
 
     public void Visit(ForNode n) {
         _symbolTable.OpenScope();
-        foreach (var stmtNode in n.Body) {
-            stmtNode.Accept(this);
-        }
-
         n.Initializer.Accept(this);
         n.Limit.Accept(this);
         n.Update.Accept(this);
@@ -357,6 +353,9 @@ public class TypeVisitor : IVisitor {
         else {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException($"Type mismatch, expected for-parameters to be of types (Number, Number, Number), actual types are ({n.Initializer.Type.ActualType}, {n.Limit.Type.ActualType}, {n.Update.Type.ActualType})");
+        }
+        foreach (var stmtNode in n.Body) {
+            stmtNode.Accept(this);
         }
         _symbolTable.CloseScope();
     }
