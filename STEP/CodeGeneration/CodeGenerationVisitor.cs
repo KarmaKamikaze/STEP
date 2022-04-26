@@ -15,6 +15,11 @@ public class CodeGenerationVisitor : IVisitor
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         File.WriteAllText(directoryPath + "/compiled.c", Output);
     }
+
+    public string OutputToString()
+    {
+        return Output;
+    }
     
     private void EmitLine(string line)
     {
@@ -128,12 +133,12 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(StringNode n)
     {
-        EmitAppend(n.Value);
+        EmitAppend("\"" + n.Value + "\"");
     }
 
     public void Visit(BoolNode n)
     {
-        EmitAppend(n.Value.ToString());
+        EmitAppend(n.Value.ToString().ToLowerInvariant());
     }
 
     public void Visit(ArrDclNode n)
@@ -197,27 +202,30 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(PlusNode n)
     {
-        // TODO: String concatenation, maybe use strcat(str1, str2) in C
-        if (n.Type.ActualType is TypeVal.String)
+        // If the overall expression has type string, we must convert any non-string children to strings
+        if (n.Type.ActualType is TypeVal.String && n.Left.Type.ActualType != TypeVal.String)
         {
-            if (n.Left.Type.ActualType is TypeVal.String && n.Right.Type.ActualType is not TypeVal.String)
-            {
-                // Convert right to string
-                // Use Arduino's built in String() class
-                EmitAppend("String(");
-                n.Right.Accept(this);
-                EmitAppend(")");
-            }
-            else if (n.Left.Type.ActualType is not TypeVal.String)
-            {
-                // Convert left to string
-            }
+            // String(left) + right
+            EmitAppend("String(");
+            n.Left.Accept(this);
+            EmitAppend(") + ");
+            n.Right.Accept(this);
         }
-        
-        // expr1 + expr2
-        n.Left.Accept(this);
-        EmitAppend(" + ");
-        n.Right.Accept(this);
+        else if (n.Type.ActualType is TypeVal.String && n.Right.Type.ActualType != TypeVal.String)
+        {
+            // left + String(right)
+            n.Left.Accept(this);
+            EmitAppend(" + String(");
+            n.Right.Accept(this);
+            EmitAppend(")");
+        }
+        else
+        {
+            // left + right
+            n.Left.Accept(this);
+            EmitAppend(" + ");
+            n.Right.Accept(this);
+        }
     }
 
     public void Visit(MinusNode n)
