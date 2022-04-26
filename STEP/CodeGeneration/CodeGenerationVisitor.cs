@@ -460,6 +460,10 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(SetupNode n)
     {
         EmitLine("void setup() {");
+        // Add declared pinModes from variables scope
+        if (_optionalPinMode != String.Empty)
+            EmitLine(_optionalPinMode);
+        
         foreach(var stmt in n.Stmts) {
             stmt.Accept(this);
         }
@@ -491,10 +495,6 @@ public class CodeGenerationVisitor : IVisitor
     {
         StringBuilder sb = new StringBuilder();
         PinCodeVisitor pinVisitor = new PinCodeVisitor();
-        /* The emitted code will be stored in a temporary variable. If any pins are declared, we know
-         * it must be declared in the variables scope, which is always visited first. Once the code generation
-         * reaches the Setup scope, the temporary variables will be used to insert this code in the correct place.
-         */
         sb.Append("pinMode(");
         n.Left.Accept(pinVisitor);
         sb.Append(pinVisitor.GetPinCode());
@@ -508,6 +508,10 @@ public class CodeGenerationVisitor : IVisitor
                 break;
         }
         sb.Append(");");
+        /* The emitted code will be stored in a temporary variable. If any pins are declared, we know
+         * it must be declared in the variables scope, which is always visited first. Once the code generation
+         * reaches the Setup scope, the temporary variables will be used to insert this code in the correct place.
+         */
         _optionalPinMode = sb.ToString();
     }
 }
