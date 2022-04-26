@@ -9,7 +9,7 @@ public class CodeGenerationVisitor : IVisitor
 {
     private readonly StringBuilder _stringBuilder = new();
     private string Output => _stringBuilder.ToString();
-    private StringBuilder _optionalPinMode = new();
+    private readonly StringBuilder _pinSetup = new();
 
     public void OutputToBaseFile()
     {
@@ -460,8 +460,8 @@ public class CodeGenerationVisitor : IVisitor
     {
         EmitLine("void setup() {");
         // Add declared pinModes from variables scope
-        if (_optionalPinMode.ToString() != String.Empty)
-            EmitLine(_optionalPinMode.ToString());
+        if (_pinSetup.ToString() != String.Empty)
+            EmitLine(_pinSetup.ToString());
         
         foreach(var stmt in n.Stmts) {
             stmt.Accept(this);
@@ -497,18 +497,18 @@ public class CodeGenerationVisitor : IVisitor
          * it must be declared in the variables scope, which is always visited first. Once the code generation
          * reaches the Setup scope, the temporary variables will be used to insert this code in the correct place.
          */
-        _optionalPinMode.Append("pinMode(");
+        _pinSetup.Append("pinMode(");
         n.Left.Accept(pinVisitor);
-        _optionalPinMode.Append(pinVisitor.GetPinCode());
+        _pinSetup.Append(pinVisitor.GetPinCode());
         switch (n.PinType.Mode)
         {
             case PinMode.INPUT:
-                _optionalPinMode.Append("INPUT");
+                _pinSetup.Append("INPUT");
                 break;
             case PinMode.OUTPUT:
-                _optionalPinMode.Append("OUTPUT");
+                _pinSetup.Append("OUTPUT");
                 break;
         }
-        _optionalPinMode.Append(");\n");
+        _pinSetup.Append(");\n");
     }
 }
