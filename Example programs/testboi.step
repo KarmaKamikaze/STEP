@@ -1,3 +1,8 @@
+variables
+input analogpin pin1 = 1
+output digitalpin pin2 = 2
+end variables
+
 loop
 number[2] thisIsCursed = [1, 2, 3]
 end loop

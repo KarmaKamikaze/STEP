@@ -100,9 +100,9 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         return node;
     }
 
-    public override VarDclNode VisitPindcl([NotNull] STEPParser.PindclContext context)
+    public override PinDclNode VisitPindcl([NotNull] STEPParser.PindclContext context)
     {
-        VarDclNode node = (VarDclNode) NodeFactory.MakeNode(AstNodeType.VarDclNode);
+        PinDclNode node = (PinDclNode) NodeFactory.MakeNode(AstNodeType.PinDclNode);
         
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Id = context.ID().GetText();
@@ -116,12 +116,13 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
 
         if (context.pinmode().INPUT() != null) {
-            ((PinType) idNode.Type).Mode = PinMode.INPUT;
+            node.Type = new PinType() {Mode = PinMode.INPUT};
         }
-        else {
-            ((PinType) idNode.Type).Mode = PinMode.OUTPUT;
+        else
+        {
+            node.Type = new PinType() {Mode = PinMode.OUTPUT};
         }
-        
+
         node.Left = idNode;
         
         NumberNode numNode = (NumberNode) NodeFactory.MakeNode(AstNodeType.NumberNode);
@@ -276,10 +277,12 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
         
         ArrLiteralNode node = (ArrLiteralNode) NodeFactory.MakeNode(AstNodeType.ArrayLiteralNode);
-        NodesList nodesList = ((NodesList)children.First(child => child is NodesList));
-        foreach(AstNode astNode in nodesList.Nodes)
-        {
-            node.Elements.Add((ExprNode) astNode);
+        NodesList nodesList = (NodesList)children.FirstOrDefault(child => child is NodesList);
+        if (nodesList is not null) {
+            foreach(AstNode astNode in nodesList.Nodes)
+            {
+                node.Elements.Add((ExprNode) astNode);
+            }
         }
         return node;
     }

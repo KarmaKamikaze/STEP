@@ -97,6 +97,19 @@ public class AstPrintVisitor : IVisitor
         }
     }
 
+    public void Visit(PinDclNode node)
+    {
+        if (node != null)
+        {
+            Indent();
+            Print(((PinType)node.Type).Mode.ToString().ToLower() + " ");
+            Print(node.Left.Type.ActualType.ToString().ToLower() + " "); // Print Id node's type (analogpin or digitalpin)
+            node.Left.Accept(this);
+            Print(" = ");
+            node.Right.Accept(this);
+        }
+    }
+
     public void Visit(LoopNode node)
     {
         if (node != null)
@@ -267,11 +280,13 @@ public class AstPrintVisitor : IVisitor
     public void Visit(ArrLiteralNode n)
     {
         Print("[");
-        n.Elements[0].Accept(this);
-        for(int i = 1; i<n.Elements.Count; i++)
-        {
-            Print(", ");
-            n.Elements[i].Accept(this);                
+        if (n.Elements.Any()) {
+            n.Elements[0].Accept(this);
+            for(int i = 1; i<n.Elements.Count; i++)
+            {
+                Print(", ");
+                n.Elements[i].Accept(this);                
+            }
         }
         Print("]");
     }

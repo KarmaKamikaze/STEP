@@ -29,6 +29,7 @@ public enum AstNodeType
     // Variable Declarations
     ArrDclNode,
     VarDclNode,
+    PinDclNode,
     VarsNode,
     // Statements
     AssNode,
