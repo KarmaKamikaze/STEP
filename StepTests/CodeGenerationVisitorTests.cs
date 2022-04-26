@@ -187,6 +187,143 @@ public class CodeGenerationVisitorTests
     }
 
     #endregion
+
+    #region ForNode
+
+    [Fact]
+    public void ForNodeVarDclInitializerIsCreatedCorrectly()
+    {
+        //Arrange
+        const string expected = "for(double i = 0; i <= 10; i = i + 1) {\r\n}\r\n";
+        IdNode idNode = new IdNode() { Id = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
+        NumberNode exprNode = new NumberNode() { Value = 0, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        VarDclNode varInit = new VarDclNode() { Left = idNode, Right = exprNode, Type = new STEP.Type() { ActualType = TypeVal.Number}};
+        
+        NumberNode limitNode = new NumberNode() { Value = 10, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        NumberNode updateNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+
+        ForNode forNode = new ForNode() { Initializer = varInit, Limit = limitNode, Update = updateNode};
+        
+        //Act
+        _visitor.Visit(forNode);
+        string actual = _visitor.OutputToString();
+        
+        //Assert
+        Assert.Equal(expected, actual);
+    }
+    
+    [Fact]
+    public void ForNodeIdAssNodeInitializerIsCreatedCorrectly()
+    {
+        //Arrange
+        const string expected = "for(i = 0; i <= 10; i = i + 1) {\r\n}\r\n";
+        IdNode idNode = new IdNode() { Id = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
+        NumberNode exprNode = new NumberNode() { Value = 0, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        AssNode assInit = new AssNode() { Id = idNode, Expr = exprNode };
+        
+        NumberNode limitNode = new NumberNode() { Value = 10, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        NumberNode updateNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+
+        ForNode forNode = new ForNode() { Initializer = assInit, Limit = limitNode, Update = updateNode};
+        
+        //Act
+        _visitor.Visit(forNode);
+        string actual = _visitor.OutputToString();
+        
+        //Assert
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void ForNodeArrAccAssNodeInitializerIsCreatedCorrectly()
+    {
+        //Arrange
+        const string expected = "for(i[1] = 0; i[1] <= 10; i[1] = i[1] + 1) {\r\n}\r\n";
+        IdNode idNode = new IdNode() { Id = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
+        NumberNode exprNode = new NumberNode() { Value = 0, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        NumberNode indexNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+
+        AssNode assInit = new AssNode() { Id = idNode, Expr = exprNode, ArrIndex = indexNode};
+        
+        NumberNode limitNode = new NumberNode() { Value = 10, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        NumberNode updateNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+
+        ForNode forNode = new ForNode() { Initializer = assInit, Limit = limitNode, Update = updateNode};
+        
+        //Act
+        _visitor.Visit(forNode);
+        string actual = _visitor.OutputToString();
+        
+        //Assert
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void ForNodeIdInitializerIsCreatedCorrectly()
+    {
+        //Arrange
+        const string expected = "for(i; i <= 10; i = i + 1) {\r\n}\r\n";
+        IdNode idNode = new IdNode() { Id = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
+        NumberNode limitNode = new NumberNode() { Value = 10, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        NumberNode updateNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+
+        ForNode forNode = new ForNode() { Initializer = idNode, Limit = limitNode, Update = updateNode};
+        
+        //Act
+        _visitor.Visit(forNode);
+        string actual = _visitor.OutputToString();
+        
+        //Assert
+        Assert.Equal(expected, actual);
+    }
+    
+    [Fact]
+    public void ForNodeArrAccInitializerIsCreatedCorrectly()
+    {
+        //Arrange
+        const string expected = "for(i[1]; i[1] <= 10; i[1] = i[1] + 1) {\r\n}\r\n";
+        IdNode idNode = new IdNode() { Id = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
+        NumberNode indexNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+
+        ArrayAccessNode arraccInit = new ArrayAccessNode() { Array = idNode, Index = indexNode};
+        
+        NumberNode limitNode = new NumberNode() { Value = 10, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        NumberNode updateNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+
+        ForNode forNode = new ForNode() { Initializer = arraccInit, Limit = limitNode, Update = updateNode};
+        
+        //Act
+        _visitor.Visit(forNode);
+        string actual = _visitor.OutputToString();
+        
+        //Assert
+        Assert.Equal(expected, actual);
+    }
+    
+    [Fact]
+    public void ForNodeBodyIsCreatedCorrectly()
+    {
+        //Arrange
+        const string expected = "for(i; i <= 10; i = i + 1) {\r\nbreak;\r\n}\r\n";
+        IdNode idNode = new IdNode() { Id = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
+        NumberNode limitNode = new NumberNode() { Value = 10, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        NumberNode updateNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        BreakNode breakNode = new BreakNode();
+        
+        ForNode forNode = new ForNode() { Initializer = idNode, Limit = limitNode, Update = updateNode,
+            Body = new List<StmtNode>(){ breakNode }};
+        
+        //Act
+        _visitor.Visit(forNode);
+        string actual = _visitor.OutputToString();
+        
+        //Assert
+        Assert.Equal(expected, actual);
+    }
+    
+    
+    #endregion
+    
 }
 
 
