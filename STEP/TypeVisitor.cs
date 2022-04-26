@@ -349,7 +349,7 @@ public class TypeVisitor : IVisitor {
         n.Update.Accept(this);
         var expectedType = new Type() {ActualType = TypeVal.Number};
         var initNode = n.Initializer;
-        if (initNode is VarDclNode vn) {
+        if (initNode is VarDclNode vn) { // VarDclNodes will have Type OK if they do not have errors - In this case, grab type from the Id
             initNode = vn.Left;
         }
         if (initNode.Type == expectedType && n.Limit.Type == expectedType && n.Update.Type == expectedType) {
