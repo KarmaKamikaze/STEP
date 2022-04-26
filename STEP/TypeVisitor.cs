@@ -180,7 +180,7 @@ public class TypeVisitor : IVisitor {
         n.Array.Accept(this);
         n.Index.Accept(this);
         if (n.Index.Type.ActualType == TypeVal.Number) {
-            n.Type = n.Array.Type;
+            n.Type.ActualType = n.Array.Type.ActualType;
         }
         else {
             n.Type.ActualType = TypeVal.Error;
@@ -400,13 +400,12 @@ public class TypeVisitor : IVisitor {
     }
 
     public void Visit(FuncExprNode n) {
-        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id) as FunctionSymTableEntry;
-        if (symbol is null) { // Should this be here?
-            throw new NoNullAllowedException("The retrieved symbol was not a function symbol table entry");
+        if (_symbolTable.RetrieveSymbol(n.Id.Id) is not FunctionSymTableEntry symbol) {
+            throw new TypeException(n, "The retrieved symbol was not a function symbol table entry");
         }
         n.Type = symbol.Type;
         var parameterTypes = symbol.Parameters.Values.ToArray();
-        int i = 0;
+        var i = 0;
         foreach (var param in n.Params) {
             param.Accept(this);
             if (param.Type != parameterTypes[i] || param.Type.ActualType == TypeVal.Error) {
@@ -418,13 +417,13 @@ public class TypeVisitor : IVisitor {
     }
 
     public void Visit(FuncStmtNode n) {
-        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id) as FunctionSymTableEntry;
-        if (symbol is null) { // Should this be here?
-            throw new NoNullAllowedException("The retrieved symbol was not a function symbol table entry");
+        if (_symbolTable.RetrieveSymbol(n.Id.Id) is not FunctionSymTableEntry symbol) {
+            throw new TypeException(n, "The retrieved symbol was not a function symbol table entry");
         }
         n.Type = symbol.Type;
         var parameterTypes = symbol.Parameters.Values.ToArray();
-        int i = 0;
+        var i = 0;
+        if (symbol.Parameters.Count != n.Params.Count) throw new FunctionCallException(n, symbol);
         foreach (var param in n.Params) {
             param.Accept(this);
             if (param.Type != parameterTypes[i] || param.Type.ActualType == TypeVal.Error) {
