@@ -122,8 +122,7 @@ public class CodeGenerationVisitor : IVisitor
         // not x -> ! x
         // not (x == y) -> !(x==y)
         EmitAppend("!");
-        // TODO: Is this the right child?!?!?!
-        n.Right.Accept(this);
+        n.Left.Accept(this);
     }
 
     public void Visit(NumberNode n)
@@ -140,14 +139,23 @@ public class CodeGenerationVisitor : IVisitor
     {
         EmitAppend(n.Value.ToString().ToLowerInvariant());
     }
-
+    
     public void Visit(ArrDclNode n)
     {
         // Type id[size] = { elements };
         EmitAppend(n.Type);
+
         n.Left.Accept(this);
-        EmitAppend(" = ");
-        n.Right.Accept(this);
+        EmitAppend($"[{n.Size}] = ");
+        if (n.IsId)
+        {
+            n.IdRight.Accept(this);
+        }
+        else
+        {
+            n.Right.Accept(this);
+        }
+
         EmitLine(";");
     }
 
@@ -177,24 +185,41 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(VarDclNode n)
     {
-        // Type id = expr;
-        EmitAppend(n.Type);
-        n.Left.Accept(this);
-        EmitAppend(" = ");
-        n.Right.Accept(this);
+        VarDclNodeGen(n);
         EmitLine(";");
     }
 
+    private void VarDclNodeGen(VarDclNode n)
+    {
+        // Type id = expr;
+        EmitAppend(n.Type);
+
+        n.Left.Accept(this);
+        EmitAppend(" = ");
+        n.Right.Accept(this);
+    }
+    
     public void Visit(AssNode n)
+    {
+        AssNodeGen(n);
+        EmitLine(";");
+    }
+
+    private void AssNodeGen(AssNode n)
     {
         // id = expr;
         // TODO: if assignments can be used in expressions, this must be redone
         n.Id.Accept(this);
+        if (n.ArrIndex != null)
+        {
+            EmitAppend("[");
+            n.ArrIndex.Accept(this);
+            EmitAppend("]");
+        }
         EmitAppend(" = ");
         n.Expr.Accept(this);
-        EmitLine(";");
     }
-
+    
     public void Visit(IdNode n)
     {
         EmitAppend(n.Id);
@@ -273,7 +298,7 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(UMinusNode n)
     {
-        // - expr
+        // -expr
         EmitAppend("-");
         n.Left.Accept(this);
     }
@@ -297,10 +322,76 @@ public class CodeGenerationVisitor : IVisitor
         // for(int x = 0; i < n; i++)
         // VarDcl, AssNode, Identifier, ArrAccessNode
         EmitAppend("for(");
-        n.Initializer.Accept(this);
-        EmitAppend("; ");
+        
+        //Each if-statement creates the for-loop header with the relevant type of initializer
+        if (n.Initializer is VarDclNode varInit)
+        {
+            VarDclNodeGen(varInit);
+            ForNodeHelper(varInit.Left, n);
+        }
+        else if (n.Initializer is AssNode assInit)
+        {
+            AssNodeGen(assInit);
+            ForNodeHelperAssNode(assInit, n);
+        }
+        else
+        {
+            n.Initializer.Accept(this);
+            ForNodeHelper(n.Initializer, n);
+        }
+        
+        n.Update.Accept(this);
+        
+        EmitLine(") {");
+        foreach (StmtNode statement in n.Body)
+        {
+            statement.Accept(this);
+        }
+        EmitLine("}");
+        
     }
 
+    private void ForNodeHelper(AstNode node, ForNode n)
+    {
+        EmitAppend("; ");
+        //Generate Limit Condition
+        node.Accept(this);
+        EmitAppend(" <= ");
+        n.Limit.Accept(this);
+        EmitAppend("; ");
+        //Generate part of the Update Condition
+        node.Accept(this);
+        EmitAppend(" = ");
+        node.Accept(this);
+        EmitAppend(" + ");
+    }
+
+    private void ForNodeHelperAssNode(AssNode node, ForNode n)
+    {
+        EmitAppend("; ");
+        //Generate Limit Condition
+        ForNodeHelperAssNodeHelper(node);
+        EmitAppend(" <= ");
+        n.Limit.Accept(this);
+        EmitAppend("; ");
+        //Generate part of the Update Condition
+        ForNodeHelperAssNodeHelper(node);
+        EmitAppend(" = ");
+        ForNodeHelperAssNodeHelper(node);
+        EmitAppend(" + ");
+    }
+
+    private void ForNodeHelperAssNodeHelper(AssNode node)
+    {
+        node.Id.Accept(this);
+        if (node.ArrIndex != null)
+        {
+            EmitAppend("[");
+            node.ArrIndex.Accept(this);
+            EmitAppend("]");
+        }
+    }
+    
     public void Visit(ContNode n)
     {
         EmitLine("continue;");
