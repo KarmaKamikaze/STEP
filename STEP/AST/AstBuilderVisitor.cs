@@ -100,9 +100,9 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         return node;
     }
 
-    public override VarDclNode VisitPindcl([NotNull] STEPParser.PindclContext context)
+    public override PinDclNode VisitPindcl([NotNull] STEPParser.PindclContext context)
     {
-        VarDclNode node = (VarDclNode) NodeFactory.MakeNode(AstNodeType.VarDclNode);
+        PinDclNode node = (PinDclNode) NodeFactory.MakeNode(AstNodeType.PinDclNode);
         
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Id = context.ID().GetText();
@@ -116,10 +116,10 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
 
         if (context.pinmode().INPUT() != null) {
-            ((PinType) idNode.Type).Mode = PinMode.INPUT;
+            node.PinType.Mode = PinMode.INPUT;
         }
         else {
-            ((PinType) idNode.Type).Mode = PinMode.OUTPUT;
+            node.PinType.Mode = PinMode.OUTPUT;
         }
         
         node.Left = idNode;
