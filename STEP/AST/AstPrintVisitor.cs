@@ -97,6 +97,11 @@ public class AstPrintVisitor : IVisitor
         }
     }
 
+    public void Visit(PinDclNode n)
+    {
+        throw new NotImplementedException();
+    }
+
     public void Visit(LoopNode node)
     {
         if (node != null)

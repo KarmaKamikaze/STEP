@@ -221,6 +221,11 @@ public class TypeVisitor : IVisitor {
         }
     }
 
+    public void Visit(PinDclNode n)
+    {
+        throw new NotImplementedException();
+    }
+
     public void Visit(AssNode n) { // Add constant check, needs to be in ST (i think)
         AssVisitor assVisitor = new AssVisitor(_symbolTable);
         n.Id.Accept(assVisitor);

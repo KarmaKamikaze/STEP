@@ -9,6 +9,8 @@ public class CodeGenerationVisitor : IVisitor
 {
     private readonly StringBuilder _stringBuilder = new();
     private string Output => _stringBuilder.ToString();
+
+    private string _optionalPinMode = String.Empty;
     
     public void OutputToBaseFile()
     {
@@ -121,7 +123,7 @@ public class CodeGenerationVisitor : IVisitor
         n.Right.Accept(this);
     }
 
-    public void Visit(NumberNode n)
+    public virtual void Visit(NumberNode n)
     {
         EmitAppend(n.Value.ToString(CultureInfo.InvariantCulture));
     }
@@ -483,5 +485,28 @@ public class CodeGenerationVisitor : IVisitor
             stmt.Accept(this);
         }
         EmitLine("}");
+    }
+
+    public void Visit(PinDclNode n)
+    {
+        StringBuilder sb = new StringBuilder();
+        PinCodeVisitor pinVisitor = new PinCodeVisitor();
+        /* The emitted code will be stored in a temporary variable. If any pins are declared, we know
+         * it must be declared in the variables scope, which is always visited first. Once the code generation
+         * reaches the Setup scope, the temporary variables will be used to insert this code in the correct place.
+         */
+        sb.Append("pinMode(");
+        n.Left.Accept(pinVisitor);
+        sb.Append(pinVisitor.GetPinCode());
+        switch (n.PinType.Mode)
+        {
+            case PinMode.INPUT:
+                sb.Append("INPUT");
+                break;
+            case PinMode.OUTPUT:
+                sb.Append("OUTPUT");
+                break;
+        }
+        _optionalPinMode = ");";
     }
 }
