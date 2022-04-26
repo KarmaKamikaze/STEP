@@ -171,6 +171,16 @@ public interface ISTEPListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitType([NotNull] STEPParser.TypeContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.paramstype"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterParamstype([NotNull] STEPParser.ParamstypeContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.paramstype"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitParamstype([NotNull] STEPParser.ParamstypeContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.stmt"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
