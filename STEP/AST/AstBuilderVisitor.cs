@@ -141,7 +141,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         {
             VarDclNode node = (VarDclNode) child;
             if (context.CONSTANT() != null)
-                node.IsConstant = true;
+                node.Left.Type.IsConstant = true;
 
             return node;
         }
@@ -149,7 +149,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         {
             ArrDclNode node = (ArrDclNode) child;
             if (context.CONSTANT() != null)
-                node.IsConstant = true;
+                node.Left.Type.IsConstant = true;
 
             return node;
         }
