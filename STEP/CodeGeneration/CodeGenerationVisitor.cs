@@ -31,21 +31,25 @@ public class CodeGenerationVisitor : IVisitor
         _stringBuilder.Append(line);
     }
 
-    private void EmitAppend(TypeVal typeVal)
+    private void EmitAppend(Type type)
     {
-        // TODO: translate our types to Arduino types here
-        switch(typeVal)
+        if (type.IsConstant)
+            EmitAppend("const ");
+        
+        switch (type.ActualType)
         {
+            case TypeVal.Number:
+                EmitAppend("double ");
+                break;
             case TypeVal.String:
-                _stringBuilder.Append("String ");
+                EmitAppend("String ");
                 break;
             case TypeVal.Boolean:
-                _stringBuilder.Append("bool ");
+                EmitAppend("boolean ");
                 break;
-            case TypeVal.Number:
-                _stringBuilder.Append("double ");
+            case TypeVal.Blank:
+                EmitAppend("void ");
                 break;
-            default: break;
         }
     }
     
@@ -140,7 +144,7 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(ArrDclNode n)
     {
         // Type id[size] = { elements };
-        EmitAppend(n.Type.ActualType);
+        EmitAppend(n.Type);
         n.Left.Accept(this);
         EmitAppend(" = ");
         n.Right.Accept(this);
@@ -174,7 +178,7 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(VarDclNode n)
     {
         // Type id = expr;
-        EmitAppend(n.Type.ActualType);
+        EmitAppend(n.Type);
         n.Left.Accept(this);
         EmitAppend(" = ");
         n.Right.Accept(this);
@@ -313,7 +317,7 @@ public class CodeGenerationVisitor : IVisitor
          *   statements
          * }
          */
-        EmitAppend(n.ReturnType.ActualType);
+        EmitAppend(n.ReturnType);
         n.Name.Accept(this);
         EmitAppend("(");
         // TODO: maybe this can be made prettier in a traditional for-loop!

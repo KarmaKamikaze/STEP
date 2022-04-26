@@ -1354,6 +1354,25 @@ public class TypeCheckerTests {
     #endregion
     
     #region Statements
+
+    [Fact]
+    public void AssNode_LeftIsConst_ThrowsTypeException() {
+        // Arrange
+        var symbol = new SymTableEntry() {Type = new Type() {ActualType = TypeVal.Number, IsConstant = true}};
+        _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
+            .Returns(symbol);
+        var assNode = new AssNode() {
+            Id = new IdNode() {Id = "left"},
+            Expr = new NumberNode() {Value = 2}
+        };
+        
+        // Act
+        var test = () => assNode.Accept(_typeVisitor);
+        
+        // Assert
+        Assert.Throws<TypeException>(test);
+    }
+    
     [Theory]
     [InlineData(TypeVal.Number)]
     [InlineData(TypeVal.String)]

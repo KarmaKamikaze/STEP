@@ -171,6 +171,16 @@ public interface ISTEPListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitType([NotNull] STEPParser.TypeContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.paramstype"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterParamstype([NotNull] STEPParser.ParamstypeContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.paramstype"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitParamstype([NotNull] STEPParser.ParamstypeContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.stmt"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -530,6 +540,26 @@ public interface ISTEPListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitPindcl([NotNull] STEPParser.PindclContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.pinmode"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterPinmode([NotNull] STEPParser.PinmodeContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.pinmode"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitPinmode([NotNull] STEPParser.PinmodeContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="STEPParser.pintype"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterPintype([NotNull] STEPParser.PintypeContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="STEPParser.pintype"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitPintype([NotNull] STEPParser.PintypeContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.arrdcl"/>.
 	/// </summary>

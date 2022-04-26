@@ -227,10 +227,9 @@ public class TypeVisitor : IVisitor {
         n.Expr.Accept(this);
         if (n.Id.Type.ActualType is TypeVal.Analogpin or TypeVal.Digitalpin) {
             throw new TypeException("Cannot reassign values to pin variables");
+        } if (n.Id.Type.IsConstant) { 
+            throw new TypeException("Cannot reassign values to constant variables");
         }
-        // if (n.Id.IsConstant) {
-        //     throw new TypeException("Cannot reassign values to constant variables");
-        // }
         if (n.Id.Type.ActualType == n.Expr.Type.ActualType) {
             n.Type.ActualType = TypeVal.Ok;
         }
