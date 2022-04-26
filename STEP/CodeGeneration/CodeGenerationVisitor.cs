@@ -9,9 +9,8 @@ public class CodeGenerationVisitor : IVisitor
 {
     private readonly StringBuilder _stringBuilder = new();
     private string Output => _stringBuilder.ToString();
+    private StringBuilder _optionalPinMode = new();
 
-    private string _optionalPinMode = String.Empty;
-    
     public void OutputToBaseFile()
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -461,8 +460,8 @@ public class CodeGenerationVisitor : IVisitor
     {
         EmitLine("void setup() {");
         // Add declared pinModes from variables scope
-        if (_optionalPinMode != String.Empty)
-            EmitLine(_optionalPinMode);
+        if (_optionalPinMode.ToString() != String.Empty)
+            EmitLine(_optionalPinMode.ToString());
         
         foreach(var stmt in n.Stmts) {
             stmt.Accept(this);
@@ -493,25 +492,23 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(PinDclNode n)
     {
-        StringBuilder sb = new StringBuilder();
         PinCodeVisitor pinVisitor = new PinCodeVisitor();
-        sb.Append("pinMode(");
-        n.Left.Accept(pinVisitor);
-        sb.Append(pinVisitor.GetPinCode());
-        switch (n.PinType.Mode)
-        {
-            case PinMode.INPUT:
-                sb.Append("INPUT");
-                break;
-            case PinMode.OUTPUT:
-                sb.Append("OUTPUT");
-                break;
-        }
-        sb.Append(");");
         /* The emitted code will be stored in a temporary variable. If any pins are declared, we know
          * it must be declared in the variables scope, which is always visited first. Once the code generation
          * reaches the Setup scope, the temporary variables will be used to insert this code in the correct place.
          */
-        _optionalPinMode = sb.ToString();
+        _optionalPinMode.Append("pinMode(");
+        n.Left.Accept(pinVisitor);
+        _optionalPinMode.Append(pinVisitor.GetPinCode());
+        switch (n.PinType.Mode)
+        {
+            case PinMode.INPUT:
+                _optionalPinMode.Append("INPUT");
+                break;
+            case PinMode.OUTPUT:
+                _optionalPinMode.Append("OUTPUT");
+                break;
+        }
+        _optionalPinMode.Append(");\n");
     }
 }
