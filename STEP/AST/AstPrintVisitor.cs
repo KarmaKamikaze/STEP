@@ -97,9 +97,17 @@ public class AstPrintVisitor : IVisitor
         }
     }
 
-    public void Visit(PinDclNode n)
+    public void Visit(PinDclNode node)
     {
-        throw new NotImplementedException();
+        if (node != null)
+        {
+            Indent();
+            Print(node.PinType.Mode.ToString().ToLower() + " ");
+            Print(node.Type.ActualType.ToString().ToLower() + " ");
+            node.Left.Accept(this);
+            Print(" = ");
+            node.Right.Accept(this);
+        }
     }
 
     public void Visit(LoopNode node)
