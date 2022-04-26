@@ -507,6 +507,7 @@ public class CodeGenerationVisitor : IVisitor
                 sb.Append("OUTPUT");
                 break;
         }
-        _optionalPinMode = ");";
+        sb.Append(");");
+        _optionalPinMode = sb.ToString();
     }
 }
