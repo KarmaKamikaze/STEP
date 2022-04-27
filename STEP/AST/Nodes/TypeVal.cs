@@ -10,4 +10,5 @@ public enum TypeVal
     Digitalpin,
     Blank,
     Ok,
+    PinLevel, // HIGH, LOW
 }
