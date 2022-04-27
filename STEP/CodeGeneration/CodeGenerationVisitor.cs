@@ -10,7 +10,8 @@ public class CodeGenerationVisitor : IVisitor
     private readonly StringBuilder _stringBuilder = new();
     private string Output => _stringBuilder.ToString();
     private readonly StringBuilder _pinSetup = new();
-
+    private int _scopeLevel = 0;
+    private List<Tuple<int, ArrDclNode>> _arrDclsPerScope = new();
     public void OutputToBaseFile()
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -22,8 +23,7 @@ public class CodeGenerationVisitor : IVisitor
         return Output;
     }
     
-    private void EmitLine(string line)
-    {
+    private void EmitLine(string line) {
         _stringBuilder.AppendLine(line);
     }
 
@@ -52,6 +52,25 @@ public class CodeGenerationVisitor : IVisitor
                 EmitAppend("void ");
                 break;
         }
+    }
+
+    private void EnterScope() {
+        _scopeLevel++;
+    }
+
+    private void ExitScope(bool isArrayFunc = false) {
+        _scopeLevel--;
+        var tuplesToRemove = new List<Tuple<int, ArrDclNode>>();
+        if (isArrayFunc) {
+            tuplesToRemove.AddRange(_arrDclsPerScope.Where(t => t.Item1 > _scopeLevel));
+        }
+        else {
+            foreach (var tuple in _arrDclsPerScope.Where(k => k.Item1 > _scopeLevel)) {
+                EmitLine($"free({tuple.Item2.Left.Id})");
+                tuplesToRemove.Add(tuple);
+            }
+        }
+        tuplesToRemove.ForEach(t => _arrDclsPerScope.Remove(t));
     }
     
     public void Visit(AndNode n)
@@ -148,7 +167,7 @@ public class CodeGenerationVisitor : IVisitor
 
         n.Left.Accept(this);
         EmitAppend($"[{n.Size}]");
-        if (n.IsId)
+        if (n.IdRight is not null)
         {
             EmitAppend(" = ");
             n.IdRight.Accept(this);
@@ -160,6 +179,7 @@ public class CodeGenerationVisitor : IVisitor
         }
 
         EmitLine(";");
+        _arrDclsPerScope.Add(new Tuple<int, ArrDclNode>(_scopeLevel, n));
     }
 
     public void Visit(ArrLiteralNode n)
@@ -167,6 +187,7 @@ public class CodeGenerationVisitor : IVisitor
         int count = n.Elements.Count;
         if (count == 0) return;
         EmitAppend("{");
+        EnterScope();
         for (int i = 0; i < count; i++)
         {
             n.Elements[i].Accept(this);
@@ -176,6 +197,8 @@ public class CodeGenerationVisitor : IVisitor
                 EmitAppend(", ");
             }
         }
+
+        ExitScope();
         EmitAppend("}");
     }
 
@@ -313,10 +336,13 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend("while(");
         n.Condition.Accept(this);
         EmitLine(") {");
+        EnterScope();
         foreach (StmtNode statement in n.Body)
         {
             statement.Accept(this);
         }
+
+        ExitScope();
         EmitLine("}");
     }
 
@@ -347,10 +373,13 @@ public class CodeGenerationVisitor : IVisitor
         n.Update.Accept(this);
         
         EmitLine(") {");
+        EnterScope();
         foreach (StmtNode statement in n.Body)
         {
             statement.Accept(this);
         }
+
+        ExitScope();
         EmitLine("}");
         
     }
@@ -431,10 +460,13 @@ public class CodeGenerationVisitor : IVisitor
         }
         EmitLine(") {");
         // Body
+        EnterScope();
         foreach (StmtNode stmt in n.Stmts)
         {
             stmt.Accept(this);
         }
+
+        ExitScope(n.Type.IsArray);
         EmitLine("}");
     }
 
@@ -507,9 +539,12 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend("if(");
         n.Condition.Accept(this);
         EmitLine(") {");
+        EnterScope();
         foreach(var stmt in n.ThenClause) {
             stmt.Accept(this);
         }
+
+        ExitScope();
         EmitLine("}");
         
         if (n.ElseIfClauses?.Count > 0)
@@ -523,10 +558,12 @@ public class CodeGenerationVisitor : IVisitor
         if (n.ElseClause?.Count > 0)
         {
             EmitLine("else {");
+            EnterScope();
             foreach (var stmt in n.ElseClause)
             {
                 stmt.Accept(this);
             }
+            ExitScope();
             EmitLine("}");
         }
     }
@@ -550,6 +587,7 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(SetupNode n)
     {
         EmitLine("void setup() {");
+        EnterScope();
         // Add declared pinModes from variables scope
         if (_pinSetup.ToString() != String.Empty)
             EmitLine(_pinSetup.ToString());
@@ -557,15 +595,20 @@ public class CodeGenerationVisitor : IVisitor
         foreach(var stmt in n.Stmts) {
             stmt.Accept(this);
         }
+
+        ExitScope();
         EmitLine("}");
     }
     
     public void Visit(LoopNode n)
     {
         EmitLine("void loop() {");
+        EnterScope();
         foreach(var stmt in n.Stmts) {
             stmt.Accept(this);
         }
+
+        ExitScope();
         EmitLine("}");
     }
 
@@ -576,10 +619,13 @@ public class CodeGenerationVisitor : IVisitor
             EmitAppend("else if(");
             n.Condition.Accept(this);
             EmitLine(") {");
+            EnterScope();
             foreach(var stmt in n.Body)
             {
                 stmt.Accept(this);
             }
+
+            ExitScope();
             EmitLine("}");
         }
     }
