@@ -2,7 +2,7 @@
 
 public class ArrLiteralNode : ExprNode
 {
-    public List<ExprNode> Elements { get; set; } = new();
+    public List<ExprNode> Elements { get; init; } = new();
     public int ExpectedSize { get; set; }
     
     public override void Accept(IVisitor v)

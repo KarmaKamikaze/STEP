@@ -6,8 +6,8 @@ public class IfNode : StmtNode
 {
     public ExprNode Condition { get; set; }
     public List<StmtNode> ThenClause { get; set; } = new();
-    public List<ElseIfNode> ElseIfClauses { get; set; } = new();
-    public List<StmtNode> ElseClause { get; set; } = new();
+    public List<ElseIfNode> ElseIfClauses { get; init; } = new();
+    public List<StmtNode> ElseClause { get; init; } = new();
 
     public override void Accept(IVisitor v)
     {
