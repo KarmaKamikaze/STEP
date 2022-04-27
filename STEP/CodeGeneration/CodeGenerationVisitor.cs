@@ -11,7 +11,7 @@ public class CodeGenerationVisitor : IVisitor
     private string Output => _stringBuilder.ToString();
     private readonly StringBuilder _pinSetup = new();
     private int _scopeLevel = 0;
-    private List<Tuple<int, ArrDclNode>> _arrDclsPerScope = new();
+    private readonly List<Tuple<int, ArrDclNode>> _arrDclsPerScope = new(); // Keeps track of array declarations per scope
     public void OutputToBaseFile()
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -57,13 +57,15 @@ public class CodeGenerationVisitor : IVisitor
     private void EnterScope() {
         _scopeLevel++;
     }
-
+    
     private void ExitScope(bool isArrayFunc = false) {
         _scopeLevel--;
         var tuplesToRemove = new List<Tuple<int, ArrDclNode>>();
+        // If exiting a function returning an array, do not free declared arrays
         if (isArrayFunc) {
             tuplesToRemove.AddRange(_arrDclsPerScope.Where(t => t.Item1 > _scopeLevel));
         }
+        // Else, when exiting a scope, free all arrays declared in the scope
         else {
             foreach (var tuple in _arrDclsPerScope.Where(k => k.Item1 > _scopeLevel)) {
                 EmitLine($"free({tuple.Item2.Left.Id});");
@@ -162,20 +164,10 @@ public class CodeGenerationVisitor : IVisitor
     
     public void Visit(ArrDclNode n)
     {
-        // Type id[size] = { elements };
+        // e.g. double* studentAges = (double*)malloc(5 * sizeof(double));
+        // equivalent to double[5] studentAges;
         EmitAppend(n.Type, "* ");
         n.Left.Accept(this);
-        // EmitAppend($"[{n.Size}]");
-        // if (n.IdRight is not null)
-        // {
-        //     EmitAppend(" = ");
-        //     n.IdRight.Accept(this);
-        // }
-        // else if (n.Right is not null)
-        // {
-        //     EmitAppend(" = ");
-        //     n.Right.Accept(this);
-        // }
         EmitAppend($" = (");
         EmitAppend(n.Type, "*");
         EmitAppend($")malloc({n.Size} * sizeof(");
@@ -254,31 +246,29 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend(n.Id);
     }
 
-    public void Visit(PlusNode n)
-    {
-        // If the overall expression has type string, we must convert any non-string children to strings
-        if (n.Type.ActualType is TypeVal.String && n.Left.Type.ActualType != TypeVal.String)
-        {
-            // String(left) + right
-            EmitAppend("String(");
-            n.Left.Accept(this);
-            EmitAppend(") + ");
-            n.Right.Accept(this);
-        }
-        else if (n.Type.ActualType is TypeVal.String && n.Right.Type.ActualType != TypeVal.String)
-        {
-            // left + String(right)
-            n.Left.Accept(this);
-            EmitAppend(" + String(");
-            n.Right.Accept(this);
-            EmitAppend(")");
-        }
-        else
-        {
-            // left + right
-            n.Left.Accept(this);
-            EmitAppend(" + ");
-            n.Right.Accept(this);
+    public void Visit(PlusNode n) {
+        switch (n.Type.ActualType) {
+            // If the overall expression has type string, we must convert any non-string children to strings
+            case TypeVal.String when n.Left.Type.ActualType != TypeVal.String:
+                // String(left) + right
+                EmitAppend("String(");
+                n.Left.Accept(this);
+                EmitAppend(") + ");
+                n.Right.Accept(this);
+                break;
+            case TypeVal.String when n.Right.Type.ActualType != TypeVal.String:
+                // left + String(right)
+                n.Left.Accept(this);
+                EmitAppend(" + String(");
+                n.Right.Accept(this);
+                EmitAppend(")");
+                break;
+            default:
+                // left + right
+                n.Left.Accept(this);
+                EmitAppend(" + ");
+                n.Right.Accept(this);
+                break;
         }
     }
 

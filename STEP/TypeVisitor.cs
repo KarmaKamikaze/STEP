@@ -372,9 +372,9 @@ public class TypeVisitor : IVisitor {
         _symbolTable.CloseScope();
     }
 
-    public void Visit(ContNode n) { } // ?
-
-    public void Visit(BreakNode n) { } // ?
+    public void Visit(ContNode n) { }
+    public void Visit(BreakNode n) { }
+    
     public void Visit(LoopNode n) {
         _symbolTable.OpenScope();
         foreach (var stmt in n.Stmts) {
