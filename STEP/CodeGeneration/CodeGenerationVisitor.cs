@@ -593,6 +593,12 @@ public class CodeGenerationVisitor : IVisitor
          */
         _pinSetup.Append("pinMode(");
         n.Right.Accept(pinVisitor);
+        // Append A if the pin is analog to allow for arduino to
+        // differentiate between analog and digital pins
+        if (n.Left.Type.ActualType is TypeVal.Analogpin)
+        {
+            _pinSetup.Append("A");
+        }
         _pinSetup.Append(pinVisitor.GetPinCode());
         switch (((PinType)n.Type).Mode)
         {

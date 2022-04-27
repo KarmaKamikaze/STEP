@@ -1,32 +1,16 @@
-﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Reflection;
 using Antlr4.Runtime;
 using STEP;
 using STEP.AST;
 using STEP.AST.Nodes;
 using STEP.CodeGeneration;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace StepTests;
 
 public class IntegrationTests
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    private static readonly bool IsRunningFromXUnit = AppDomain.CurrentDomain.GetAssemblies()
-        .Any(assembly => assembly.FullName.ToLowerInvariant().StartsWith("xunit"));
-
-    public IntegrationTests(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
-    }
-
     private STEPParser.ProgramContext GetParseTree(string input) 
     { 
         AntlrInputStream streamReader = new(input);
@@ -40,7 +24,7 @@ public class IntegrationTests
     [MemberData(nameof(programStrings))]
     public void IntegrationTest1(string sourceFile, string expectedFile)
     {
-        string sourceFilePath = Directory.GetCurrentDirectory() + "\\..\\..\\..\\" + sourceFile;
+        string sourceFilePath = Directory.GetCurrentDirectory() + "\\..\\..\\..\\IntegrationTestPrograms\\" + sourceFile;
         string sourceText = File.ReadAllText(sourceFilePath);
         STEPParser.ProgramContext tree = GetParseTree(sourceText);
         
@@ -55,7 +39,8 @@ public class IntegrationTests
 
         string actual = codeGen.OutputToString();
 
-        string expectedFilePath = Directory.GetCurrentDirectory() + "\\..\\..\\..\\" + expectedFile;
+        string expectedFilePath = Directory.GetCurrentDirectory() + "\\..\\..\\..\\IntegrationTestPrograms\\" + expectedFile;
+
         string expected = File.ReadAllText(expectedFilePath);
         
         Assert.Equal(expected, actual);
@@ -66,11 +51,11 @@ public class IntegrationTests
         {
             new string[]
             {
-                "IntegrationTestPrograms/printArraySource.step" , "IntegrationTestPrograms/printArrayExpected.ino"  
+                "printArraySource.step" , "printArrayExpected.ino"  
             },
             new string[]
             {
-                "IntegrationTestPrograms/int2Source.step" , "IntegrationTestPrograms/int2Expected.ino"
+                "int2Source.step" , "int2Expected.ino"
             }
             
         };
