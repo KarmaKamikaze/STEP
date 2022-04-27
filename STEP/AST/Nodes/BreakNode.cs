@@ -2,7 +2,8 @@
 
 public class BreakNode : StmtNode
 {
-    public override void Accept(IVisitor v) {
+    public override void Accept(IVisitor v)
+    {
         v.Visit(this);
     }
 

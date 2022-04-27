@@ -3,7 +3,9 @@
 public class FuncsNode : AstNode
 {
     public List<FuncDefNode> FuncDcls { get; set; }
-    public override void Accept(IVisitor v) {
+
+    public override void Accept(IVisitor v)
+    {
         v.Visit(this);
     }
 
@@ -13,6 +15,7 @@ public class FuncsNode : AstNode
         {
             return FuncDcls.SequenceEqual(other.FuncDcls);
         }
+
         return false;
     }
 }
