@@ -14,7 +14,7 @@ blank function printArray(number[] array, number count)
     end for
 end function
 
-number[] function reverseArray(number[] array, number count)
+##number[] function reverseArray(number[] array, number count)
     number j = count - 1
     
     repeat for(number i = 0 to count, change by 1)
@@ -24,7 +24,7 @@ number[] function reverseArray(number[] array, number count)
         j = j - 1
     end for
     return array
-end function
+end function##
 
 
 

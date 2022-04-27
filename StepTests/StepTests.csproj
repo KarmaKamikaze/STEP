@@ -26,4 +26,8 @@
       <ProjectReference Include="..\STEP\STEP.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ClCompile Include="IntegrationTestPrograms\int2Expected.ino" />
+    </ItemGroup>
+
 </Project>

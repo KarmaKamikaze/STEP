@@ -133,7 +133,7 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(StringNode n)
     {
-        EmitAppend("\"" + n.Value + "\"");
+        EmitAppend(n.Value);
     }
 
     public void Visit(BoolNode n)
@@ -601,6 +601,6 @@ public class CodeGenerationVisitor : IVisitor
                 _pinSetup.Append("OUTPUT");
                 break;
         }
-        _pinSetup.Append(");\n");
+        _pinSetup.Append(");\r\n");
     }
 }

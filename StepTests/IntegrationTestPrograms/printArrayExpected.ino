@@ -7,11 +7,11 @@ print(array[i]);
 }
 }
 }
-double[] reverseArray(double array[], double count) {
+/*double[] reverseArray(double array[], double count) {
 double j = count - 1;
 for(double i = 0; i <= count; i = i + 1) {
 
 }
-}
+}*/
 void setup() {
 }
