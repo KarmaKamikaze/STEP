@@ -244,7 +244,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             node.IsId = true;
             node.IdRight = (IdNode)children.First(child => child is IdNode);
         }
-        else
+        else if(children.Any(child => child is ArrLiteralNode))
         {
             node.Right = (ArrLiteralNode) children.First(child => child is ArrLiteralNode);
             ((ArrLiteralNode) node.Right).ExpectedSize = node.Size;
@@ -964,7 +964,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
         
         List<IdNode> paramsChildren = children.OfType<IdNode>().ToList();
-        paramsChildren.Add(node);
+        paramsChildren.Insert(0,node);
         
         NodesList nodesList = (NodesList) NodeFactory.MakeNode(AstNodeType.NodesList);
         
