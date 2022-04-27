@@ -591,6 +591,10 @@ public class CodeGenerationVisitor : IVisitor
          */
         _pinSetup.Append("pinMode(");
         n.Right.Accept(pinVisitor);
+        if (n.Left.Type.ActualType is TypeVal.Analogpin)
+        {
+            _pinSetup.Append("A");
+        }
         _pinSetup.Append(pinVisitor.GetPinCode());
         switch (((PinType)n.Type).Mode)
         {

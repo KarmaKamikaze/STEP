@@ -1,22 +1,37 @@
 ﻿const double num = 10.5;
 String str = "test";
 boolean boo = true;
+void blankfunc(String array[]) {
+String tempArray[3] = {"test1", "test2", "test3"};
+array = tempArray;
+}
+String stringfunc(double num, boolean isConstant) {
+String arr[3] = {"t1", "t2", "t3"};
+blankfunc(arr);
+if(isConstant || true && false) {
+return "constant " + String(num);
+}
+else {
+return "not constant " + String(num);
+}
+}
 void setup() {
-pinMode(INPUT);
+pinMode(1, INPUT);
+pinMode(A3, OUTPUT);
 
 str = "test2";
 double num2 = 0;
 for(double i = num2; i <= num; i = i + 3) {
-num2 = num2 + 1;
+num2 = num2 + 1 * 1 + (2 + -2);
 }
 }
 void loop() {
 double num3 = 1;
 while(true) {
-if(num3 > 20) {
+if(num3 > 2 * 10 + (15 - 15)) {
 break;
 }
-else if(num3 > num) {
+else if(num3 > num || num3 == num) {
 num3 = num3 * 2;
 continue;
 }
@@ -24,4 +39,5 @@ else {
 num3 = num3 + 1;
 }
 }
+str = stringfunc(num3, boo);
 }
