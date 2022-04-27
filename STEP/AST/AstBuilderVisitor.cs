@@ -247,6 +247,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         else
         {
             node.Right = (ArrLiteralNode) children.First(child => child is ArrLiteralNode);
+            ((ArrLiteralNode) node.Right).ExpectedSize = node.Size;
         }
 
         return node;

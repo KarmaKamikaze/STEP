@@ -168,6 +168,7 @@ public class TypeVisitor : IVisitor {
     public void Visit(ArrLiteralNode n) {
         // Check if all elements have the same type
         if (!n.Elements.Any()) return;
+        if (n.Elements.Count != n.ExpectedSize) throw new ParameterMismatchException(n);
         foreach (var expr in n.Elements) {
             expr.Accept(this);
             if (expr.Type.ActualType == n.Type.ActualType) continue;
@@ -400,13 +401,18 @@ public class TypeVisitor : IVisitor {
     }
 
     public void Visit(FuncExprNode n) {
-        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id) as FunctionSymTableEntry;
-        if (symbol is null) { // Should this be here?
-            throw new NoNullAllowedException("The retrieved symbol was not a function symbol table entry");
+        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id);
+        if (symbol is not FunctionSymTableEntry funcEntry) { // FuncEntry is now symbol as FunctionSymTableEntry
+            if (symbol is null) {
+                throw new TypeException(n, $"The symbol {n.Id.Id} does not exist in any current scope");
+            }
+            throw new TypeException(n, $"The retrieved symbol {n.Id.Id} was not a function symbol table entry");
         }
-        n.Type = symbol.Type;
-        var parameterTypes = symbol.Parameters.Values.ToArray();
-        int i = 0;
+        
+        n.Type = funcEntry.Type;
+        var parameterTypes = funcEntry.Parameters.Values.ToArray();
+        var i = 0;
+        if (funcEntry.Parameters.Count != n.Params.Count) throw new ParameterMismatchException(n, funcEntry);
         foreach (var param in n.Params) {
             param.Accept(this);
             if (param.Type != parameterTypes[i] || param.Type.ActualType == TypeVal.Error) {
@@ -418,13 +424,17 @@ public class TypeVisitor : IVisitor {
     }
 
     public void Visit(FuncStmtNode n) {
-        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id) as FunctionSymTableEntry;
-        if (symbol is null) { // Should this be here?
-            throw new NoNullAllowedException("The retrieved symbol was not a function symbol table entry");
+        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id);
+        if (symbol is not FunctionSymTableEntry funcEntry) { // FuncEntry is now symbol as FunctionSymTableEntry
+            if (symbol is null) {
+                throw new TypeException(n, $"The symbol {n.Id.Id} does not exist in any current scope");
+            }
+            throw new TypeException(n, $"The retrieved symbol {n.Id.Id} was not a function symbol table entry");
         }
-        n.Type = symbol.Type;
-        var parameterTypes = symbol.Parameters.Values.ToArray();
-        int i = 0;
+        n.Type = funcEntry.Type;
+        var parameterTypes = funcEntry.Parameters.Values.ToArray();
+        var i = 0;
+        if (funcEntry.Parameters.Count != n.Params.Count) throw new ParameterMismatchException(n, funcEntry);
         foreach (var param in n.Params) {
             param.Accept(this);
             if (param.Type != parameterTypes[i] || param.Type.ActualType == TypeVal.Error) {
