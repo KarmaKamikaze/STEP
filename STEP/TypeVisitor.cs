@@ -454,11 +454,11 @@ public class TypeVisitor : IVisitor
 
     public void Visit(ContNode n)
     {
-    } // ?
+    }
 
     public void Visit(BreakNode n)
     {
-    } // ?
+    }
 
     public void Visit(LoopNode n)
     {
