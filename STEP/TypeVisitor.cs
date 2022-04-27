@@ -158,6 +158,10 @@ public class TypeVisitor : IVisitor {
     public void Visit(ArrDclNode n) {
         DclVisitor dclVisitor = new DclVisitor(_symbolTable);
         n.Left.Accept(dclVisitor);
+        if (n.Right is null) {
+            n.Type = n.Left.Type;
+            return;
+        }
         n.Right.Type = n.Left.Type;
         n.Right.Accept(this);
         n.Type = (n.Left.Type != n.Right.Type)

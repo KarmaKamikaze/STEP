@@ -147,13 +147,15 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend(n.Type);
 
         n.Left.Accept(this);
-        EmitAppend($"[{n.Size}] = ");
+        EmitAppend($"[{n.Size}]");
         if (n.IsId)
         {
+            EmitAppend(" = ");
             n.IdRight.Accept(this);
         }
-        else
+        else if (n.Right is not null)
         {
+            EmitAppend(" = ");
             n.Right.Accept(this);
         }
 
