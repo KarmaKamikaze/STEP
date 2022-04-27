@@ -586,7 +586,7 @@ public class CodeGenerationVisitor : IVisitor
          * reaches the Setup scope, the temporary variables will be used to insert this code in the correct place.
          */
         _pinSetup.Append("pinMode(");
-        n.Left.Accept(pinVisitor);
+        n.Right.Accept(pinVisitor);
         _pinSetup.Append(pinVisitor.GetPinCode());
         switch (((PinType)n.Type).Mode)
         {
