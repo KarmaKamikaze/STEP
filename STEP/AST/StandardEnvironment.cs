@@ -59,7 +59,7 @@ public static class StandardEnvironment
         {
             {"pin", new PinType() {ActualType = TypeVal.Analogpin}}
         },
-        Type = new Type() { ActualType = TypeVal.PinLevel, IsConstant = true }
+        Type = new Type() { ActualType = TypeVal.Number }
     };
     public static StdFuncSymTableEntry AnalogWrite => new()
     {
@@ -68,7 +68,7 @@ public static class StandardEnvironment
         Parameters = new()
         {
             { "pin", new PinType { ActualType = TypeVal.Analogpin } },
-            { "value", new Type { ActualType = TypeVal.PinLevel } }
+            { "value", new Type { ActualType = TypeVal.Number } }
         },
         Type = new Type { ActualType = TypeVal.Blank }
     };
