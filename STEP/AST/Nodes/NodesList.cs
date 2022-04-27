@@ -2,7 +2,8 @@
 
 public class NodesList : AstNode
 {
-    public List<AstNode> Nodes { get; set; } = new();
+    public List<AstNode> Nodes { get; } = new();
+
     public override void Accept(IVisitor v)
     {
         throw new NotImplementedException();

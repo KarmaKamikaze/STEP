@@ -1,7 +1,9 @@
 ﻿namespace STEP.AST.Nodes;
 
-public class ParenNode : ExprNode {
-    public override void Accept(IVisitor v) {
+public class ParenNode : ExprNode
+{
+    public override void Accept(IVisitor v)
+    {
         v.Visit(this);
     }
 
@@ -11,6 +13,7 @@ public class ParenNode : ExprNode {
         {
             return Equals(other.Left, Left);
         }
+
         return false;
     }
 }

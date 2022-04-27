@@ -2,6 +2,7 @@
 
 namespace STEP;
 
-public class PinType : Type {
+public class PinType : Type
+{
     public PinMode Mode { get; set; }
 }

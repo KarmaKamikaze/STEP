@@ -1,20 +1,26 @@
 ﻿using STEP.AST;
 using STEP.AST.Nodes;
 
-namespace STEP; 
+namespace STEP;
 
-public class AssVisitor : TypeVisitor {
-    public AssVisitor(ISymbolTable symbolTable) {
+public class AssVisitor : TypeVisitor
+{
+    public AssVisitor(ISymbolTable symbolTable)
+    {
         _symbolTable = symbolTable;
     }
 
     private readonly ISymbolTable _symbolTable;
-    public override void Visit(IdNode n) {
+
+    public override void Visit(IdNode n)
+    {
         var symbol = _symbolTable.RetrieveSymbol(n.Id);
-        if (symbol is not null) {
+        if (symbol is not null)
+        {
             n.Type = symbol.Type;
         }
-        else {
+        else
+        {
             n.Type.ActualType = TypeVal.Error;
         }
     }

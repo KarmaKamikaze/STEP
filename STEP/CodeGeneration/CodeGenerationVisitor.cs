@@ -161,7 +161,7 @@ public class CodeGenerationVisitor : IVisitor
     {
         EmitAppend(n.Value.ToString().ToLowerInvariant());
     }
-    
+
     public void Visit(ArrDclNode n)
     {
         // e.g. double* studentAges = (double*)malloc(5 * sizeof(double));
@@ -185,7 +185,7 @@ public class CodeGenerationVisitor : IVisitor
         for (int i = 0; i < count; i++)
         {
             n.Elements[i].Accept(this);
-            if (i < count-1)
+            if (i < count - 1)
             {
                 // Add comma after all but the last element
                 EmitAppend(", ");
@@ -219,7 +219,7 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend(" = ");
         n.Right.Accept(this);
     }
-    
+
     public void Visit(AssNode n)
     {
         AssNodeGen(n);
@@ -237,10 +237,11 @@ public class CodeGenerationVisitor : IVisitor
             n.ArrIndex.Accept(this);
             EmitAppend("]");
         }
+
         EmitAppend(" = ");
         n.Expr.Accept(this);
     }
-    
+
     public void Visit(IdNode n)
     {
         EmitAppend(n.Id);
@@ -344,7 +345,7 @@ public class CodeGenerationVisitor : IVisitor
         // for(int x = 0; i < n; i++)
         // VarDcl, AssNode, Identifier, ArrAccessNode
         EmitAppend("for(");
-        
+
         //Each if-statement creates the for-loop header with the relevant type of initializer
         if (n.Initializer is VarDclNode varInit)
         {
@@ -361,9 +362,9 @@ public class CodeGenerationVisitor : IVisitor
             n.Initializer.Accept(this);
             ForNodeHelper(n.Initializer, n);
         }
-        
+
         n.Update.Accept(this);
-        
+
         EmitLine(") {");
         EnterScope();
         foreach (StmtNode statement in n.Body)
@@ -373,7 +374,6 @@ public class CodeGenerationVisitor : IVisitor
 
         ExitScope();
         EmitLine("}");
-        
     }
 
     private void ForNodeHelper(AstNode node, ForNode n)
@@ -416,7 +416,7 @@ public class CodeGenerationVisitor : IVisitor
             EmitAppend("]");
         }
     }
-    
+
     public void Visit(ContNode n)
     {
         EmitLine("continue;");
@@ -445,11 +445,13 @@ public class CodeGenerationVisitor : IVisitor
             {
                 EmitAppend("[]");
             }
+
             if (i < n.FormalParams.Count - 1)
             {
                 EmitAppend(", ");
             }
         }
+
         EmitLine(") {");
         // Body
         EnterScope();
@@ -475,6 +477,7 @@ public class CodeGenerationVisitor : IVisitor
                 EmitAppend(", ");
             }
         }
+
         EmitAppend(")");
     }
 
@@ -491,6 +494,7 @@ public class CodeGenerationVisitor : IVisitor
                 EmitAppend(", ");
             }
         }
+
         EmitLine(");");
     }
 
@@ -505,10 +509,12 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(RetNode n)
     {
         // If no expression, emit empty return
-        if (n.RetVal is null) {
+        if (n.RetVal is null)
+        {
             EmitLine("return;");
         }
-        else {
+        else
+        {
             EmitAppend("return ");
             n.RetVal.Accept(this);
             EmitLine(";");
@@ -527,7 +533,7 @@ public class CodeGenerationVisitor : IVisitor
          *   ElseClause
          * }
          */
-        
+
         EmitAppend("if(");
         n.Condition.Accept(this);
         EmitLine(") {");
@@ -538,7 +544,7 @@ public class CodeGenerationVisitor : IVisitor
 
         ExitScope();
         EmitLine("}");
-        
+
         if (n.ElseIfClauses?.Count > 0)
         {
             foreach (var elseIf in n.ElseIfClauses)
@@ -546,7 +552,7 @@ public class CodeGenerationVisitor : IVisitor
                 elseIf.Accept(this);
             }
         }
-        
+
         if (n.ElseClause?.Count > 0)
         {
             EmitLine("else {");
@@ -562,7 +568,8 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(VarsNode n)
     {
-        foreach(var dclNode in n.Dcls) {
+        foreach (var dclNode in n.Dcls)
+        {
             dclNode.Accept(this);
         }
     }
@@ -583,15 +590,16 @@ public class CodeGenerationVisitor : IVisitor
         // Add declared pinModes from variables scope
         if (_pinSetup.ToString() != String.Empty)
             EmitLine(_pinSetup.ToString());
-        
-        foreach(var stmt in n.Stmts) {
+
+        foreach (var stmt in n.Stmts)
+        {
             stmt.Accept(this);
         }
 
         ExitScope();
         EmitLine("}");
     }
-    
+
     public void Visit(LoopNode n)
     {
         EmitLine("void loop() {");
@@ -631,8 +639,15 @@ public class CodeGenerationVisitor : IVisitor
          */
         _pinSetup.Append("pinMode(");
         n.Right.Accept(pinVisitor);
+        // Append A if the pin is analog to allow for arduino to
+        // differentiate between analog and digital pins
+        if (n.Left.Type.ActualType is TypeVal.Analogpin)
+        {
+            _pinSetup.Append('A');
+        }
+
         _pinSetup.Append(pinVisitor.GetPinCode());
-        switch (((PinType)n.Type).Mode)
+        switch (((PinType) n.Type).Mode)
         {
             case PinMode.INPUT:
                 _pinSetup.Append("INPUT");
@@ -641,6 +656,7 @@ public class CodeGenerationVisitor : IVisitor
                 _pinSetup.Append("OUTPUT");
                 break;
         }
+
         _pinSetup.Append(");\r\n");
     }
 }

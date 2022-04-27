@@ -1,6 +1,7 @@
-﻿namespace STEP.AST.Nodes; 
+﻿namespace STEP.AST.Nodes;
 
-public enum PinMode {
+public enum PinMode
+{
     INPUT,
     OUTPUT
 }
