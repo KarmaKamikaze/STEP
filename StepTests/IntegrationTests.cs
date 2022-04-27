@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using Antlr4.Runtime;
 using STEP;
@@ -11,7 +11,6 @@ namespace StepTests;
 
 public class IntegrationTests
 {
-
     private STEPParser.ProgramContext GetParseTree(string input) 
     { 
         AntlrInputStream streamReader = new(input);
@@ -41,6 +40,7 @@ public class IntegrationTests
         string actual = codeGen.OutputToString();
 
         string expectedFilePath = Directory.GetCurrentDirectory() + "\\..\\..\\..\\IntegrationTestPrograms\\" + expectedFile;
+
         string expected = File.ReadAllText(expectedFilePath);
         
         Assert.Equal(expected, actual);

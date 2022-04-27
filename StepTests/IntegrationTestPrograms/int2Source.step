@@ -1,4 +1,4 @@
-﻿variables
+variables
     input digitalpin dpin = 1
     output analogpin apin = 3
     constant number num = 10.5
@@ -46,8 +46,4 @@ functions
         end if 
     end function
 end functions
-
-
-
-
 
