@@ -7,7 +7,9 @@ public class ForNode : StmtNode
     public ExprNode Limit { get; set; }
     public ExprNode Update { get; set; }
     public List<StmtNode> Body { get; set; } = new();
-    public override void Accept(IVisitor v) {
+
+    public override void Accept(IVisitor v)
+    {
         v.Visit(this);
     }
 
@@ -16,10 +18,11 @@ public class ForNode : StmtNode
         if (obj is ForNode other)
         {
             return Equals(other.Initializer, Initializer)
-                && Equals(other.Limit, Limit)
-                && Equals(other.Update, Update)
-                && other.Body.SequenceEqual(Body);
+                   && Equals(other.Limit, Limit)
+                   && Equals(other.Update, Update)
+                   && other.Body.SequenceEqual(Body);
         }
+
         return false;
     }
 }

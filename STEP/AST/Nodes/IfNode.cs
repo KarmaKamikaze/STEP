@@ -16,13 +16,14 @@ public class IfNode : StmtNode
 
     public override bool Equals(object obj)
     {
-        if(obj is IfNode other)
+        if (obj is IfNode other)
         {
             return Equals(other.Condition, Condition)
                    && other.ThenClause.SequenceEqual(ThenClause)
                    && other.ElseIfClauses.SequenceEqual(ElseIfClauses)
                    && other.ElseClause.SequenceEqual(ElseClause);
         }
+
         return false;
     }
 }

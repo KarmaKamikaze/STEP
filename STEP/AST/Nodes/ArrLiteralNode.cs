@@ -4,7 +4,7 @@ public class ArrLiteralNode : ExprNode
 {
     public List<ExprNode> Elements { get; init; } = new();
     public int ExpectedSize { get; set; }
-    
+
     public override void Accept(IVisitor v)
     {
         v.Visit(this);
@@ -16,6 +16,7 @@ public class ArrLiteralNode : ExprNode
         {
             return Elements.SequenceEqual(other.Elements);
         }
+
         return false;
     }
 }

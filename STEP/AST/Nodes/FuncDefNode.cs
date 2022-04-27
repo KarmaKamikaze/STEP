@@ -6,7 +6,9 @@ public class FuncDefNode : AstNode
     public Type ReturnType { get; init; } = new();
     public List<IdNode> FormalParams { get; init; } = new();
     public List<StmtNode> Stmts { get; set; }
-    public override void Accept(IVisitor v) {
+
+    public override void Accept(IVisitor v)
+    {
         v.Visit(this);
     }
 
@@ -15,11 +17,11 @@ public class FuncDefNode : AstNode
         if (obj is FuncDefNode other)
         {
             return Equals(other.Name, Name)
-                && Equals(other.ReturnType, ReturnType)
-                && FormalParams.SequenceEqual(other.FormalParams)
-                && Stmts.SequenceEqual(other.Stmts);
-
+                   && Equals(other.ReturnType, ReturnType)
+                   && FormalParams.SequenceEqual(other.FormalParams)
+                   && Stmts.SequenceEqual(other.Stmts);
         }
+
         return base.Equals(obj);
     }
 }

@@ -53,7 +53,7 @@ public static class NodeFactory
                 return new ArrayAccessNode() {NodeType = AstNodeType.ArrayAccessNode};
             case AstNodeType.ArrayLiteralNode:
                 return new ArrLiteralNode() {NodeType = AstNodeType.ArrayLiteralNode};
-                // Variable Declarations
+            // Variable Declarations
             case AstNodeType.ArrDclNode:
                 return new ArrDclNode() {NodeType = AstNodeType.ArrDclNode};
             case AstNodeType.VarDclNode:

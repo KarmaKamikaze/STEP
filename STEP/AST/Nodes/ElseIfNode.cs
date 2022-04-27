@@ -15,8 +15,9 @@ public class ElseIfNode : StmtNode
         if (obj is ElseIfNode other)
         {
             return Equals(other.Condition, Condition)
-                && Body.SequenceEqual(other.Body);
+                   && Body.SequenceEqual(other.Body);
         }
+
         return false;
     }
 }
