@@ -592,6 +592,32 @@ public class CodeGenerationVisitorTests
     }
 
     #endregion
+
+    #region PinDclNode
+
+    [Theory]
+    [InlineData("OUTPUT", PinMode.OUTPUT)]
+    [InlineData("INPUT", PinMode.INPUT)]
+    public void PinDclNode_InputOutputAnalogpin_ShouldGeneratepinMode(string mode, PinMode pinMode)
+    {
+        // Arrange
+        string expected = $"void setup() {{\r\npinMode(1, {mode});\n\r\n}}\r\n";
+        var n = new NumberNode() {Value = 1};
+        var x = new IdNode {Id = "x"};
+        var setup = new SetupNode() {Stmts = new List<StmtNode>()};
+        var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = pinMode}};
+        
+        // Act
+        _visitor.Visit(pinDclNode);
+        _visitor.Visit(setup);
+        string actual = _visitor.OutputToString();
+        
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+    
+
+    #endregion
 }
 
 
