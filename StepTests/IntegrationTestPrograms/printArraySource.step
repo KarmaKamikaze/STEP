@@ -26,8 +26,5 @@ end function
     return array
 end function##
 
-
-
-
 end functions
 
