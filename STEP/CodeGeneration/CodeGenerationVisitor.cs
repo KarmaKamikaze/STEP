@@ -133,7 +133,7 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(StringNode n)
     {
-        EmitAppend("\"" + n.Value + "\"");
+        EmitAppend(n.Value);
     }
 
     public void Visit(BoolNode n)
@@ -194,7 +194,7 @@ public class CodeGenerationVisitor : IVisitor
     private void VarDclNodeGen(VarDclNode n)
     {
         // Type id = expr;
-        EmitAppend(n.Type);
+        EmitAppend(n.Left.Type);
 
         n.Left.Accept(this);
         EmitAppend(" = ");
@@ -418,6 +418,10 @@ public class CodeGenerationVisitor : IVisitor
             var param = n.FormalParams[i];
             EmitAppend(param.Type);
             param.Accept(this);
+            if (param.Type.IsArray)
+            {
+                EmitAppend("[]");
+            }
             if (i < n.FormalParams.Count - 1)
             {
                 EmitAppend(", ");
@@ -597,6 +601,6 @@ public class CodeGenerationVisitor : IVisitor
                 _pinSetup.Append("OUTPUT");
                 break;
         }
-        _pinSetup.Append(");\n");
+        _pinSetup.Append(");\r\n");
     }
 }

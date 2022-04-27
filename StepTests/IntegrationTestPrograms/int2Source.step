@@ -1,0 +1,36 @@
+﻿variables
+    input digitalpin dpin = 1
+    constant number num = 10.5
+    string str = "test"
+    boolean boo = true
+end variables
+
+setup
+    str = "test2"
+    number num2 = 0
+    repeat for(number i = num2 to num, change by 3)
+        num2 = num2 + 1
+    end for
+end setup
+
+
+loop 
+    number num3 = 1
+    repeat while(true)
+        if(num3 > 20)
+            break
+        else if(num3 > num)
+            num3 = num3 * 2
+            continue
+        else
+            num3 = num3 + 1
+        end if
+    end while
+    
+end loop
+
+
+
+
+
+
