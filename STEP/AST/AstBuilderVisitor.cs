@@ -459,19 +459,6 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         return (ExprNode) children.First(child => child is ExprNode);
     }
 
-    // Helper function
-    private ExprNode UMinusCheck([NotNull] STEPParser.ValueContext context, ExprNode node)
-    {
-        UMinusNode uNode = (UMinusNode) NodeFactory.MakeNode(AstNodeType.UMinusNode);
-        if (context.MINUS() != null)
-        {
-            uNode.Left = node;
-            return uNode;
-        }
-
-        return node;
-    }
-
     public override ExprNode VisitArrindex([NotNull] STEPParser.ArrindexContext context)
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
@@ -509,9 +496,22 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         return UMinusCheck(context, (ExprNode) children.First(child => child is ExprNode));
     }
 
+    // Helper function
+    private ExprNode UMinusCheck([NotNull] STEPParser.ValueContext context, ExprNode node)
+    {
+        UMinusNode uNode = (UMinusNode) NodeFactory.MakeNode(AstNodeType.UMinusNode);
+        if (context.MINUS() != null)
+        {
+            uNode.Left = node;
+            return uNode;
+        }
+
+        return node;
+    }
+
     public override ExprNode VisitConstant([NotNull] STEPParser.ConstantContext context)
     {
-        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+        context.children.Select(kiddies => kiddies.Accept(this));
 
         if (context.NUMLITERAL() != null)
         {
@@ -814,49 +814,6 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             {
                 node.Body.Add(stmtNode);
             }
-        }
-
-        return node;
-    }
-
-    // The method only accepts either STEPParser.IfstmtContext or STEPParser.LoopifstmtContext type contexts.
-    [Obsolete("Should not be used after the inclusion of else-if clauses")]
-    private IfNode IfNodeGenerator<T>(T context) where T : ParserRuleContext
-    {
-        List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
-        IfNode node = (IfNode) NodeFactory.MakeNode(AstNodeType.IfNode);
-
-        // Get condition
-        node.Condition = (ExprNode) children.First(child => child is ExprNode);
-
-        if ((context as STEPParser.IfstmtContext)?.elsestmt() != null ||
-            (context as STEPParser.LoopifstmtContext)?.loopelsestmt() != null)
-        {
-            /* Find the first statement node in the list of children and use it to add all statements
-             * (before the first null node) to the ThenClause.
-             * The null node represents the else terminal.
-             */
-            int index = children.FindIndex(child => child is StmtNode);
-            while (children[index] != null)
-            {
-                node.ThenClause.Add((StmtNode) children[index++]);
-            }
-
-            // TODO: REMEMBER TO TEST NL-ONLY STATEMENTS
-            while (children[index] == null)
-            {
-                index++; // Increment the index to skip the else terminal
-            }
-
-            // Add the remaining statement nodes to the ElseClause.
-            while (children[index] is StmtNode)
-            {
-                node.ElseClause.Add((StmtNode) children[index++]);
-            }
-        }
-        else
-        {
-            node.ThenClause = children.OfType<StmtNode>().ToList();
         }
 
         return node;
