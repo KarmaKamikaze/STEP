@@ -32,24 +32,24 @@ public class CodeGenerationVisitor : IVisitor
         _stringBuilder.Append(line);
     }
 
-    private void EmitAppend(Type type)
+    private void EmitAppend(Type type, string suffix = " ")
     {
         if (type.IsConstant)
-            EmitAppend("const ");
+            EmitAppend("const" + suffix);
         
         switch (type.ActualType)
         {
             case TypeVal.Number:
-                EmitAppend("double ");
+                EmitAppend("double" + suffix);
                 break;
             case TypeVal.String:
-                EmitAppend("String ");
+                EmitAppend("String" + suffix);
                 break;
             case TypeVal.Boolean:
-                EmitAppend("boolean ");
+                EmitAppend("boolean" + suffix);
                 break;
             case TypeVal.Blank:
-                EmitAppend("void ");
+                EmitAppend("void" + suffix);
                 break;
         }
     }
@@ -66,7 +66,7 @@ public class CodeGenerationVisitor : IVisitor
         }
         else {
             foreach (var tuple in _arrDclsPerScope.Where(k => k.Item1 > _scopeLevel)) {
-                EmitLine($"free({tuple.Item2.Left.Id})");
+                EmitLine($"free({tuple.Item2.Left.Id});");
                 tuplesToRemove.Add(tuple);
             }
         }
@@ -163,21 +163,23 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(ArrDclNode n)
     {
         // Type id[size] = { elements };
-        EmitAppend(n.Type);
-
+        EmitAppend(n.Type, "* ");
         n.Left.Accept(this);
-        EmitAppend($"[{n.Size}]");
-        if (n.IdRight is not null)
-        {
-            EmitAppend(" = ");
-            n.IdRight.Accept(this);
-        }
-        else if (n.Right is not null)
-        {
-            EmitAppend(" = ");
-            n.Right.Accept(this);
-        }
-
+        // EmitAppend($"[{n.Size}]");
+        // if (n.IdRight is not null)
+        // {
+        //     EmitAppend(" = ");
+        //     n.IdRight.Accept(this);
+        // }
+        // else if (n.Right is not null)
+        // {
+        //     EmitAppend(" = ");
+        //     n.Right.Accept(this);
+        // }
+        EmitAppend($" = (");
+        EmitAppend(n.Type, "*");
+        EmitAppend($")malloc({n.Size} * sizeof(");
+        EmitAppend(n.Type, "))");
         EmitLine(";");
         _arrDclsPerScope.Add(new Tuple<int, ArrDclNode>(_scopeLevel, n));
     }
@@ -441,7 +443,7 @@ public class CodeGenerationVisitor : IVisitor
          *   statements
          * }
          */
-        EmitAppend(n.ReturnType);
+        EmitAppend(n.ReturnType, n.Type.IsArray ? "* " : " ");
         n.Name.Accept(this);
         EmitAppend("(");
         for (int i = 0; i < n.FormalParams.Count; i++)
