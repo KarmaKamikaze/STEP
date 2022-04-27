@@ -9,29 +9,29 @@ end loop
 
 functions
 
-string function manass(string testes)
-  string asstits = "assmnasas"
+string function func1(string test)
+  string str = "teststring"
   repeat while(true)
     if(true)
       break
     end if
   end while
-  return testes
+  return test
 end function
 
-number[] function assfunc(string test, number[] assss) 
-boolean ass = true
-  if(ass)
-     return assss
+number[] function func2(string test, number[] num) 
+boolean bool1 = true
+  if(bool1)
+     return num
   end if
   return assss
 end function
 
 
-blank function asssdafunc()
+blank function blankfunc()
   number x = 10
-  boolean ass = true
-  if(ass)
+  boolean b = true
+  if(b)
   end if
 end function
 
