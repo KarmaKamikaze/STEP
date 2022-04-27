@@ -10,7 +10,8 @@ public class CodeGenerationVisitor : IVisitor
     private readonly StringBuilder _stringBuilder = new();
     private string Output => _stringBuilder.ToString();
     private readonly StringBuilder _pinSetup = new();
-
+    private int _scopeLevel = 0;
+    private readonly List<Tuple<int, ArrDclNode>> _arrDclsPerScope = new(); // Keeps track of array declarations per scope
     public void OutputToBaseFile()
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -21,9 +22,8 @@ public class CodeGenerationVisitor : IVisitor
     {
         return Output;
     }
-
-    private void EmitLine(string line)
-    {
+    
+    private void EmitLine(string line) {
         _stringBuilder.AppendLine(line);
     }
 
@@ -32,28 +32,49 @@ public class CodeGenerationVisitor : IVisitor
         _stringBuilder.Append(line);
     }
 
-    private void EmitAppend(Type type)
+    private void EmitAppend(Type type, string suffix = " ")
     {
         if (type.IsConstant)
-            EmitAppend("const ");
-
+            EmitAppend("const" + suffix);
+        
         switch (type.ActualType)
         {
             case TypeVal.Number:
-                EmitAppend("double ");
+                EmitAppend("double" + suffix);
                 break;
             case TypeVal.String:
-                EmitAppend("String ");
+                EmitAppend("String" + suffix);
                 break;
             case TypeVal.Boolean:
-                EmitAppend("boolean ");
+                EmitAppend("boolean" + suffix);
                 break;
             case TypeVal.Blank:
-                EmitAppend("void ");
+                EmitAppend("void" + suffix);
                 break;
         }
     }
 
+    private void EnterScope() {
+        _scopeLevel++;
+    }
+    
+    private void ExitScope(bool isArrayFunc = false) {
+        _scopeLevel--;
+        var tuplesToRemove = new List<Tuple<int, ArrDclNode>>();
+        // If exiting a function returning an array, do not free declared arrays
+        if (isArrayFunc) {
+            tuplesToRemove.AddRange(_arrDclsPerScope.Where(t => t.Item1 > _scopeLevel));
+        }
+        // Else, when exiting a scope, free all arrays declared in the scope
+        else {
+            foreach (var tuple in _arrDclsPerScope.Where(k => k.Item1 > _scopeLevel)) {
+                EmitLine($"free({tuple.Item2.Left.Id});");
+                tuplesToRemove.Add(tuple);
+            }
+        }
+        tuplesToRemove.ForEach(t => _arrDclsPerScope.Remove(t));
+    }
+    
     public void Visit(AndNode n)
     {
         // E.g.: x and true -> x && true 
@@ -143,23 +164,16 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ArrDclNode n)
     {
-        // Type id[size] = { elements };
-        EmitAppend(n.Type);
-
+        // e.g. double* studentAges = (double*)malloc(5 * sizeof(double));
+        // equivalent to double[5] studentAges;
+        EmitAppend(n.Type, "* ");
         n.Left.Accept(this);
-        EmitAppend($"[{n.Size}]");
-        if (n.IsId)
-        {
-            EmitAppend(" = ");
-            n.IdRight.Accept(this);
-        }
-        else if (n.Right is not null)
-        {
-            EmitAppend(" = ");
-            n.Right.Accept(this);
-        }
-
+        EmitAppend($" = (");
+        EmitAppend(n.Type, "*");
+        EmitAppend($")malloc({n.Size} * sizeof(");
+        EmitAppend(n.Type, "))");
         EmitLine(";");
+        _arrDclsPerScope.Add(new Tuple<int, ArrDclNode>(_scopeLevel, n));
     }
 
     public void Visit(ArrLiteralNode n)
@@ -167,6 +181,7 @@ public class CodeGenerationVisitor : IVisitor
         int count = n.Elements.Count;
         if (count == 0) return;
         EmitAppend("{");
+        EnterScope();
         for (int i = 0; i < count; i++)
         {
             n.Elements[i].Accept(this);
@@ -177,6 +192,7 @@ public class CodeGenerationVisitor : IVisitor
             }
         }
 
+        ExitScope();
         EmitAppend("}");
     }
 
@@ -231,31 +247,29 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend(n.Id);
     }
 
-    public void Visit(PlusNode n)
-    {
-        // If the overall expression has type string, we must convert any non-string children to strings
-        if (n.Type.ActualType is TypeVal.String && n.Left.Type.ActualType != TypeVal.String)
-        {
-            // String(left) + right
-            EmitAppend("String(");
-            n.Left.Accept(this);
-            EmitAppend(") + ");
-            n.Right.Accept(this);
-        }
-        else if (n.Type.ActualType is TypeVal.String && n.Right.Type.ActualType != TypeVal.String)
-        {
-            // left + String(right)
-            n.Left.Accept(this);
-            EmitAppend(" + String(");
-            n.Right.Accept(this);
-            EmitAppend(")");
-        }
-        else
-        {
-            // left + right
-            n.Left.Accept(this);
-            EmitAppend(" + ");
-            n.Right.Accept(this);
+    public void Visit(PlusNode n) {
+        switch (n.Type.ActualType) {
+            // If the overall expression has type string, we must convert any non-string children to strings
+            case TypeVal.String when n.Left.Type.ActualType != TypeVal.String:
+                // String(left) + right
+                EmitAppend("String(");
+                n.Left.Accept(this);
+                EmitAppend(") + ");
+                n.Right.Accept(this);
+                break;
+            case TypeVal.String when n.Right.Type.ActualType != TypeVal.String:
+                // left + String(right)
+                n.Left.Accept(this);
+                EmitAppend(" + String(");
+                n.Right.Accept(this);
+                EmitAppend(")");
+                break;
+            default:
+                // left + right
+                n.Left.Accept(this);
+                EmitAppend(" + ");
+                n.Right.Accept(this);
+                break;
         }
     }
 
@@ -315,11 +329,13 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend("while(");
         n.Condition.Accept(this);
         EmitLine(") {");
+        EnterScope();
         foreach (StmtNode statement in n.Body)
         {
             statement.Accept(this);
         }
 
+        ExitScope();
         EmitLine("}");
     }
 
@@ -350,11 +366,13 @@ public class CodeGenerationVisitor : IVisitor
         n.Update.Accept(this);
 
         EmitLine(") {");
+        EnterScope();
         foreach (StmtNode statement in n.Body)
         {
             statement.Accept(this);
         }
 
+        ExitScope();
         EmitLine("}");
     }
 
@@ -415,7 +433,7 @@ public class CodeGenerationVisitor : IVisitor
          *   statements
          * }
          */
-        EmitAppend(n.ReturnType);
+        EmitAppend(n.ReturnType, n.Type.IsArray ? "* " : " ");
         n.Name.Accept(this);
         EmitAppend("(");
         for (int i = 0; i < n.FormalParams.Count; i++)
@@ -436,11 +454,13 @@ public class CodeGenerationVisitor : IVisitor
 
         EmitLine(") {");
         // Body
+        EnterScope();
         foreach (StmtNode stmt in n.Stmts)
         {
             stmt.Accept(this);
         }
 
+        ExitScope(n.Type.IsArray);
         EmitLine("}");
     }
 
@@ -517,11 +537,12 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend("if(");
         n.Condition.Accept(this);
         EmitLine(") {");
-        foreach (var stmt in n.ThenClause)
-        {
+        EnterScope();
+        foreach(var stmt in n.ThenClause) {
             stmt.Accept(this);
         }
 
+        ExitScope();
         EmitLine("}");
 
         if (n.ElseIfClauses?.Count > 0)
@@ -535,11 +556,12 @@ public class CodeGenerationVisitor : IVisitor
         if (n.ElseClause?.Count > 0)
         {
             EmitLine("else {");
+            EnterScope();
             foreach (var stmt in n.ElseClause)
             {
                 stmt.Accept(this);
             }
-
+            ExitScope();
             EmitLine("}");
         }
     }
@@ -564,6 +586,7 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(SetupNode n)
     {
         EmitLine("void setup() {");
+        EnterScope();
         // Add declared pinModes from variables scope
         if (_pinSetup.ToString() != String.Empty)
             EmitLine(_pinSetup.ToString());
@@ -573,17 +596,19 @@ public class CodeGenerationVisitor : IVisitor
             stmt.Accept(this);
         }
 
+        ExitScope();
         EmitLine("}");
     }
 
     public void Visit(LoopNode n)
     {
         EmitLine("void loop() {");
-        foreach (var stmt in n.Stmts)
-        {
+        EnterScope();
+        foreach(var stmt in n.Stmts) {
             stmt.Accept(this);
         }
 
+        ExitScope();
         EmitLine("}");
     }
 
@@ -594,11 +619,13 @@ public class CodeGenerationVisitor : IVisitor
             EmitAppend("else if(");
             n.Condition.Accept(this);
             EmitLine(") {");
-            foreach (var stmt in n.Body)
+            EnterScope();
+            foreach(var stmt in n.Body)
             {
                 stmt.Accept(this);
             }
 
+            ExitScope();
             EmitLine("}");
         }
     }

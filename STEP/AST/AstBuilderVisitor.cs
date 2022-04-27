@@ -550,11 +550,8 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         List<ExprNode> parameters = new();
 
-        NodesList nodesList = ((NodesList) children.First(child => child is NodesList));
-        foreach (AstNode astNode in nodesList.Nodes)
-        {
-            parameters.Add((ExprNode) astNode);
-        }
+        NodesList nodesList = (NodesList)children.FirstOrDefault(child => child is NodesList);
+        if (nodesList != null) parameters.AddRange(nodesList.Nodes.Cast<ExprNode>());
 
         if (context.Parent is STEPParser.ValueContext)
         {
