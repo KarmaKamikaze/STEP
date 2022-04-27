@@ -1,6 +1,4 @@
-﻿using STEP.AST.Nodes;
-
-namespace STEP.AST;
+﻿namespace STEP.AST;
 
 public class FunctionSymTableEntry : SymTableEntry
 {

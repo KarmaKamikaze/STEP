@@ -21,12 +21,32 @@ public class SymbolTable : ISymbolTable
 
     private void AddStandardEnvironment()
     {
+        // Constants
         EnterSymbol(StandardEnvironment.High);
         EnterSymbol(StandardEnvironment.Low);
+        // I/O
         EnterSymbol(StandardEnvironment.DigitalRead);
         EnterSymbol(StandardEnvironment.DigitalWrite);
+        EnterSymbol(StandardEnvironment.AnalogRead);
+        EnterSymbol(StandardEnvironment.AnalogWrite);
+        EnterSymbol(StandardEnvironment.Print);
+        // Math
+        EnterSymbol(StandardEnvironment.Min);
+        EnterSymbol(StandardEnvironment.Max);
+        EnterSymbol(StandardEnvironment.Constrain);
+        EnterSymbol(StandardEnvironment.Sine);
+        EnterSymbol(StandardEnvironment.Cosine);
+        EnterSymbol(StandardEnvironment.Squared);
+        EnterSymbol(StandardEnvironment.SquareRoot);
+        EnterSymbol(StandardEnvironment.Abs);
+        EnterSymbol(StandardEnvironment.Power);
+        // Random
+        EnterSymbol(StandardEnvironment.Random);
+        EnterSymbol(StandardEnvironment.RandomSeed);
+        // Time
+        EnterSymbol(StandardEnvironment.Delay);
     }
-    
+
     public void OpenScope()
     {
         this._depth++;

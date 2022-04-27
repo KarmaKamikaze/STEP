@@ -36,13 +36,13 @@ public class StandardEnvironmentTests
         };
         var digitalRead = new FuncExprNode
         {
-            Id = new IdNode {Id = "digitalRead"},
+            Id = new IdNode {Id = "ReadFromDigitalPin" },
             Params = new List<ExprNode> {new IdNode {Id = "p"}}
         };
         var condition = new EqNode
         {
             Left = digitalRead,
-            Right = new IdNode {Id = "HIGH"}
+            Right = new IdNode {Id = "High"}
         };
         var ifStmt = new IfNode
         {
@@ -79,12 +79,12 @@ public class StandardEnvironmentTests
     [Fact]
     public void DigitalRead_InvalidParameter_ThrowsTypeException()
     {
-        // digitalRead(1) -> type exception since 1 is not a digitalpin!
+        // ReadFromDigitalPin(1) -> type exception since 1 is not a digitalpin!
 
         // Arrange
         var digitalRead = new FuncExprNode
         {
-            Id = new IdNode { Id = "digitalRead" },
+            Id = new IdNode { Id = "ReadFromDigitalPin" },
             Params = new List<ExprNode> { new NumberNode { Value = 1 } }
         };
         
@@ -108,8 +108,8 @@ public class StandardEnvironmentTests
         // Arrange
         var digitalWrite = new FuncStmtNode
         {
-            Id = new IdNode { Id = "digitalWrite" },
-            Params = new List<ExprNode> { new IdNode { Id = "p" }, new IdNode { Id = "LOW" } }
+            Id = new IdNode { Id = "WriteToDigitalPin" },
+            Params = new List<ExprNode> { new IdNode { Id = "p" }, new IdNode { Id = "Low" } }
         };
         var pinDcl = new PinDclNode
         {
