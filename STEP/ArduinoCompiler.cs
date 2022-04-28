@@ -21,9 +21,10 @@ public class ArduinoCompiler
             // The /C flag means that cmd should execute the following command and exit without waiting for further input.
             Process.Start("cmd.exe",
                 "/C " +
-                $"avr-gcc -O2 -Wall -mmcu=atmega328p {directoryPath}/compiled.c -o {directoryPath}/compiled.out");
+                $"{directoryPath}/avr-gcc-destination/avr-gcc -O2 -Wall -mmcu=atmega328p {directoryPath}/compiled.c -o {directoryPath}/compiled.out");
             Process.Start("cmd.exe",
-                "/C " + $"avr-objcopy -O ihex {directoryPath}/compiled.out {directoryPath}/.compiled.hex");
+                "/C " +
+                $"{directoryPath}/avr-gcc-destination/avr-objcopy -O ihex {directoryPath}/compiled.out {directoryPath}/.compiled.hex");
         }
         else
         {
