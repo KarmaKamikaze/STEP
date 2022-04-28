@@ -38,6 +38,14 @@ functions
     number[] function makeArray()
         number[2] z
         number[10] y = z
+        number[50] x
+        if(true)
+            if (true)
+                return y
+            end if
+        else if (true)
+            return y
+        end if
         return z
         end function
     blank function usesArray()

@@ -10,8 +10,8 @@ public class CodeGenerationVisitor : IVisitor
     private readonly StringBuilder _stringBuilder = new();
     private string Output => _stringBuilder.ToString();
     private readonly StringBuilder _pinSetup = new();
-    private int _scopeLevel = 0;
-    private readonly List<Tuple<int, IdNode>> _arrDclsPerScope = new(); // Keeps track of array declarations per scope
+    private int _scopeLevel;
+    private readonly List<IdNode> _arrDclsInScope = new(); // Keeps track of array declarations currently in scope
     public void OutputToBaseFile()
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -63,15 +63,26 @@ public class CodeGenerationVisitor : IVisitor
         FreeArrays(_scopeLevel);
     }
 
+    // Called upon exiting any scope
     private void FreeArrays(int scopeLevel) {
-        var tuplesToRemove = new List<Tuple<int, IdNode>>();
-        foreach (var tuple in _arrDclsPerScope.Where(k => k.Item1 > scopeLevel)) {
-            if (!tuple.Item2.Type.IsReturned) {
-                EmitLine($"free({tuple.Item2.Id});");
+        var arrsToRemove = new List<IdNode>();
+        foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel)) {
+            if (!id.Type.IsReturned) {
+                EmitLine($"free({id.Id});");
             }
-            tuplesToRemove.Add(tuple);
+            arrsToRemove.Add(id);
         }
-        tuplesToRemove.ForEach(t => _arrDclsPerScope.Remove(t));
+        arrsToRemove.ForEach(id => _arrDclsInScope.Remove(id));
+    }
+    
+    // Called upon exiting array function, handles freeing excess arrays
+    private void FreeArrays(int scopeLevel, IdNode exemptId, bool shouldRemove) {
+        var arrsToRemove = new List<IdNode>();
+        foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel && !n.Equals(exemptId))) {
+            EmitLine($"free({id.Id});");
+            arrsToRemove.Add(id);
+        }
+        if(shouldRemove) arrsToRemove.ForEach(id => _arrDclsInScope.Remove(id));
     }
 
     private void CopyArrayHelper(ArrDclNode n) {
@@ -183,7 +194,7 @@ public class CodeGenerationVisitor : IVisitor
             CopyArrayHelper(n);
         }
 
-        _arrDclsPerScope.Add(new Tuple<int, IdNode>(_scopeLevel, n.Left));
+        _arrDclsInScope.Add(n.Left);
     }
 
     public void Visit(ArrLiteralNode n)
@@ -516,17 +527,17 @@ public class CodeGenerationVisitor : IVisitor
         }
     }
 
-    public void Visit(RetNode n)
-    {
+    public void Visit(RetNode n) {
         // If no expression, emit empty return
         if (n.RetVal is null) {
             EmitLine("return;");
         }
         else {
             // If returning from function, free arrays declared in scope
-            // Todo: Clear all arrays from function, even if in nested scope
             if (n.SurroundingFuncType.IsArray) {
-                FreeArrays(_scopeLevel - 1);
+                // If in outer scope, free all arrays except returned and remove from list - else free without removing from list
+                bool isInOuterScope = n.Type.ScopeLevel - 1 == n.SurroundingFuncType.ScopeLevel;
+                FreeArrays(n.SurroundingFuncType.ScopeLevel, (IdNode) n.RetVal, isInOuterScope);
             }
             EmitAppend("return ");
             n.RetVal.Accept(this);

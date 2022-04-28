@@ -9,6 +9,7 @@ public class Type : IEquatable<Type>
     public int ArrSize { get; set; }
     public Boolean IsConstant { get; set; }
     public Boolean IsReturned { get; set; }
+    public int ScopeLevel { get; set; }
 
     public bool Equals(Type other)
     {

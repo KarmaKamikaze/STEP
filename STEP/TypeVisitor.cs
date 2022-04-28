@@ -18,6 +18,17 @@ public class TypeVisitor : IVisitor
 
     private readonly ISymbolTable _symbolTable;
     private readonly IPinTable _pinTable;
+    private int _scopeLevel = 0;
+
+    private void EnterScope() {
+        _symbolTable.OpenScope();
+        _scopeLevel++;
+    }
+
+    private void ExitScope() {
+        _scopeLevel--;
+        _symbolTable.CloseScope();
+    }
 
     public void Visit(AndNode n)
     {
@@ -403,7 +414,7 @@ public class TypeVisitor : IVisitor
 
     public void Visit(WhileNode n)
     {
-        _symbolTable.OpenScope();
+        EnterScope();
         n.Condition.Accept(this);
         if (n.Condition.Type.ActualType == TypeVal.Boolean)
         {
@@ -419,14 +430,15 @@ public class TypeVisitor : IVisitor
         foreach (var stmtNode in n.Body)
         {
             stmtNode.Accept(this);
+            stmtNode.Type.ScopeLevel = _scopeLevel;
         }
 
-        _symbolTable.CloseScope();
+        ExitScope();
     }
 
     public void Visit(ForNode n)
     {
-        _symbolTable.OpenScope();
+        EnterScope();
         n.Initializer.Accept(this);
         n.Limit.Accept(this);
         n.Update.Accept(this);
@@ -452,22 +464,24 @@ public class TypeVisitor : IVisitor
         foreach (var stmtNode in n.Body)
         {
             stmtNode.Accept(this);
+            stmtNode.Type.ScopeLevel = _scopeLevel;
         }
 
-        _symbolTable.CloseScope();
+        ExitScope();
     }
 
     public void Visit(ContNode n) { }
     public void Visit(BreakNode n) { }
     
     public void Visit(LoopNode n) {
-        _symbolTable.OpenScope();
+        EnterScope();
         foreach (var stmt in n.Stmts)
         {
             stmt.Accept(this);
+            stmt.Type.ScopeLevel = _scopeLevel;
         }
 
-        _symbolTable.CloseScope();
+        ExitScope();
     }
 
     public void Visit(FuncDefNode n)
@@ -477,7 +491,7 @@ public class TypeVisitor : IVisitor
             throw new DuplicateDeclarationException("An id of this name have already been declared", n.Name.Id);
         }
 
-        _symbolTable.OpenScope();
+        EnterScope();
         foreach (var param in n.FormalParams)
         {
             _symbolTable.EnterSymbol(param.Id, param.Type);
@@ -486,9 +500,10 @@ public class TypeVisitor : IVisitor
         foreach (var stmtNode in n.Stmts)
         {
             stmtNode.Accept(this); // Should throw exception if return doesn't match type
+            stmtNode.Type.ScopeLevel = _scopeLevel;
         }
 
-        _symbolTable.CloseScope();
+        ExitScope();
 
         n.Type = n.ReturnType;
         _symbolTable.EnterSymbol(n);
@@ -607,20 +622,28 @@ public class TypeVisitor : IVisitor
                 $"Type mismatch, expected condition to be of type {TypeVal.Boolean}, actual type is {n.Condition.Type}");
         }
 
-        _symbolTable.OpenScope();
+        EnterScope();
         foreach (var node in n.ThenClause)
         {
             node.Accept(this);
+            node.Type.ScopeLevel = _scopeLevel;
+        }
+        ExitScope();
+        
+        foreach (var node in n.ElseIfClauses) {
+            node.Accept(this);
+            node.Type.ScopeLevel = _scopeLevel;
         }
 
-        _symbolTable.CloseScope();
-        _symbolTable.OpenScope();
+        EnterScope();
         foreach (var node in n.ElseClause)
         {
             node.Accept(this);
+            node.Type.ScopeLevel = _scopeLevel;
         }
-
-        _symbolTable.CloseScope();
+        ExitScope();
+        
+        
     }
 
     public void Visit(ElseIfNode n)
@@ -633,13 +656,14 @@ public class TypeVisitor : IVisitor
         }
 
         n.Type.ActualType = TypeVal.Ok;
-        _symbolTable.OpenScope();
+        
+        EnterScope();
         foreach (var stmt in n.Body)
         {
             stmt.Accept(this);
+            stmt.Type.ScopeLevel = _scopeLevel;
         }
-
-        _symbolTable.CloseScope();
+        ExitScope();
     }
 
     public void Visit(VarsNode n)
@@ -647,6 +671,7 @@ public class TypeVisitor : IVisitor
         foreach (var node in n.Dcls)
         {
             node.Accept(this);
+            node.Type.ScopeLevel = _scopeLevel;
         }
     }
 
@@ -660,12 +685,13 @@ public class TypeVisitor : IVisitor
 
     public void Visit(SetupNode n)
     {
-        _symbolTable.OpenScope();
+        EnterScope();
         foreach (var node in n.Stmts)
         {
             node.Accept(this);
+            node.Type.ScopeLevel = _scopeLevel;
         }
 
-        _symbolTable.CloseScope();
+        ExitScope();
     }
 }
