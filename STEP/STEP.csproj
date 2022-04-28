@@ -5,7 +5,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
-        <NoWarn>CS3021</NoWarn>
+        <NoWarn>CS3021, NU1701, CS0660, CS0661, CS0659</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
