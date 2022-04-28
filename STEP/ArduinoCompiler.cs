@@ -16,41 +16,65 @@ public class ArduinoCompiler
     public void Upload()
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        
+        // Check if avr-gcc files are present in correct folder
+        if (!File.Exists($"{directoryPath}/avr-destination/bin/avr-gcc.exe") &&
+            !File.Exists($"{directoryPath}/avr-destination/bin/avr-objcopy.exe"))
+        {
+            throw new ApplicationException(
+                "Please download the avr8 toolchain and place the contents in the avr-destination folder");
+        }
+        
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             // The /C flag means that cmd should execute the following command and exit without waiting for further input.
-            Process.Start("cmd.exe",
+            Process compiler = Process.Start("cmd.exe",
                 "/C " +
-                $"{directoryPath}/avr-gcc-destination/avr-gcc -O2 -Wall -mmcu=atmega328p {directoryPath}/compiled.c -o {directoryPath}/compiled.out");
-            Process.Start("cmd.exe",
-                "/C " +
-                $"{directoryPath}/avr-gcc-destination/avr-objcopy -O ihex {directoryPath}/compiled.out {directoryPath}/.compiled.hex");
+                $"{directoryPath}/avr-destination/bin/avr-gcc.exe -O2 -Wall -mmcu=atmega328p " +
+                $"-I {directoryPath}/avr-destination/Arduino-Core/cores/arduino " +
+                $"-I {directoryPath}/avr-destination/Arduino-Core/variants/standard " +
+                $"{directoryPath}/compiled.c -o compiled.out");
+            if (compiler != null && compiler.HasExited)
+            {
+                if (!File.Exists(directoryPath + "/compiled.out"))
+                {
+                    throw new ApplicationException("Arduino compiler error.");
+                }
+                Process.Start("cmd.exe",
+                    "/C " +
+                    $"{directoryPath}/avr-destination/bin/avr-objcopy.exe -O ihex {directoryPath}/compiled.out {directoryPath}/.compiled.hex");
+            }
         }
         else
         {
             Process.Start("/bin/bash",
-                $"avr-gcc -O2 -Wall -mmcu=atmega328p {directoryPath}/compiled.c -o {directoryPath}/compiled.out");
+                $"{directoryPath}/avr-destination/bin/avr-gcc.exe -O2 -Wall -mmcu=atmega328p {directoryPath}/compiled.c -o {directoryPath}/compiled.out");
             Process.Start("/bin/bash",
-                $"avr-objcopy -O ihex {directoryPath}/compiled.out {directoryPath}/.compiled.hex");
+                $"{directoryPath}/avr-destination/bin/avr-objcopy.exe -O ihex {directoryPath}/compiled.out {directoryPath}/.compiled.hex");
+        }
+
+        if (!File.Exists(directoryPath + "/.compiled.hex"))
+        {
+            throw new ApplicationException("Arduino compiler error.");
         }
 
         ArduinoSketchUploader uploader = new ArduinoSketchUploader(new ArduinoSketchUploaderOptions()
         {
-            FileName = directoryPath + @"/.compiled.hex",
+            FileName = directoryPath + "/.compiled.hex",
             //PortName = "COM3", // Can be omitted to try to auto-detect the COM port.
             ArduinoModel = ArduinoModel.UnoR3
         });
         uploader.UploadSketch();
 
         // Clean up
-        if (File.Exists(directoryPath + @"/compiled.out"))
+        if (File.Exists(directoryPath + "/compiled.out"))
         {
-            File.Delete(directoryPath + @"/compiled.out");
+            File.Delete(directoryPath + "/compiled.out");
         }
 
-        if (File.Exists(directoryPath + @"/.compiled.hex"))
+        if (File.Exists(directoryPath + "/.compiled.hex"))
         {
-            File.Delete(directoryPath + @"/.compiled.hex");
+            File.Delete(directoryPath + "/.compiled.hex");
         }
     }
 }

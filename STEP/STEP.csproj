@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="avr-gcc-destination" />
+      <Folder Include="avr-destination" />
     </ItemGroup>
 
 </Project>

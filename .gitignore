@@ -221,8 +221,7 @@ project.lock.json
 *.Specs_*.htmlS
 
 # AVR-GCC executables
-avr-gcc.exe
-avr-objcopy.exe
+**/avr-destination/*
 
 #####
 # End of core ignore list, below put you custom 'per project' settings (patterns or path)

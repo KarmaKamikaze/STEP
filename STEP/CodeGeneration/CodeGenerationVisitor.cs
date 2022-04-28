@@ -576,7 +576,7 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ProgNode n)
     {
-        // TODO: library inclusion?
+        _stringBuilder.Append("#include <Arduino.h>\n");
         n.VarsBlock?.Accept(this);
         n.FuncsBlock?.Accept(this);
         n.SetupBlock?.Accept(this);
