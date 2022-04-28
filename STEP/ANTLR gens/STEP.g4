@@ -282,6 +282,7 @@ grammar STEP;
   arr_id_or_lit
         : ID 
         | LBRACK params_options? RBRACK
+        | funccall
         ;
   
   arrsizedcl 

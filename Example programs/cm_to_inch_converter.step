@@ -37,6 +37,7 @@ functions
     end function
     number[] function makeArray()
         number[2] z
+        number[10] y = z
         return z
         end function
     blank function usesArray()

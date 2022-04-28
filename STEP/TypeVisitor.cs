@@ -179,17 +179,18 @@ public class TypeVisitor : IVisitor
     {
         DclVisitor dclVisitor = new DclVisitor(_symbolTable);
         n.Left.Accept(dclVisitor);
-        if (n.Right is null)
-        {
-            n.Type = n.Left.Type;
-            return;
-        }
-
+        n.Left.Type.ArrSize = n.Size;
+        n.Type = n.Left.Type;
+        if (n.Right is null) return;
         n.Right.Type = n.Left.Type;
         n.Right.Accept(this);
-        n.Type = (n.Left.Type != n.Right.Type)
-            ? throw new TypeException(n, $"Type mismatch, type of left: {n.Left.Type}, type of right: {n.Right.Type}")
-            : n.Left.Type;
+        if (n.Right is IdNode id) {
+            if (id.Type.IsArray) {
+                if (n.Left.Type.ArrSize < n.Right.Type.ArrSize) throw new TypeException(n, $"Array size mismatch, {n.Left.Id} can only fit {n.Left.Type.ArrSize} elements. {id.Id} has {id.Type.ArrSize} elements");
+            } 
+        }
+        if (n.Left.Type != n.Right.Type)
+            throw new TypeException(n, $"Type mismatch, type of left: {n.Left.Type}, type of right: {n.Right.Type}");
     }
 
     public void Visit(ArrLiteralNode n)
@@ -268,6 +269,10 @@ public class TypeVisitor : IVisitor
         AssVisitor assVisitor = new AssVisitor(_symbolTable);
         n.Id.Accept(assVisitor);
         n.Expr.Accept(this);
+        // Prevent copying larger array into smaller
+        if (n.Id.Type.IsArray && n.Expr.Type.IsArray) {
+            if (n.Id.Type.ArrSize < n.Expr.Type.ArrSize) throw new TypeException(n, $"Array size mismatch, {n.Id} can only fit {n.Id.Type.ArrSize} elements. {((IdNode)n.Expr).Id} has {n.Expr.Type.ArrSize} elements");
+        }
         if (n.Id.Type.ActualType is TypeVal.Analogpin or TypeVal.Digitalpin)
         {
             throw new TypeException(n, "Cannot reassign values to pin variables");
@@ -570,6 +575,10 @@ public class TypeVisitor : IVisitor
         else
         {
             n.RetVal.Accept(this);
+            // Mark arrays that are returned from functions for later
+            if (n.RetVal.Type.IsArray) {
+                n.RetVal.Type.IsReturned = true;
+            }
             if (n.SurroundingFuncType == n.RetVal.Type)
             {
                 n.Type.ActualType = TypeVal.Ok;

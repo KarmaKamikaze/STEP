@@ -239,11 +239,11 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         node.Left = idNode;
 
         node.Size = Int32.Parse(context.arrsizedcl().GetText().Trim('[', ']'));
-
+        
         if (children.Any(child => child is IdNode))
         {
             node.IsId = true;
-            node.IdRight = (IdNode) children.First(child => child is IdNode);
+            node.Right = (IdNode) children.First(child => child is IdNode);
         }
         else if (children.Any(child => child is ArrLiteralNode))
         {

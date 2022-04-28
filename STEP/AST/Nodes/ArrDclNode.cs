@@ -10,7 +10,6 @@ public class ArrDclNode : VarDclNode
     }
 
     public bool IsId { get; set; }
-    public IdNode IdRight { get; set; }
 
     public override bool Equals(object obj)
     {
@@ -18,7 +17,6 @@ public class ArrDclNode : VarDclNode
         {
             return other.Size == Size
                    && other.IsId == IsId
-                   && Equals(other.IdRight, IdRight)
                    && Equals(other.Right, Right);
         }
 
