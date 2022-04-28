@@ -601,11 +601,32 @@ public class CodeGenerationVisitorTests
     public void PinDclNode_InputOutputAnalogpin_ShouldGeneratepinMode(string expectedMode, PinMode givenPinMode)
     {
         // Arrange
-        string expected = $"void setup() {{\r\npinMode(1, {expectedMode});\n\r\n}}\r\n";
+        string expected = $"#define x 1\nvoid setup() {{\r\npinMode(1, {expectedMode});\r\n\r\n}}\r\n";
         var n = new NumberNode() {Value = 1};
         var x = new IdNode {Id = "x"};
         var setup = new SetupNode() {Stmts = new List<StmtNode>()};
         var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = givenPinMode}};
+        
+        // Act
+        _visitor.Visit(pinDclNode);
+        _visitor.Visit(setup);
+        string actual = _visitor.OutputToString();
+        
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+    
+    [Theory]
+    [InlineData("pin1", 1)]
+    [InlineData("LEDPIN", 5)]
+    public void PinDclNode_DeclarePinVariableName_ShouldDefinePinConstantVariable(string variableName, int pinNumber)
+    {
+        // Arrange
+        string expected = $"#define {variableName} {pinNumber}\nvoid setup() {{\r\npinMode({pinNumber}, INPUT);\r\n\r\n}}\r\n";
+        var n = new NumberNode() {Value = pinNumber};
+        var x = new IdNode {Id = variableName};
+        var setup = new SetupNode() {Stmts = new List<StmtNode>()};
+        var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = PinMode.INPUT}};
         
         // Act
         _visitor.Visit(pinDclNode);
