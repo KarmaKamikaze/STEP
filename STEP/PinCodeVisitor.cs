@@ -11,7 +11,7 @@ public class PinCodeVisitor : CodeGenerationVisitor
 
     public override void Visit(NumberNode n)
     {
-        _stringBuilder.Append(n.Value.ToString(CultureInfo.InvariantCulture) + ", ");
+        _stringBuilder.Append(n.Value.ToString(CultureInfo.InvariantCulture));
     }
 
     public string GetPinCode()

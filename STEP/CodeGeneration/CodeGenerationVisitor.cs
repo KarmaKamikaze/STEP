@@ -646,7 +646,7 @@ public class CodeGenerationVisitor : IVisitor
             _pinSetup.Append('A');
         }
 
-        _pinSetup.Append(pinVisitor.GetPinCode());
+        _pinSetup.Append(pinVisitor.GetPinCode() + ", ");
         switch (((PinType) n.Type).Mode)
         {
             case PinMode.INPUT:
@@ -658,5 +658,9 @@ public class CodeGenerationVisitor : IVisitor
         }
 
         _pinSetup.Append(");\r\n");
+        
+        // Save variable names as constant declarations and prepend to generated code
+        string variableConstant = $"#define {n.Left.Id} {pinVisitor.GetPinCode()}\n";
+        _stringBuilder.Insert(0, variableConstant);
     }
 }
