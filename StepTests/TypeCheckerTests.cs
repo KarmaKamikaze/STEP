@@ -898,7 +898,7 @@ public class TypeCheckerTests {
         var action = () => funcExprNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<NoNullAllowedException>(action);
+        Assert.Throws<TypeException>(action);
     }
     
     [Fact]
@@ -985,7 +985,8 @@ public class TypeCheckerTests {
             Elements = new List<ExprNode>() {
                 new IdNode(){Id = "a"},
                 new IdNode(){Id = "b"}
-            }
+            },
+            ExpectedSize = 2
         };
 
         // Act
@@ -1002,7 +1003,8 @@ public class TypeCheckerTests {
             Elements = new List<ExprNode>() {
                 new NumberNode() {Value = 5}, 
                 new BoolNode() {Value = false}
-            }
+            },
+            ExpectedSize = 2
         };
 
         // Act
@@ -1097,7 +1099,7 @@ public class TypeCheckerTests {
             .Returns(symbol);
         var arrDclNode = new ArrDclNode() {
             Left = new IdNode() {Id = "left", Type = new Type(){ActualType = TypeVal.Number, IsArray = true}},
-            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}}
+            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}, ExpectedSize = 1}
         };
         
         // Act
@@ -1122,7 +1124,7 @@ public class TypeCheckerTests {
             .Returns(symbol2);
         var arrDclNode = new ArrDclNode() {
             Left = new IdNode() {Id = "left"},
-            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}}
+            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}, ExpectedSize = 1}
         };
 
         //Act
@@ -1143,8 +1145,9 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
             .Returns(symbol);
         var arrDclNode = new ArrDclNode {
+            Size = 1,
             Left = new IdNode() {Id = "left", Type = new Type(){ActualType = type, IsArray = true}},
-            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}}
+            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}, ExpectedSize = 1}
         };
 
         //Act
@@ -1718,7 +1721,7 @@ public class TypeCheckerTests {
         var test = () => funcExprNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<NoNullAllowedException>(test);
+        Assert.Throws<TypeException>(test);
     }
 
     #endregion Statements
