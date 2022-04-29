@@ -56,7 +56,7 @@ public class ArduinoCompiler
             else
             {
                 Process compiler = Process.Start("/bin/bash",
-                    $"{directoryPath}/avr-destination/bin/avr-gcc.exe -O2 -Wall -mmcu=atmega328p " +
+                    $"avr-gcc -O2 -Wall -mmcu=atmega328p " +
                     $"-I {directoryPath}/avr-destination/Arduino-Core/cores/arduino " +
                     $"-I {directoryPath}/avr-destination/Arduino-Core/variants/standard " +
                     $"{directoryPath}/compiled.c -o {directoryPath}/compiled.out");
@@ -69,7 +69,7 @@ public class ArduinoCompiler
                 }
 
                 Process hexConverter = Process.Start("/bin/bash",
-                    $"{directoryPath}/avr-destination/bin/avr-objcopy.exe -O ihex {directoryPath}/compiled.out {directoryPath}/compiled.hex");
+                    $"avr-objcopy -O ihex {directoryPath}/compiled.out {directoryPath}/compiled.hex");
 
                 hexConverter?.WaitForExit();
             }
