@@ -82,7 +82,7 @@ public class TypeCheckerTests {
         
         // Intercept symbol table entry request, save locally
        SymTableEntry symbolTableEntry = new();
-        _symbolTableMock.Setup(x => x.EnterSymbol(It.IsAny<string>(), It.IsAny<Type>()))
+        _symbolTableMock.Setup(x => x.EnterSymbol(It.IsAny<IdNode>()))
             .Callback<string, Type>((a, b) => symbolTableEntry = new SymTableEntry(){ Name = a, Type = b});
         
         var dclNode = new VarDclNode()

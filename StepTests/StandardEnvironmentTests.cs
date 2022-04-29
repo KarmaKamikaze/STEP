@@ -16,7 +16,7 @@ public class StandardEnvironmentTests
         /*
          * boolean function x()
          *   input digitalpin p = 1
-         *   if(digitalRead(p) == HIGH)
+         *   if(ReadFromDigitalPin(p) == High)
          *     return true
          *   else
          *     return false
@@ -101,7 +101,7 @@ public class StandardEnvironmentTests
         /*
          * blank function x()
          *   input digitalpin p = 1
-         *   digitalWrite(p, LOW)
+         *   WriteToDigitalPin(p, Low)
          * end function
          */
 

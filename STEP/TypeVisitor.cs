@@ -317,7 +317,15 @@ public class TypeVisitor : IVisitor
     public virtual void Visit(IdNode n)
     {
         var symbol = _symbolTable.RetrieveSymbol(n.Id);
-        n.Type = symbol?.Type ?? throw new SymbolNotDeclaredException(n.Id);
+        if (symbol is null)
+        {
+            throw new SymbolNotDeclaredException(n.Id);
+        }
+        if(n.AttributesRef is null)
+        {
+            n.AttributesRef = symbol;
+        }
+        n.Type = symbol.Type;
     }
 
     public void Visit(PlusNode n)
@@ -505,9 +513,8 @@ public class TypeVisitor : IVisitor
         }
 
         EnterScope();
-        foreach (var param in n.FormalParams)
-        {
-            _symbolTable.EnterSymbol(param.Id, param.Type);
+        foreach (var param in n.FormalParams) {
+            _symbolTable.EnterSymbol(param);
         }
 
         foreach (var stmtNode in n.Stmts)
@@ -532,10 +539,12 @@ public class TypeVisitor : IVisitor
             {
                 throw new TypeException(n, $"The symbol {n.Id.Id} does not exist in any current scope");
             }
-
             throw new TypeException(n, $"The retrieved symbol {n.Id.Id} was not a function symbol table entry");
         }
-
+        if (n.Id.AttributesRef is null)
+        {
+            n.Id.AttributesRef = funcEntry;
+        }
         n.Type = funcEntry.Type;
         var parameterTypes = funcEntry.Parameters.Values.ToArray();
         var i = 0;
@@ -565,10 +574,12 @@ public class TypeVisitor : IVisitor
             {
                 throw new TypeException(n, $"The symbol {n.Id.Id} does not exist in any current scope");
             }
-
             throw new TypeException(n, $"The retrieved symbol {n.Id.Id} was not a function symbol table entry");
         }
-
+        if (n.Id.AttributesRef is null)
+        {
+            n.Id.AttributesRef = funcEntry;
+        }
         n.Type = funcEntry.Type;
         var parameterTypes = funcEntry.Parameters.Values.ToArray();
         var i = 0;
@@ -708,7 +719,6 @@ public class TypeVisitor : IVisitor
             node.Accept(this);
             node.Type.ScopeLevel = _scopeLevel;
         }
-
         ExitScope();
     }
 }

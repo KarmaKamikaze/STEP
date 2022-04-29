@@ -1,0 +1,15 @@
+variables
+  input digitalpin d1 = 1
+  output digitalpin d2 = 2
+  number y = 9.17
+end variables
+
+setup
+  ReadFromDigitalPin(d1)
+  WriteToDigitalPin(d2, High)
+  number x = Max(2.9, 1500)
+  number o = 52^5
+  Wait(2000.2509)
+  Random(2.51, y)
+  RandomSeed(y)
+end setup

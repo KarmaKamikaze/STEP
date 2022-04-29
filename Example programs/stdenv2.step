@@ -1,0 +1,4 @@
+setup
+  string x = "hej"
+  Print(x)
+end setup

@@ -28,10 +28,9 @@ public interface ISymbolTable
     /// <summary>
     /// Enters the given symbol in the current scope if not already declared within the scope.
     /// </summary>
-    /// <param name="name">The name of the symbol to enter.</param>
-    /// <param name="type">The type of the symbol to enter</param>
+    /// <param name="node">The symbol to enter.</param>
     /// <exception cref="DuplicateDeclarationException">Thrown if the given name is already declared in the current scope.</exception>
-    void EnterSymbol(string name, Type type);
+    void EnterSymbol(IdNode node);
 
     /// <summary>
     /// Enters a symbol for the given function definition in the current scope if not already declared within the scope.
