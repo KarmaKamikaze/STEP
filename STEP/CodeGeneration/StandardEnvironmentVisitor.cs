@@ -3,6 +3,9 @@ using STEP.AST.Nodes;
 
 namespace STEP.CodeGeneration;
 
+/// <summary>
+/// A visitor that replaces the names of any standard functions with their corresponding Arduino names.
+/// </summary>
 public class StandardEnvironmentVisitor : IVisitor
 {
     public void Visit(AndNode n)
@@ -60,14 +63,17 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(NumberNode n)
     {
+
     }
 
     public void Visit(StringNode n)
     {
+        
     }
 
     public void Visit(BoolNode n)
     {
+        
     }
 
     public void Visit(ArrDclNode n)
@@ -179,10 +185,12 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(ContNode n)
     {
+        
     }
 
     public void Visit(BreakNode n)
     {
+        
     }
 
     public void Visit(LoopNode n)
@@ -203,18 +211,7 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(FuncExprNode n)
     {
-        if(n.Id.AttributesRef is StdFuncSymTableEntry symbol)
-        {
-            n.Id.Id = symbol.ArduinoName;
-            // TODO: Convert parameters to Arduino specific types
-            // E.g., if analogWrite(pin, value) requires an int as the value,
-            // then our double must be converted to an int for our code gen.
-            // Would be much easier if the visitor supports arguments!
-        }
-    }
-
-    public void Visit(FuncStmtNode n)
-    {
+        // Check for Arduino standard function
         if (n.Id.AttributesRef is StdFuncSymTableEntry symbol)
         {
             n.Id.Id = symbol.ArduinoName;
@@ -222,7 +219,19 @@ public class StandardEnvironmentVisitor : IVisitor
             {
                 param.Accept(this);
             }
-            // TODO: Convert parameters to Arduino specific types
+        }
+    }
+
+    public void Visit(FuncStmtNode n)
+    {
+        // Check for Arduino standard function
+        if (n.Id.AttributesRef is StdFuncSymTableEntry symbol)
+        {
+            n.Id.Id = symbol.ArduinoName;
+            foreach (var param in n.Params)
+            {
+                param.Accept(this);
+            }
         }
     }
 
@@ -236,6 +245,7 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(RetNode n)
     {
+        
     }
 
     public void Visit(IfNode n)
@@ -257,7 +267,7 @@ public class StandardEnvironmentVisitor : IVisitor
             foreach (var stmt in n.ElseClause)
             {
                 stmt.Accept(this);
-            } 
+            }
         }
     }
 

@@ -5,6 +5,7 @@ namespace STEP.AST;
 public static class StandardEnvironment
 {
     #region Constants
+
     public static StdSymTableEntry High => new()
     {
         Name = "High",
@@ -15,6 +16,7 @@ public static class StandardEnvironment
             IsConstant = true
         }
     };
+
     public static StdSymTableEntry Low => new()
     {
         Name = "Low",
@@ -25,9 +27,11 @@ public static class StandardEnvironment
             IsConstant = true
         }
     };
+
     #endregion
 
     #region I/O
+
     public static StdFuncSymTableEntry DigitalRead => new()
     {
         Name = "ReadFromDigitalPin",
@@ -38,14 +42,15 @@ public static class StandardEnvironment
         },
         Type = new Type() { ActualType = TypeVal.PinLevel, IsConstant = true}
     };
+
     public static StdFuncSymTableEntry DigitalWrite => new()
     {
         Name = "WriteToDigitalPin",
         ArduinoName = "digitalWrite",
         Parameters = new()
         {
-            { "pin", new PinType { ActualType = TypeVal.Digitalpin } },
-            { "value", new Type { ActualType = TypeVal.PinLevel } }
+            {"pin", new PinType {ActualType = TypeVal.Digitalpin}},
+            {"value", new Type {ActualType = TypeVal.PinLevel}}
         },
         Type = new Type { ActualType = TypeVal.Blank }
     };
@@ -61,14 +66,15 @@ public static class StandardEnvironment
         },
         Type = new Type() { ActualType = TypeVal.Number }
     };
+
     public static StdFuncSymTableEntry AnalogWrite => new()
     {
         Name = "WriteToAnalogPin",
         ArduinoName = "analogWrite",
         Parameters = new()
         {
-            { "pin", new PinType { ActualType = TypeVal.Analogpin } },
-            { "value", new Type { ActualType = TypeVal.Number } }
+            {"pin", new PinType {ActualType = TypeVal.Analogpin}},
+            {"value", new Type {ActualType = TypeVal.Number}}
         },
         Type = new Type { ActualType = TypeVal.Blank }
     };
@@ -80,13 +86,15 @@ public static class StandardEnvironment
         ArduinoName = "Serial.println",
         Parameters = new()
         {
-            { "message", new Type { ActualType = TypeVal.String } }
+            {"message", new Type {ActualType = TypeVal.String}}
         },
         Type = new Type { ActualType = TypeVal.Blank }
     };
+
     #endregion
 
     #region Time
+
     // delay(unsigned long)
     public static StdFuncSymTableEntry Delay => new()
     {
@@ -94,20 +102,22 @@ public static class StandardEnvironment
         ArduinoName = "delay",
         Parameters = new()
         {
-            { "ms", new Type { ActualType = TypeVal.Number } }
+            {"ms", new Type {ActualType = TypeVal.Number}}
         },
         Type = new Type { ActualType = TypeVal.Blank }
     };
+
     #endregion
 
     #region Math
+
     public static StdFuncSymTableEntry Abs => new()
     {
         Name = "AbsoluteValue",
         ArduinoName = "abs",
         Parameters = new()
         {
-            { "x", new Type { ActualType = TypeVal.Number } }
+            {"x", new Type {ActualType = TypeVal.Number}}
         },
         Type = new Type { ActualType = TypeVal.Number }
     };
@@ -118,9 +128,9 @@ public static class StandardEnvironment
         ArduinoName = "constrain",
         Parameters = new()
         {
-            { "x", new Type { ActualType = TypeVal.Number } },
-            { "upperLimit", new Type { ActualType = TypeVal.Number } },
-            { "lowerLimit", new Type { ActualType = TypeVal.Number } }
+            {"x", new Type {ActualType = TypeVal.Number}},
+            {"upperLimit", new Type {ActualType = TypeVal.Number}},
+            {"lowerLimit", new Type {ActualType = TypeVal.Number}}
         },
         Type = new Type { ActualType = TypeVal.Number }
     };
@@ -131,8 +141,8 @@ public static class StandardEnvironment
         ArduinoName = "max",
         Parameters = new()
         {
-            { "x", new Type { ActualType = TypeVal.Number } },
-            { "y", new Type { ActualType = TypeVal.Number } },
+            {"x", new Type {ActualType = TypeVal.Number}},
+            {"y", new Type {ActualType = TypeVal.Number}},
         },
         Type = new Type { ActualType = TypeVal.Number }
     };
@@ -143,8 +153,8 @@ public static class StandardEnvironment
         ArduinoName = "min",
         Parameters = new()
         {
-            { "x", new Type { ActualType = TypeVal.Number } },
-            { "y", new Type { ActualType = TypeVal.Number } },
+            {"x", new Type {ActualType = TypeVal.Number}},
+            {"y", new Type {ActualType = TypeVal.Number}},
         },
         Type = new Type { ActualType = TypeVal.Number }
     };
@@ -155,8 +165,8 @@ public static class StandardEnvironment
         ArduinoName = "pow",
         Parameters = new()
         {
-            { "base", new Type { ActualType = TypeVal.Number } },
-            { "exponent", new Type { ActualType = TypeVal.Number } },
+            {"base", new Type {ActualType = TypeVal.Number}},
+            {"exponent", new Type {ActualType = TypeVal.Number}},
         },
         Type = new Type { ActualType = TypeVal.Number }
     };
@@ -167,7 +177,7 @@ public static class StandardEnvironment
         ArduinoName = "sq",
         Parameters = new()
         {
-            { "x", new Type { ActualType = TypeVal.Number } },
+            {"x", new Type {ActualType = TypeVal.Number}},
         },
         Type = new Type { ActualType = TypeVal.Number }
     };
@@ -178,7 +188,7 @@ public static class StandardEnvironment
         ArduinoName = "sqrt",
         Parameters = new()
         {
-            { "x", new Type { ActualType = TypeVal.Number } },
+            {"x", new Type {ActualType = TypeVal.Number}},
         },
         Type = new Type { ActualType = TypeVal.Number }
     };
@@ -190,7 +200,7 @@ public static class StandardEnvironment
         ArduinoName = "cos",
         Parameters = new()
         {
-            { "rad", new Type { ActualType = TypeVal.Number } },
+            {"rad", new Type {ActualType = TypeVal.Number}},
         },
         Type = new Type { ActualType = TypeVal.Number }
     };
@@ -201,7 +211,7 @@ public static class StandardEnvironment
         ArduinoName = "sin",
         Parameters = new()
         {
-            { "rad", new Type { ActualType = TypeVal.Number } },
+            {"rad", new Type {ActualType = TypeVal.Number}},
         },
         Type = new Type { ActualType = TypeVal.Number }
     };
@@ -212,21 +222,23 @@ public static class StandardEnvironment
         ArduinoName = "tan",
         Parameters = new()
         {
-            { "rad", new Type { ActualType = TypeVal.Number } },
+            {"rad", new Type {ActualType = TypeVal.Number}},
         },
         Type = new Type { ActualType = TypeVal.Number }
     };
+
     #endregion
 
     #region Random numbers
+
     public static StdFuncSymTableEntry Random => new()
     {
         Name = "Random",
         ArduinoName = "random",
         Parameters = new()
         {
-            { "min", new Type { ActualType = TypeVal.Number } },
-            { "max", new Type { ActualType = TypeVal.Number } }
+            {"min", new Type {ActualType = TypeVal.Number}},
+            {"max", new Type {ActualType = TypeVal.Number}}
         },
         Type = new Type { ActualType = TypeVal.Number }
     };
@@ -237,9 +249,10 @@ public static class StandardEnvironment
         ArduinoName = "randomSeed",
         Parameters = new()
         {
-            { "seed", new Type { ActualType = TypeVal.Number } }
+            {"seed", new Type {ActualType = TypeVal.Number}}
         },
         Type = new Type { ActualType = TypeVal.Blank }
     };
+
     #endregion
 }
