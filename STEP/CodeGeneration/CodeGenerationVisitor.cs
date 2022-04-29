@@ -11,9 +11,13 @@ public class CodeGenerationVisitor : IVisitor
     private string Output => _stringBuilder.ToString();
     private readonly StringBuilder _pinSetup = new();
     private int _scopeLevel = 0;
-    private readonly List<Tuple<int, ArrDclNode>> _arrDclsPerScope = new(); // Keeps track of array declarations per scope
+
+    private readonly List<Tuple<int, ArrDclNode>>
+        _arrDclsPerScope = new(); // Keeps track of array declarations per scope
+
     public void OutputToBaseFile()
     {
+        InitProgramFileHelper();
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         File.WriteAllText(directoryPath + "/compiled.c", Output);
     }
@@ -22,8 +26,9 @@ public class CodeGenerationVisitor : IVisitor
     {
         return Output;
     }
-    
-    private void EmitLine(string line) {
+
+    private void EmitLine(string line)
+    {
         _stringBuilder.AppendLine(line);
     }
 
@@ -36,7 +41,7 @@ public class CodeGenerationVisitor : IVisitor
     {
         if (type.IsConstant)
             EmitAppend("const" + suffix);
-        
+
         switch (type.ActualType)
         {
             case TypeVal.Number:
@@ -54,27 +59,33 @@ public class CodeGenerationVisitor : IVisitor
         }
     }
 
-    private void EnterScope() {
+    private void EnterScope()
+    {
         _scopeLevel++;
     }
-    
-    private void ExitScope(bool isArrayFunc = false) {
+
+    private void ExitScope(bool isArrayFunc = false)
+    {
         _scopeLevel--;
         var tuplesToRemove = new List<Tuple<int, ArrDclNode>>();
         // If exiting a function returning an array, do not free declared arrays
-        if (isArrayFunc) {
+        if (isArrayFunc)
+        {
             tuplesToRemove.AddRange(_arrDclsPerScope.Where(t => t.Item1 > _scopeLevel));
         }
         // Else, when exiting a scope, free all arrays declared in the scope
-        else {
-            foreach (var tuple in _arrDclsPerScope.Where(k => k.Item1 > _scopeLevel)) {
+        else
+        {
+            foreach (var tuple in _arrDclsPerScope.Where(k => k.Item1 > _scopeLevel))
+            {
                 EmitLine($"free({tuple.Item2.Left.Id});");
                 tuplesToRemove.Add(tuple);
             }
         }
+
         tuplesToRemove.ForEach(t => _arrDclsPerScope.Remove(t));
     }
-    
+
     public void Visit(AndNode n)
     {
         // E.g.: x and true -> x && true 
@@ -247,8 +258,10 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend(n.Id);
     }
 
-    public void Visit(PlusNode n) {
-        switch (n.Type.ActualType) {
+    public void Visit(PlusNode n)
+    {
+        switch (n.Type.ActualType)
+        {
             // If the overall expression has type string, we must convert any non-string children to strings
             case TypeVal.String when n.Left.Type.ActualType != TypeVal.String:
                 // String(left) + right
@@ -538,7 +551,8 @@ public class CodeGenerationVisitor : IVisitor
         n.Condition.Accept(this);
         EmitLine(") {");
         EnterScope();
-        foreach(var stmt in n.ThenClause) {
+        foreach (var stmt in n.ThenClause)
+        {
             stmt.Accept(this);
         }
 
@@ -561,6 +575,7 @@ public class CodeGenerationVisitor : IVisitor
             {
                 stmt.Accept(this);
             }
+
             ExitScope();
             EmitLine("}");
         }
@@ -576,26 +591,6 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ProgNode n)
     {
-        // Insert main
-        _stringBuilder.Append("#include <Arduino.h>\n\n"+
-                              "// Weak empty variant initialization function.\n" +
-                              "// May be redefined by variant files.\n" +
-                              "void initVariant() __attribute__((weak));\n" + 
-                              "void initVariant() { }\n\n" +
-                              "void setupUSB() __attribute__((weak));\n" +
-                              "void setupUSB() { }\n\n" + 
-                              "int main(void)\n" +
-                              "{\n" +
-                              "initVariant();\n\n" +
-                              "#if defined(USBCON)\n" + 
-                              "USBDevice.attach();\n" + 
-                              "#endif\n\n" +
-                              "setup();\n\n" +
-                              "for (;;) {\n" + 
-                              "loop();\n" +
-                              "}\n\n" +
-                              "return 0;\n" + 
-                              "}\n");
         n.VarsBlock?.Accept(this);
         n.FuncsBlock?.Accept(this);
         EmitLine("void setup() {");
@@ -623,7 +618,8 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(LoopNode n)
     {
         EnterScope();
-        foreach(var stmt in n.Stmts) {
+        foreach (var stmt in n.Stmts)
+        {
             stmt.Accept(this);
         }
 
@@ -638,7 +634,7 @@ public class CodeGenerationVisitor : IVisitor
             n.Condition.Accept(this);
             EmitLine(") {");
             EnterScope();
-            foreach(var stmt in n.Body)
+            foreach (var stmt in n.Body)
             {
                 stmt.Accept(this);
             }
@@ -676,9 +672,33 @@ public class CodeGenerationVisitor : IVisitor
         }
 
         _pinSetup.Append(");\r\n");
-        
+
         // Save variable names as constant declarations and prepend to generated code
         string variableConstant = $"#define {n.Left.Id} {pinVisitor.GetPinCode()}\n";
         _stringBuilder.Insert(0, variableConstant);
+    }
+
+    private void InitProgramFileHelper()
+    {
+        // Insert main
+        _stringBuilder.Insert(0, "#include <Arduino.h>\n\n" +
+                                 "// Weak empty variant initialization function.\n" +
+                                 "// May be redefined by variant files.\n" +
+                                 "void initVariant() __attribute__((weak));\n" +
+                                 "void initVariant() { }\n\n" +
+                                 "void setupUSB() __attribute__((weak));\n" +
+                                 "void setupUSB() { }\n\n" +
+                                 "int main(void)\n" +
+                                 "{\n" +
+                                 "initVariant();\n\n" +
+                                 "#if defined(USBCON)\n" +
+                                 "USBDevice.attach();\n" +
+                                 "#endif\n\n" +
+                                 "setup();\n\n" +
+                                 "for (;;) {\n" +
+                                 "loop();\n" +
+                                 "}\n\n" +
+                                 "return 0;\n" +
+                                 "}\n");
     }
 }
