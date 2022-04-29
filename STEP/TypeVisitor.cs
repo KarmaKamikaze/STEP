@@ -195,9 +195,9 @@ public class TypeVisitor : IVisitor
         if (n.Right is null) return;
         n.Right.Type = n.Left.Type;
         n.Right.Accept(this);
-        if (n.Right is IdNode id) {
-            if (id.Type.IsArray) {
-                if (n.Left.Type.ArrSize < n.Right.Type.ArrSize) throw new TypeException(n, $"Array size mismatch, {n.Left.Id} can only fit {n.Left.Type.ArrSize} elements. {id.Id} has {id.Type.ArrSize} elements");
+        if (n.Right is IdNode idRight) {
+            if (idRight.Type.IsArray) {
+                if (n.Left.Type.ArrSize < idRight.Type.ArrSize) throw new TypeException(n, $"Array size mismatch, {n.Left.Id} can only fit {n.Left.Type.ArrSize} elements. {idRight.Id} has {idRight.Type.ArrSize} elements");
             } 
         }
         if (n.Left.Type != n.Right.Type)

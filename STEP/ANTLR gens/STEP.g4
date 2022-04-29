@@ -276,10 +276,10 @@ grammar STEP;
         ;
   
   arrdcl 
-        : type arrsizedcl ID (ASSIGN arr_id_or_lit)?
+        : type arrsizedcl ID (ASSIGN arrdclrhs)?
         ;
   
-  arr_id_or_lit
+  arrdclrhs
         : ID 
         | LBRACK params_options? RBRACK
         | funccall

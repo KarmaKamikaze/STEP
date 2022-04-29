@@ -9,14 +9,11 @@ public class ArrDclNode : VarDclNode
         v.Visit(this);
     }
 
-    public bool IsId { get; set; }
-
     public override bool Equals(object obj)
     {
         if (obj is ArrDclNode other)
         {
             return other.Size == Size
-                   && other.IsId == IsId
                    && Equals(other.Right, Right);
         }
 

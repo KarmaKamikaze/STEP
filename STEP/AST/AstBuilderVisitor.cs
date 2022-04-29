@@ -242,7 +242,6 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         
         if (children.Any(child => child is IdNode))
         {
-            node.IsId = true;
             node.Right = (IdNode) children.First(child => child is IdNode);
         }
         else if (children.Any(child => child is ArrLiteralNode))

@@ -536,6 +536,8 @@ public class CodeGenerationVisitor : IVisitor
             // If returning from function, free arrays declared in scope
             if (n.SurroundingFuncType.IsArray) {
                 // If in outer scope, free all arrays except returned and remove from list - else free without removing from list
+                // Typed functions always end on return, so this is where we 'forget' about the obsolete arrays
+                // In inner scopes, we want to free them, but still 'remember' them to free at any returns in outer scopes
                 bool isInOuterScope = n.Type.ScopeLevel - 1 == n.SurroundingFuncType.ScopeLevel;
                 FreeArrays(n.SurroundingFuncType.ScopeLevel, (IdNode) n.RetVal, isInOuterScope);
             }
