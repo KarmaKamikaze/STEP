@@ -3,6 +3,9 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using ArduinoUploader;
 using ArduinoUploader.Hardware;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 
 namespace STEP;
 
@@ -75,13 +78,25 @@ public class ArduinoCompiler
             {
                 throw new ApplicationException("Arduino compiler error. compiled.hex file was not generated.");
             }
+            
+            // Enable upload logging
+            var nlogConfig = new LoggingConfiguration();
 
+            nlogConfig.AddRule(minLevel: LogLevel.Trace, maxLevel: LogLevel.Fatal, 
+                target: new ConsoleTarget("consoleTarget") 
+                {
+                    Layout = "${longdate} level=${level} message=${message}"
+                });
+
+            LogManager.Configuration = nlogConfig;
+            
+            // Update compiled hex file to Arduino board
             ArduinoSketchUploader uploader = new ArduinoSketchUploader(new ArduinoSketchUploaderOptions()
             {
                 FileName = directoryPath + "/compiled.hex",
                 PortName = "COM3", // Can be omitted to try to auto-detect the COM port.
                 ArduinoModel = ArduinoModel.UnoR3
-            });
+            }, new NLogArduinoUploaderLogger());
             uploader.UploadSketch();
         }
         catch (ApplicationException e)
@@ -100,6 +115,36 @@ public class ArduinoCompiler
             {
                 File.Delete(directoryPath + "/compiled.hex");
             }
+        }
+    }
+    
+    private class NLogArduinoUploaderLogger : IArduinoUploaderLogger
+    {
+        private static readonly Logger Logger = LogManager.GetLogger("ArduinoSketchUploader");
+
+        public void Error(string message, Exception exception)
+        {
+            Logger.Error(exception, message);
+        }
+
+        public void Warn(string message)
+        {
+            Logger.Warn(message);
+        }
+
+        public void Info(string message)
+        {
+            Logger.Info(message);
+        }
+
+        public void Debug(string message)
+        {
+            // Logger.Debug(message);
+        }
+
+        public void Trace(string message)
+        {
+            // Logger.Trace(message);
         }
     }
 }
