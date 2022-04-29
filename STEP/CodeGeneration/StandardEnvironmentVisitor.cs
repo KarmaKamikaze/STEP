@@ -118,7 +118,7 @@ public class StandardEnvironmentVisitor : IVisitor
         // Check for Arduino constants here
         if (n.AttributesRef is StdSymTableEntry symbol)
         {
-            n.Id = symbol.ArduinoName;
+            n.Name = symbol.ArduinoName;
         }
     }
 
@@ -213,7 +213,7 @@ public class StandardEnvironmentVisitor : IVisitor
         // Check for Arduino standard function
         if (n.Id.AttributesRef is StdFuncSymTableEntry symbol)
         {
-            n.Id.Id = symbol.ArduinoName;
+            n.Id.Name = symbol.ArduinoName;
             foreach(var param in n.Params)
             {
                 param.Accept(this);
@@ -226,7 +226,7 @@ public class StandardEnvironmentVisitor : IVisitor
         // Check for Arduino standard function
         if (n.Id.AttributesRef is StdFuncSymTableEntry symbol)
         {
-            n.Id.Id = symbol.ArduinoName;
+            n.Id.Name = symbol.ArduinoName;
             foreach (var param in n.Params)
             {
                 param.Accept(this);

@@ -14,7 +14,7 @@ public class AssVisitor : TypeVisitor
 
     public override void Visit(IdNode n)
     {
-        var symbol = _symbolTable.RetrieveSymbol(n.Id);
+        var symbol = _symbolTable.RetrieveSymbol(n.Name);
         if (symbol is not null)
         {
             n.Type = symbol.Type;

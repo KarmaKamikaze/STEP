@@ -199,8 +199,8 @@ public class TypeVisitor : IVisitor
         if (n.Right is IdNode idRight && idRight.Type.IsArray) {
             if (n.Left.Type.ArrSize < idRight.Type.ArrSize) {
                  throw new TypeException(n, 
-                     $"Array size mismatch, {n.Left.Id} can only fit {n.Left.Type.ArrSize} elements. "+
-                       $"{idRight.Id} has {idRight.Type.ArrSize} elements");
+                     $"Array size mismatch, {n.Left.Name} can only fit {n.Left.Type.ArrSize} elements. "+
+                       $"{idRight.Name} has {idRight.Type.ArrSize} elements");
             }
         }
         if (n.Left.Type != n.Right.Type)
@@ -290,7 +290,7 @@ public class TypeVisitor : IVisitor
             if (n.Id.Type.ArrSize < n.Expr.Type.ArrSize) {
                 throw new TypeException(n, 
                     $"Array size mismatch, {n.Id} can only fit {n.Id.Type.ArrSize} elements. " +
-                      $"{((IdNode)n.Expr).Id} has {n.Expr.Type.ArrSize} elements");
+                      $"{((IdNode)n.Expr).Name} has {n.Expr.Type.ArrSize} elements");
             }
         }
         if (n.Id.Type.ActualType is TypeVal.Analogpin or TypeVal.Digitalpin)
@@ -316,10 +316,10 @@ public class TypeVisitor : IVisitor
 
     public virtual void Visit(IdNode n)
     {
-        var symbol = _symbolTable.RetrieveSymbol(n.Id);
+        var symbol = _symbolTable.RetrieveSymbol(n.Name);
         if (symbol is null)
         {
-            throw new SymbolNotDeclaredException(n.Id);
+            throw new SymbolNotDeclaredException(n.Name);
         }
         if(n.AttributesRef is null)
         {
@@ -507,9 +507,9 @@ public class TypeVisitor : IVisitor
 
     public void Visit(FuncDefNode n)
     {
-        if (_symbolTable.IsDeclaredLocally(n.Name.Id))
+        if (_symbolTable.IsDeclaredLocally(n.Id.Name))
         {
-            throw new DuplicateDeclarationException("An id of this name have already been declared", n.Name.Id);
+            throw new DuplicateDeclarationException("An id of this name have already been declared", n.Id.Name);
         }
 
         EnterScope();
@@ -531,15 +531,15 @@ public class TypeVisitor : IVisitor
 
     public void Visit(FuncExprNode n)
     {
-        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id);
+        var symbol = _symbolTable.RetrieveSymbol(n.Id.Name);
         if (symbol is not FunctionSymTableEntry funcEntry)
         {
             // FuncEntry is now symbol as FunctionSymTableEntry
             if (symbol is null)
             {
-                throw new TypeException(n, $"The symbol {n.Id.Id} does not exist in any current scope");
+                throw new TypeException(n, $"The symbol {n.Id.Name} does not exist in any current scope");
             }
-            throw new TypeException(n, $"The retrieved symbol {n.Id.Id} was not a function symbol table entry");
+            throw new TypeException(n, $"The retrieved symbol {n.Id.Name} was not a function symbol table entry");
         }
         if (n.Id.AttributesRef is null)
         {
@@ -566,15 +566,15 @@ public class TypeVisitor : IVisitor
 
     public void Visit(FuncStmtNode n)
     {
-        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id);
+        var symbol = _symbolTable.RetrieveSymbol(n.Id.Name);
         if (symbol is not FunctionSymTableEntry funcEntry)
         {
             // FuncEntry is now symbol as FunctionSymTableEntry
             if (symbol is null)
             {
-                throw new TypeException(n, $"The symbol {n.Id.Id} does not exist in any current scope");
+                throw new TypeException(n, $"The symbol {n.Id.Name} does not exist in any current scope");
             }
-            throw new TypeException(n, $"The retrieved symbol {n.Id.Id} was not a function symbol table entry");
+            throw new TypeException(n, $"The retrieved symbol {n.Id.Name} was not a function symbol table entry");
         }
         if (n.Id.AttributesRef is null)
         {

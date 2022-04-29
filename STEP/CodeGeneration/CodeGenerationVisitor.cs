@@ -68,7 +68,7 @@ public class CodeGenerationVisitor : IVisitor
         var arrsToRemove = new List<IdNode>();
         foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel)) {
             if (!id.Type.IsReturned) {
-                EmitLine($"free({id.Id});");
+                EmitLine($"free({id.Name});");
             }
             arrsToRemove.Add(id);
         }
@@ -79,7 +79,7 @@ public class CodeGenerationVisitor : IVisitor
     private void FreeArrays(int scopeLevel, IdNode exemptId, bool shouldRemove) {
         var arrsToRemove = new List<IdNode>();
         foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel && !n.Equals(exemptId))) {
-            EmitLine($"free({id.Id});");
+            EmitLine($"free({id.Name});");
             arrsToRemove.Add(id);
         }
         if(shouldRemove) arrsToRemove.ForEach(id => _arrDclsInScope.Remove(id));
@@ -88,7 +88,7 @@ public class CodeGenerationVisitor : IVisitor
     private void CopyArrayHelper(ArrDclNode n) {
         // Copies array from RHS into LHS
         var id = n.Right as IdNode;
-        EmitLine($"memcpy({n.Left.Id}, {id.Id}, sizeof({id.Id}[0])*{Math.Min(n.Left.Type.ArrSize, id.Type.ArrSize)});");
+        EmitLine($"memcpy({n.Left.Name}, {id.Name}, sizeof({id.Name}[0])*{Math.Min(n.Left.Type.ArrSize, id.Type.ArrSize)});");
     }
     
     public void Visit(AndNode n)
@@ -245,7 +245,7 @@ public class CodeGenerationVisitor : IVisitor
     {
         // If assigning new pointer to array pointer, free previously allocated memory
         if (n.Id.Type.IsArray && n.ArrIndex is null) {
-            EmitLine($"free({n.Id.Id});");
+            EmitLine($"free({n.Id.Name});");
         }
         AssNodeGen(n);
         EmitLine(";");
@@ -269,7 +269,7 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(IdNode n)
     {
-        EmitAppend(n.Id);
+        EmitAppend(n.Name);
     }
 
     public void Visit(PlusNode n) {
@@ -459,7 +459,7 @@ public class CodeGenerationVisitor : IVisitor
          * }
          */
         EmitAppend(n.ReturnType, n.Type.IsArray ? "* " : " ");
-        n.Name.Accept(this);
+        n.Id.Accept(this);
         EmitAppend("(");
         for (int i = 0; i < n.FormalParams.Count; i++)
         {
@@ -686,7 +686,7 @@ public class CodeGenerationVisitor : IVisitor
         _pinSetup.Append(");\r\n");
         
         // Save variable names as constant declarations and prepend to generated code
-        string variableConstant = $"#define {n.Left.Id} {pinVisitor.GetPinCode()}\r\n";
+        string variableConstant = $"#define {n.Left.Name} {pinVisitor.GetPinCode()}\r\n";
         _stringBuilder.Insert(0, variableConstant);
     }
 }

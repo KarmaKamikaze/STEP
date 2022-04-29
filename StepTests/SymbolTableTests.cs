@@ -20,8 +20,8 @@ public class SymbolTableTests
         // Arrange
         string expectedName = "Teststring";
         Type expectedType = new Type() { ActualType = TypeVal.String };
-        var idNode1 = new IdNode { Id = expectedName, Type = expectedType };
-        var idNode2 = new IdNode { Id = expectedName, Type = expectedType };
+        var idNode1 = new IdNode { Name = expectedName, Type = expectedType };
+        var idNode2 = new IdNode { Name = expectedName, Type = expectedType };
         symbolTable.EnterSymbol(idNode1);
         
         // Act / Assert
@@ -37,7 +37,7 @@ public class SymbolTableTests
         // Arrange
         string expectedName = "Teststring";
         Type expectedType = new Type() {ActualType = TypeVal.String};
-        var idNode = new IdNode { Id = expectedName, Type = expectedType };
+        var idNode = new IdNode { Name = expectedName, Type = expectedType };
         symbolTable.EnterSymbol(idNode);
         symbolTable.OpenScope();
         
@@ -55,13 +55,13 @@ public class SymbolTableTests
         // Arrange
         string expectedName = "Teststring";
         Type type = new Type() {ActualType = TypeVal.Boolean};
-        var idNode1 = new IdNode { Id = expectedName, Type = type };
+        var idNode1 = new IdNode { Name = expectedName, Type = type };
         symbolTable.EnterSymbol(idNode1);
         symbolTable.OpenScope();
         
         // Redeclaration of Teststring with another type
         Type expectedType = new Type() {ActualType = TypeVal.Number};
-        var idNode2 = new IdNode { Id = expectedName, Type = expectedType };
+        var idNode2 = new IdNode { Name = expectedName, Type = expectedType };
         symbolTable.EnterSymbol(idNode2);
 
         // Act
@@ -78,7 +78,7 @@ public class SymbolTableTests
         symbolTable.OpenScope();
         string expectedName = "Teststring";
         Type expectedType = new Type() {ActualType = TypeVal.String};
-        var idNode = new IdNode { Id = expectedName, Type = expectedType };
+        var idNode = new IdNode { Name = expectedName, Type = expectedType };
         symbolTable.EnterSymbol(idNode);
         symbolTable.CloseScope();
         symbolTable.OpenScope();

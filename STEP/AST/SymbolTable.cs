@@ -97,24 +97,24 @@ public class SymbolTable : ISymbolTable
     public void EnterSymbol(IdNode node)
     {
         //exception to check if a symbol is declared locally more than once
-        if(IsDeclaredLocally(node.Id))
+        if(IsDeclaredLocally(node.Name))
         {
-            throw new DuplicateDeclarationException("An id of this name have already been declared", node.Id);
+            throw new DuplicateDeclarationException("An id of this name have already been declared", node.Name);
         }
 
         var symbolEntry = new SymTableEntry
         {
-            Name = node.Id,
+            Name = node.Name,
             Type = node.Type
         };
         node.AttributesRef = symbolEntry;
         // Add the symbol to the innermost scope (top of the scopeStack)
-        _scopeStack.Peek().Add(node.Id, symbolEntry);
+        _scopeStack.Peek().Add(node.Name, symbolEntry);
     }
 
     public void EnterSymbol(FuncDefNode node)
     {
-        string name = node.Name.Id;
+        string name = node.Id.Name;
         //exception to check if a symbol is declared locally more than once
         if (IsDeclaredLocally(name))
         {
@@ -125,7 +125,7 @@ public class SymbolTable : ISymbolTable
         var parameters = new Dictionary<string, Type>();
         foreach (var param in node.FormalParams)
         {
-            parameters.Add(param.Id, param.Type);
+            parameters.Add(param.Name, param.Type);
         }
 
         var symbolEntry = new FunctionSymTableEntry()
@@ -134,7 +134,7 @@ public class SymbolTable : ISymbolTable
             Type = node.Type,
             Parameters = parameters
         };
-        node.Name.AttributesRef = symbolEntry;
+        node.Id.AttributesRef = symbolEntry;
         // Add the symbol to the innermost scope (top of the scopeStack)
         _scopeStack.Peek().Add(name, symbolEntry);
     }

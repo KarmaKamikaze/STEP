@@ -36,7 +36,7 @@ public class ASTVisitorTests
 
         var parseTree = GetParseTree(program);
 
-        var idNode = new IdNode() { Id = "x", NodeType = AstNodeType.IdNode};
+        var idNode = new IdNode() { Name = "x", NodeType = AstNodeType.IdNode};
         var numNode = new NumberNode() { Value = 1, NodeType = AstNodeType.NumberNode };
         var varDclNode = new VarDclNode() 
         {

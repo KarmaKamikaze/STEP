@@ -24,7 +24,7 @@ public class TypeCheckerTests {
     public void ExprNode_IdNotDeclared_ThrowsSymbolNotDeclaredException() {
         // Arrange
         var plusNode = new PlusNode() {
-            Left = new IdNode() {Id = "lhs"},
+            Left = new IdNode() {Name = "lhs"},
             Right = new NumberNode() {Value = 5}
         };
 
@@ -87,10 +87,10 @@ public class TypeCheckerTests {
         
         var dclNode = new VarDclNode()
         {
-            Left = new IdNode() {Id = id, Type = new Type() {ActualType = TypeVal.Number}},
+            Left = new IdNode() {Name = id, Type = new Type() {ActualType = TypeVal.Number}},
             Right = new NumberNode() {Value = 50 }
         };
-        var idNode = new IdNode() {Id = id};
+        var idNode = new IdNode() {Name = id};
 
         // Act
         _typeVisitor.Visit(dclNode);
@@ -179,7 +179,7 @@ public class TypeCheckerTests {
         var symbol = new SymTableEntry() {Type = new Type(){ActualType = type}};
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
-        var exprNode = new IdNode() {Id = "val"};
+        var exprNode = new IdNode() {Name = "val"};
         var uMinusNode = new UMinusNode() {Left = exprNode};
         
         // Act
@@ -229,8 +229,8 @@ public class TypeCheckerTests {
             .Returns(symbol);
         var multNode = new MultNode()
         {
-            Left = new IdNode() { Id = "x" },
-            Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Name = "x" },
+            Right = new IdNode() { Name = "y" }
         };
         
         // Act
@@ -271,8 +271,8 @@ public class TypeCheckerTests {
             .Returns(symbol);
         var divNode = new DivNode()
         {
-            Left = new IdNode() { Id = "x" },
-            Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Name = "x" },
+            Right = new IdNode() { Name = "y" }
         };
         
         // Act
@@ -313,8 +313,8 @@ public class TypeCheckerTests {
             .Returns(symbol);
         var powNode = new PowNode()
         {
-            Left = new IdNode() { Id = "x" },
-            Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Name = "x" },
+            Right = new IdNode() { Name = "y" }
         };
         
         // Act
@@ -355,8 +355,8 @@ public class TypeCheckerTests {
             .Returns(symbol);
         var minusNode = new MinusNode()
         {
-            Left = new IdNode() { Id = "x" },
-            Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Name = "x" },
+            Right = new IdNode() { Name = "y" }
         };
         
         // Act
@@ -475,8 +475,8 @@ public class TypeCheckerTests {
             .Returns(symbol);
         var andNode = new AndNode()
         {
-            Left = new IdNode() { Id = "x" },
-            Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Name = "x" },
+            Right = new IdNode() { Name = "y" }
         };
         
         // Act
@@ -517,8 +517,8 @@ public class TypeCheckerTests {
             .Returns(symbol);
         var orNode = new OrNode()
         {
-            Left = new IdNode() { Id = "x" },
-            Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Name = "x" },
+            Right = new IdNode() { Name = "y" }
         };
         
         // Act
@@ -541,8 +541,8 @@ public class TypeCheckerTests {
             .Returns(symbol);
         var eqNode = new EqNode()
         {
-            Left = new IdNode() { Id = "x" },
-            Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Name = "x" },
+            Right = new IdNode() { Name = "y" }
         };
         
         // Act
@@ -582,8 +582,8 @@ public class TypeCheckerTests {
             .Returns(symbol);
         var neqNode = new NeqNode()
         {
-            Left = new IdNode() { Id = "x" },
-            Right = new IdNode() { Id = "y" }
+            Left = new IdNode() { Name = "x" },
+            Right = new IdNode() { Name = "y" }
         };
         
         // Act
@@ -620,8 +620,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var gThanNode = new GThanNode() {
-        Left = new IdNode() {Id = "left"},
-        Right = new IdNode() {Id = "right"}
+        Left = new IdNode() {Name = "left"},
+        Right = new IdNode() {Name = "right"}
         };
         // Act
         var test = () => gThanNode.Accept(_typeVisitor);
@@ -637,8 +637,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var gThanNode = new GThanNode() {
-        Left = new IdNode() {Id = "left"},
-        Right = new IdNode() {Id = "right"}
+        Left = new IdNode() {Name = "left"},
+        Right = new IdNode() {Name = "right"}
         };
         // Act
         gThanNode.Accept(_typeVisitor);
@@ -656,8 +656,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var gThanEqNode = new GThanEqNode() {
-            Left = new IdNode() {Id = "left"},
-            Right = new IdNode() {Id = "right"}
+            Left = new IdNode() {Name = "left"},
+            Right = new IdNode() {Name = "right"}
         };
         // Act
         var test = () => gThanEqNode.Accept(_typeVisitor);
@@ -673,8 +673,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var gThanEqNode = new GThanEqNode() {
-            Left = new IdNode() {Id = "left"},
-            Right = new IdNode() {Id = "right"}
+            Left = new IdNode() {Name = "left"},
+            Right = new IdNode() {Name = "right"}
         };
         // Act
         gThanEqNode.Accept(_typeVisitor);
@@ -692,8 +692,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var lThanNode = new LThanNode() {
-            Left = new IdNode() {Id = "left"},
-            Right = new IdNode() {Id = "right"}
+            Left = new IdNode() {Name = "left"},
+            Right = new IdNode() {Name = "right"}
         };
 
         // Act
@@ -711,8 +711,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var lThanNode = new LThanNode() {
-            Left = new IdNode() {Id = "left"},
-            Right = new IdNode() {Id = "right"}
+            Left = new IdNode() {Name = "left"},
+            Right = new IdNode() {Name = "right"}
         };
 
         // Act
@@ -732,8 +732,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var lThanEqNode = new LThanEqNode() {
-            Left = new IdNode() {Id = "left"},
-            Right = new IdNode() {Id = "right"}
+            Left = new IdNode() {Name = "left"},
+            Right = new IdNode() {Name = "right"}
         };
 
         // Act
@@ -751,8 +751,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var lThanEqNode = new LThanEqNode() {
-            Left = new IdNode() {Id = "left"},
-            Right = new IdNode() {Id = "right"}
+            Left = new IdNode() {Name = "left"},
+            Right = new IdNode() {Name = "right"}
         };
 
         // Act
@@ -775,8 +775,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("index"))
             .Returns(symbol2);
         var arrAccNode = new ArrayAccessNode() {
-            Array = new IdNode() {Id = "array"},
-            Index = new IdNode() {Id = "index"}
+            Array = new IdNode() {Name = "array"},
+            Index = new IdNode() {Name = "index"}
         };
         // Act
         arrAccNode.Accept(_typeVisitor);
@@ -798,8 +798,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("index"))
             .Returns(symbol2);
         var arrAccNode = new ArrayAccessNode() {
-            Array = new IdNode() {Id = "array"},
-            Index = new IdNode() {Id = "index"}
+            Array = new IdNode() {Name = "array"},
+            Index = new IdNode() {Name = "index"}
         };
         // Act
         var test = () => arrAccNode.Accept(_typeVisitor);
@@ -831,11 +831,11 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
             .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Boolean}});
         var funcExprNode = new FuncExprNode() {
-            Id = new IdNode() {Id = "func"},
+            Id = new IdNode() {Name = "func"},
             Params = new List<ExprNode>() {
-                new IdNode() {Id = "a"},
-                new IdNode() {Id = "b"},
-                new IdNode() {Id = "c"}
+                new IdNode() {Name = "a"},
+                new IdNode() {Name = "b"},
+                new IdNode() {Name = "c"}
             }
         };
 
@@ -869,11 +869,11 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
             .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Boolean}});
         var funcExprNode = new FuncExprNode() {
-            Id = new IdNode() {Id = "func"},
+            Id = new IdNode() {Name = "func"},
             Params = new List<ExprNode>() {
-                new IdNode() {Id = "c"},
-                new IdNode() {Id = "a"},
-                new IdNode() {Id = "b"}
+                new IdNode() {Name = "c"},
+                new IdNode() {Name = "a"},
+                new IdNode() {Name = "b"}
             }
         };
 
@@ -891,7 +891,7 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
             .Returns(symbol);
         var funcExprNode = new FuncExprNode() {
-            Id = new IdNode() {Id = "func"},
+            Id = new IdNode() {Name = "func"},
         };
         
         // Act
@@ -921,11 +921,11 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
             .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Boolean}});
         var funcExprNode = new FuncExprNode() {
-            Id = new IdNode() {Id = "func"},
+            Id = new IdNode() {Name = "func"},
             Params = new List<ExprNode>() {
-                new IdNode() {Id = "a"},
-                new IdNode() {Id = "b"},
-                new IdNode() {Id = "c"}
+                new IdNode() {Name = "a"},
+                new IdNode() {Name = "b"},
+                new IdNode() {Name = "c"}
             }
         };
 
@@ -956,11 +956,11 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
             .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Boolean}});
         var funcExprNode = new FuncExprNode() {
-            Id = new IdNode() {Id = "func"},
+            Id = new IdNode() {Name = "func"},
             Params = new List<ExprNode>() {
-                new IdNode() {Id = "a"},
-                new IdNode() {Id = "b"},
-                new IdNode() {Id = "c"}
+                new IdNode() {Name = "a"},
+                new IdNode() {Name = "b"},
+                new IdNode() {Name = "c"}
             }
         };
 
@@ -983,8 +983,8 @@ public class TypeCheckerTests {
         var arrLiteralNode = new ArrLiteralNode() {
             Type = new Type() {ActualType = type, IsArray = true},
             Elements = new List<ExprNode>() {
-                new IdNode(){Id = "a"},
-                new IdNode(){Id = "b"}
+                new IdNode(){Name = "a"},
+                new IdNode(){Name = "b"}
             },
             ExpectedSize = 2
         };
@@ -1028,10 +1028,10 @@ public class TypeCheckerTests {
         .Returns(symbol);
     var varDclNode = new VarDclNode {
         Left = new IdNode() {
-            Id = "left",
+            Name = "left",
             Type = new Type() {ActualType = type}
         },
-        Right = new IdNode() {Id = "right"}
+        Right = new IdNode() {Name = "right"}
     };
 
     //Act
@@ -1053,10 +1053,10 @@ public class TypeCheckerTests {
             .Returns(symbol);
         var varDclNode = new VarDclNode {
             Left = new IdNode() {
-                Id = "left",
+                Name = "left",
                 Type = new Type() {ActualType = type1}
             },
-            Right = new IdNode() {Id = "right"}
+            Right = new IdNode() {Name = "right"}
         };
 
         //Act
@@ -1078,10 +1078,10 @@ public class TypeCheckerTests {
             .Returns(symbol2);
         var varDclNode = new VarDclNode {
             Left = new IdNode() {
-                Id = "left",
+                Name = "left",
                 Type = new Type() {ActualType = type}
             },
-            Right = new IdNode() {Id = "right"}
+            Right = new IdNode() {Name = "right"}
         };
 
         //Act
@@ -1098,8 +1098,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
             .Returns(symbol);
         var arrDclNode = new ArrDclNode() {
-            Left = new IdNode() {Id = "left", Type = new Type(){ActualType = TypeVal.Number, IsArray = true}},
-            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}, ExpectedSize = 1}
+            Left = new IdNode() {Name = "left", Type = new Type(){ActualType = TypeVal.Number, IsArray = true}},
+            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Name = "right"}}, ExpectedSize = 1}
         };
         
         // Act
@@ -1123,8 +1123,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
             .Returns(symbol2);
         var arrDclNode = new ArrDclNode() {
-            Left = new IdNode() {Id = "left"},
-            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}, ExpectedSize = 1}
+            Left = new IdNode() {Name = "left"},
+            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Name = "right"}}, ExpectedSize = 1}
         };
 
         //Act
@@ -1146,8 +1146,8 @@ public class TypeCheckerTests {
             .Returns(symbol);
         var arrDclNode = new ArrDclNode {
             Size = 1,
-            Left = new IdNode() {Id = "left", Type = new Type(){ActualType = type, IsArray = true}},
-            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Id = "right"}}, ExpectedSize = 1}
+            Left = new IdNode() {Name = "left", Type = new Type(){ActualType = type, IsArray = true}},
+            Right = new ArrLiteralNode(){Elements = new List<ExprNode>(){new IdNode(){Name = "right"}}, ExpectedSize = 1}
         };
 
         //Act
@@ -1163,22 +1163,22 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number}});
         var funcDefNode = new FuncDefNode() {
-            Name = new IdNode() {Id = "Add2"},
+            Id = new IdNode() {Name = "Add2"},
             Stmts = new List<StmtNode>() {
                 new AssNode() {
-                    Id = new IdNode(){Id = "a"},
+                    Id = new IdNode(){Name = "a"},
                     Expr = new PlusNode() {
-                        Left = new IdNode(){Id = "a", Type = new Type() {ActualType = TypeVal.Number}},
+                        Left = new IdNode(){Name = "a", Type = new Type() {ActualType = TypeVal.Number}},
                         Right = new NumberNode(){Value = 2}
                     }
                 },
                 new RetNode() {
-                    RetVal = new IdNode(){Id = "return1", Type = new Type() {ActualType = TypeVal.Number}},
+                    RetVal = new IdNode(){Name = "return1", Type = new Type() {ActualType = TypeVal.Number}},
                     SurroundingFuncType = new Type(){ActualType = TypeVal.Number}
                 }
             },
             FormalParams = new List<IdNode>() {
-                new IdNode(){Id = "a"}
+                new IdNode(){Name = "a"}
             },
             ReturnType = new Type() {ActualType = TypeVal.Number}
         };
@@ -1198,22 +1198,22 @@ public class TypeCheckerTests {
     public void FuncDefNode_ReturnMismatch_NotEnteredInSymbolTable() {
         // Arrange
         var funcDefNode = new FuncDefNode() {
-            Name = new IdNode() {Id = "Add2"},
+            Id = new IdNode() {Name = "Add2"},
             Stmts = new List<StmtNode>() {
                 new AssNode() {
-                    Id = new IdNode(){Id = "a"},
+                    Id = new IdNode(){Name = "a"},
                     Expr = new PlusNode() {
-                        Left = new IdNode(){Id = "a", Type = new Type() {ActualType = TypeVal.Number}},
+                        Left = new IdNode(){Name = "a", Type = new Type() {ActualType = TypeVal.Number}},
                         Right = new NumberNode(){Value = 2}
                     }
                 },
                 new RetNode() {
-                    RetVal = new IdNode(){Id = "a"},
+                    RetVal = new IdNode(){Name = "a"},
                     SurroundingFuncType = new Type() {ActualType = TypeVal.Boolean}
                 }
             },
             FormalParams = new List<IdNode>() {
-                new IdNode(){Id = "a", Type = new Type() {ActualType = TypeVal.Number, IsArray = false}}
+                new IdNode(){Name = "a", Type = new Type() {ActualType = TypeVal.Number, IsArray = false}}
             },
             ReturnType = new Type() {ActualType = TypeVal.Boolean}
         };
@@ -1232,23 +1232,23 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(new SymTableEntry() {Type = new Type(){ActualType = TypeVal.Number}});
         var funcDefNode = new FuncDefNode() {
-            Name = new IdNode() {Id = "Add2"},
+            Id = new IdNode() {Name = "Add2"},
             Stmts = new List<StmtNode>() {
                 new AssNode() {
-                    Id = new IdNode(){Id = "a"},
+                    Id = new IdNode(){Name = "a"},
                     Expr = new PlusNode() {
-                        Left = new IdNode(){Id = "a", Type = new Type() {ActualType = TypeVal.Number}},
+                        Left = new IdNode(){Name = "a", Type = new Type() {ActualType = TypeVal.Number}},
                         Right = new NumberNode(){Value = 2}
                     }
                 },
                 new RetNode() {
-                    RetVal = new IdNode(){Id = "return1", Type = new Type() {ActualType = TypeVal.Number}},
+                    RetVal = new IdNode(){Name = "return1", Type = new Type() {ActualType = TypeVal.Number}},
                     SurroundingFuncType = new Type() {ActualType = TypeVal.Number}
                 }
             },
             FormalParams = new List<IdNode>() {
-                new IdNode(){Id = "b", Type = new Type(){ActualType = TypeVal.Analogpin}},
-                new IdNode(){Id = "c", Type = new Type(){ActualType = TypeVal.Digitalpin}}
+                new IdNode(){Name = "b", Type = new Type(){ActualType = TypeVal.Analogpin}},
+                new IdNode(){Name = "c", Type = new Type(){ActualType = TypeVal.Digitalpin}}
             },
             ReturnType = new Type() {ActualType = TypeVal.Number}
         };
@@ -1268,11 +1268,11 @@ public class TypeCheckerTests {
     public void PinDclNode_PinAlreadyDeclared_ThrowsDuplicateDeclarationException(TypeVal type) { 
     // Arrange
     var pinDclNode1 = new PinDclNode() {
-        Left = new IdNode() {Id = "a", Type = new Type() {ActualType = type}},
+        Left = new IdNode() {Name = "a", Type = new Type() {ActualType = type}},
         Right = new NumberNode() {Value = 5}
     };
     var pinDclNode2 = new PinDclNode() {
-        Left = new IdNode() {Id = "b", Type = new Type() {ActualType = type}},
+        Left = new IdNode() {Name = "b", Type = new Type() {ActualType = type}},
         Right = new NumberNode() {Value = 5}
     };
     var varsNode = new VarsNode() {
@@ -1295,11 +1295,11 @@ public class TypeCheckerTests {
     public void PinDclNode_PinNotDeclared_DoesNotThrowException(TypeVal type) {
         // Arrange
         var pinDclNode1 = new PinDclNode() {
-            Left = new IdNode() {Id = "a", Type = new Type() {ActualType = type}},
+            Left = new IdNode() {Name = "a", Type = new Type() {ActualType = type}},
             Right = new NumberNode() {Value = 4}
         };
         var pinDclNode2 = new PinDclNode() {
-            Left = new IdNode() {Id = "b", Type = new Type() {ActualType = type}},
+            Left = new IdNode() {Name = "b", Type = new Type() {ActualType = type}},
             Right = new NumberNode() {Value = 5}
         };
         var varsNode = new VarsNode() {
@@ -1324,7 +1324,7 @@ public class TypeCheckerTests {
     public void PinDclNode_AnalogPinOutOfRange(int pinVal) {
         // Arrange
         var pinDclNode = new PinDclNode() {
-            Left = new IdNode() {Id = "a", Type = new Type() {ActualType = TypeVal.Analogpin}},
+            Left = new IdNode() {Name = "a", Type = new Type() {ActualType = TypeVal.Analogpin}},
             Right = new NumberNode() {Value = pinVal}
         };
         
@@ -1341,7 +1341,7 @@ public class TypeCheckerTests {
     public void PinDclNode_DigitalPinOutOfRange(int pinVal) {
         // Arrange
         var pinDclNode = new PinDclNode() {
-            Left = new IdNode() {Id = "a", Type = new Type() {ActualType = TypeVal.Digitalpin}},
+            Left = new IdNode() {Name = "a", Type = new Type() {ActualType = TypeVal.Digitalpin}},
             Right = new NumberNode() {Value = pinVal}
         };
             
@@ -1363,7 +1363,7 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var assNode = new AssNode() {
-            Id = new IdNode() {Id = "left"},
+            Id = new IdNode() {Name = "left"},
             Expr = new NumberNode() {Value = 2}
         };
         
@@ -1384,7 +1384,7 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("bool"))
             .Returns(symbol);
         var ifNode = new IfNode {
-            Condition = new IdNode() {Id = "bool"},
+            Condition = new IdNode() {Name = "bool"},
             ThenClause = new List<StmtNode>(){new ContNode()},
             ElseClause = new List<StmtNode>(){new BreakNode()}
         };
@@ -1404,7 +1404,7 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("bool"))
             .Returns(symbol);
         var ifNode = new IfNode {
-            Condition = new IdNode() {Id = "bool"},
+            Condition = new IdNode() {Name = "bool"},
             ThenClause = new List<StmtNode>(){new ContNode()},
             ElseClause = new List<StmtNode>(){new BreakNode()}
         };
@@ -1428,7 +1428,7 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("cond"))
             .Returns(symbol);
         var whileNode = new WhileNode{
-            Condition = new IdNode(){Id = "cond"},
+            Condition = new IdNode(){Name = "cond"},
             Body = new List<StmtNode>(){new ContNode()}
         };
         
@@ -1447,7 +1447,7 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("cond"))
             .Returns(symbol);
         var whileNode = new WhileNode{
-            Condition = new IdNode(){Id = "cond"},
+            Condition = new IdNode(){Name = "cond"},
             Body = new List<StmtNode>(){new ContNode()}
         };
         
@@ -1475,9 +1475,9 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("update"))
             .Returns(symbol3);
         var forNode = new ForNode{
-            Initializer = new IdNode() {Id = "init"},
-            Limit = new IdNode() {Id = "limit"},
-            Update = new IdNode() {Id = "update"},
+            Initializer = new IdNode() {Name = "init"},
+            Limit = new IdNode() {Name = "limit"},
+            Update = new IdNode() {Name = "update"},
             Body = new List<StmtNode>(){new ContNode()}
         };
         
@@ -1496,9 +1496,9 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol1);
         var forNode = new ForNode{
-            Initializer = new IdNode() {Id = "init"},
-            Limit = new IdNode() {Id = "limit"},
-            Update = new IdNode() {Id = "update"},
+            Initializer = new IdNode() {Name = "init"},
+            Limit = new IdNode() {Name = "limit"},
+            Update = new IdNode() {Name = "update"},
             Body = new List<StmtNode>(){new ContNode()}
         };
         
@@ -1521,8 +1521,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var assNode = new AssNode() {
-            Id = new IdNode() {Id = "left"},
-            Expr = new IdNode() {Id = "right"}
+            Id = new IdNode() {Name = "left"},
+            Expr = new IdNode() {Name = "right"}
         };
         var loopNode = new LoopNode() {
             Stmts = new List<StmtNode>() {assNode}
@@ -1549,8 +1549,8 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("right"))
             .Returns(symbol2);
         var assNode = new AssNode() {
-            Id = new IdNode() {Id = "left"},
-            Expr = new IdNode() {Id = "right"}
+            Id = new IdNode() {Name = "left"},
+            Expr = new IdNode() {Name = "right"}
         };
 
         //Act
@@ -1569,7 +1569,7 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("id"))
             .Returns(symbol);
         var assNode = new AssNode() {
-            Id = new IdNode() {Id = "id"},
+            Id = new IdNode() {Name = "id"},
             Expr = new NumberNode() {Value = 5}
         };
 
@@ -1590,7 +1590,7 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var retNode = new RetNode() {
-            RetVal = new IdNode() {Id = "type"},
+            RetVal = new IdNode() {Name = "type"},
             SurroundingFuncType = new Type(){ActualType = type}
         };
         
@@ -1611,7 +1611,7 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol(It.IsAny<string>()))
             .Returns(symbol);
         var retNode = new RetNode() {
-            RetVal = new IdNode() {Id = "type2"},
+            RetVal = new IdNode() {Name = "type2"},
             SurroundingFuncType = new Type(){ActualType = type1}
         };
         
@@ -1657,11 +1657,11 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
             .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Boolean}});
         var funcExprNode = new FuncStmtNode() {
-            Id = new IdNode() {Id = "func"},
+            Id = new IdNode() {Name = "func"},
             Params = new List<ExprNode>() {
-                new IdNode() {Id = "a"},
-                new IdNode() {Id = "b"},
-                new IdNode() {Id = "c"}
+                new IdNode() {Name = "a"},
+                new IdNode() {Name = "b"},
+                new IdNode() {Name = "c"}
             }
         };
 
@@ -1692,11 +1692,11 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("c"))
             .Returns(new SymTableEntry(){Type = new Type(){ActualType = TypeVal.Boolean}});
         var funcExprNode = new FuncStmtNode() {
-            Id = new IdNode() {Id = "func"},
+            Id = new IdNode() {Name = "func"},
             Params = new List<ExprNode>() {
-                new IdNode() {Id = "c"},
-                new IdNode() {Id = "a"},
-                new IdNode() {Id = "b"}
+                new IdNode() {Name = "c"},
+                new IdNode() {Name = "a"},
+                new IdNode() {Name = "b"}
             }
         };
 
@@ -1714,7 +1714,7 @@ public class TypeCheckerTests {
         _symbolTableMock.Setup(x => x.RetrieveSymbol("func"))
             .Returns(symbol);
         var funcExprNode = new FuncStmtNode() {
-            Id = new IdNode() {Id = "func"},
+            Id = new IdNode() {Name = "func"},
         };
         
         // Act
@@ -1739,7 +1739,7 @@ public class TypeCheckerTests {
             Right = new NumberNode() {Value = 5}
         };
         var idNode = new IdNode() {
-            Id = "a",
+            Name = "a",
             Type = new Type() {ActualType = TypeVal.Number}
         };
         var varDcl = new VarDclNode() {
@@ -1747,7 +1747,7 @@ public class TypeCheckerTests {
             Right = exprNode
         };
         var boolLeft = new GThanNode() {
-            Left = new IdNode(){Id = "b"},
+            Left = new IdNode(){Name = "b"},
             Right = new NumberNode(){Value = 5}
         };
         var boolRight = new EqNode() {

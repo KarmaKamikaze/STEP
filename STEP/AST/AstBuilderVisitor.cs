@@ -104,7 +104,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         PinDclNode node = (PinDclNode) NodeFactory.MakeNode(AstNodeType.PinDclNode);
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
-        idNode.Id = context.ID().GetText();
+        idNode.Name = context.ID().GetText();
         idNode.Type = new PinType();
         if (context.pintype().ANALOGPIN() != null)
         {
@@ -167,7 +167,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Type.ActualType = TypeVal.Number;
 
-        idNode.Id = context.ID().GetText();
+        idNode.Name = context.ID().GetText();
 
         node.Left = idNode;
 
@@ -184,7 +184,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Type.ActualType = TypeVal.String;
 
-        idNode.Id = context.ID().GetText();
+        idNode.Name = context.ID().GetText();
 
         node.Left = idNode;
 
@@ -202,7 +202,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Type.ActualType = TypeVal.Boolean;
 
-        idNode.Id = context.ID().GetText();
+        idNode.Name = context.ID().GetText();
 
         node.Left = idNode;
 
@@ -232,7 +232,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
                 break;
         }
 
-        idNode.Id = context.ID().GetText();
+        idNode.Name = context.ID().GetText();
 
         idNode.Type.IsArray = true;
 
@@ -273,7 +273,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (children.Count == 1)
         {
             IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
-            idNode.Id = context.ID().GetText();
+            idNode.Name = context.ID().GetText();
             return idNode;
         }
 
@@ -473,7 +473,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (context.ID() != null)
         {
             IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
-            idNode.Id = context.ID().GetText();
+            idNode.Name = context.ID().GetText();
             if (context.arrindex() != null)
             {
                 ArrayAccessNode node = (ArrayAccessNode) NodeFactory.MakeNode(AstNodeType.ArrayAccessNode);
@@ -545,7 +545,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
-        idNode.Id = context.ID().GetText();
+        idNode.Name = context.ID().GetText();
 
         List<ExprNode> parameters = new();
 
@@ -580,7 +580,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         AssNode node = (AssNode) NodeFactory.MakeNode(AstNodeType.AssNode);
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
-        idNode.Id = context.ID().GetText();
+        idNode.Name = context.ID().GetText();
 
         node.Id = idNode;
         if (context.arrindex() != null)
@@ -660,7 +660,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (context.ID() != null)
         {
             IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
-            idNode.Id = context.ID().GetText();
+            idNode.Name = context.ID().GetText();
             if (children.Any(child => child is ExprNode))
             {
                 ArrayAccessNode node = (ArrayAccessNode) NodeFactory.MakeNode(AstNodeType.ArrayAccessNode);
@@ -877,8 +877,8 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         FuncDefNode node = (FuncDefNode) NodeFactory.MakeNode(AstNodeType.FuncDefNode);
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
-        idNode.Id = context.ID().GetText();
-        node.Name = idNode;
+        idNode.Name = context.ID().GetText();
+        node.Id = idNode;
 
         node.Stmts = children.OfType<StmtNode>().ToList();
 
@@ -924,7 +924,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
 
         IdNode node = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
-        node.Id = context.ID().GetText();
+        node.Name = context.ID().GetText();
 
         string type = context.paramstype().GetText().ToLower();
         node.Type.ActualType = type == "number" ? TypeVal.Number :
@@ -951,7 +951,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override IdNode VisitParams_multi([NotNull] STEPParser.Params_multiContext context)
     {
         IdNode node = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
-        node.Id = context.ID().GetText();
+        node.Name = context.ID().GetText();
 
         string type = context.paramstype().GetText().ToLower();
         node.Type.ActualType = type == "number" ? TypeVal.Number :
