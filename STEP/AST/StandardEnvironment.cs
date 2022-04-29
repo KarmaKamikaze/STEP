@@ -8,7 +8,7 @@ public static class StandardEnvironment
 
     public static StdSymTableEntry High => new()
     {
-        Name = "High",
+        Name = "On",
         ArduinoName = "HIGH",
         Type = new Type
         {
@@ -19,7 +19,7 @@ public static class StandardEnvironment
 
     public static StdSymTableEntry Low => new()
     {
-        Name = "Low",
+        Name = "Off",
         ArduinoName = "LOW",
         Type = new Type
         {

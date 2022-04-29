@@ -1,12 +1,14 @@
-﻿const double num = 10.5;
+﻿#define apin 3
+#define dpin 1
+const double num = 10.5;
 String str = "test";
 boolean boo = true;
 void blankfunc(String array[]) {
-String tempArray[3] = {"test1", "test2", "test3"};
-array = tempArray;
+String* tempArray = (String*)malloc(3 * sizeof(String));
+free(tempArray);
 }
 String stringfunc(double num, boolean isConstant) {
-String arr[3] = {"t1", "t2", "t3"};
+String* arr = (String*)malloc(3 * sizeof(String));
 blankfunc(arr);
 if(isConstant || true && false) {
 return "constant " + String(num);
@@ -14,6 +16,7 @@ return "constant " + String(num);
 else {
 return "not constant " + String(num);
 }
+free(arr);
 }
 void setup() {
 pinMode(1, INPUT);

@@ -16,7 +16,7 @@ public class StandardEnvironmentTests
         /*
          * boolean function x()
          *   input digitalpin p = 1
-         *   if(digitalRead(p) == HIGH)
+         *   if(ReadFromDigitalPin(p) == On)
          *     return true
          *   else
          *     return false
@@ -36,13 +36,13 @@ public class StandardEnvironmentTests
         };
         var digitalRead = new FuncExprNode
         {
-            Id = new IdNode {Id = "ReadFromDigitalPin" },
-            Params = new List<ExprNode> {new IdNode {Id = "p"}}
+            Id = new IdNode {Name = "ReadFromDigitalPin" },
+            Params = new List<ExprNode> {new IdNode {Name = "p"}}
         };
         var condition = new EqNode
         {
             Left = digitalRead,
-            Right = new IdNode {Id = "High"}
+            Right = new IdNode {Name = "On"}
         };
         var ifStmt = new IfNode
         {
@@ -54,7 +54,7 @@ public class StandardEnvironmentTests
         {
             Left = new IdNode 
             {
-                Id = "p",
+                Name = "p",
                 Type = new PinType
                 {
                     ActualType = TypeVal.Digitalpin,
@@ -66,7 +66,7 @@ public class StandardEnvironmentTests
         };
         var funcDcl = new FuncDefNode
         {
-            Name = new IdNode {Id = "x"},
+            Id = new IdNode {Name = "x"},
             Stmts = new List<StmtNode> {pinDcl, ifStmt},
             FormalParams = new List<IdNode>(),
             ReturnType = new Type {ActualType = TypeVal.Boolean}
@@ -84,7 +84,7 @@ public class StandardEnvironmentTests
         // Arrange
         var digitalRead = new FuncExprNode
         {
-            Id = new IdNode { Id = "ReadFromDigitalPin" },
+            Id = new IdNode { Name = "ReadFromDigitalPin" },
             Params = new List<ExprNode> { new NumberNode { Value = 1 } }
         };
         
@@ -101,21 +101,21 @@ public class StandardEnvironmentTests
         /*
          * blank function x()
          *   input digitalpin p = 1
-         *   digitalWrite(p, LOW)
+         *   WriteToDigitalPin(p, Low)
          * end function
          */
 
         // Arrange
         var digitalWrite = new FuncStmtNode
         {
-            Id = new IdNode { Id = "WriteToDigitalPin" },
-            Params = new List<ExprNode> { new IdNode { Id = "p" }, new IdNode { Id = "Low" } }
+            Id = new IdNode { Name = "WriteToDigitalPin" },
+            Params = new List<ExprNode> { new IdNode { Name = "p" }, new IdNode { Name = "Off" } }
         };
         var pinDcl = new PinDclNode
         {
             Left = new IdNode
             {
-                Id = "p",
+                Name = "p",
                 Type = new PinType
                 {
                     ActualType = TypeVal.Digitalpin,
@@ -127,7 +127,7 @@ public class StandardEnvironmentTests
         };
         var funcDcl = new FuncDefNode
         {
-            Name = new IdNode { Id = "x" },
+            Id = new IdNode { Name = "x" },
             Stmts = new List<StmtNode> { pinDcl, digitalWrite },
             FormalParams = new List<IdNode>(),
             ReturnType = new Type { ActualType = TypeVal.Blank }

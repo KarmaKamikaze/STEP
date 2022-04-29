@@ -18,6 +18,17 @@ public class TypeVisitor : IVisitor
 
     private readonly ISymbolTable _symbolTable;
     private readonly IPinTable _pinTable;
+    private int _scopeLevel = 0;
+
+    private void EnterScope() {
+        _symbolTable.OpenScope();
+        _scopeLevel++;
+    }
+
+    private void ExitScope() {
+        _scopeLevel--;
+        _symbolTable.CloseScope();
+    }
 
     public void Visit(AndNode n)
     {
@@ -31,7 +42,8 @@ public class TypeVisitor : IVisitor
         else
         {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(n, new Type() {ActualType = TypeVal.Boolean}, n.Left.Type, n.Right.Type);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Boolean}, 
+                                  n.Left.Type, n.Right.Type);
         }
     }
 
@@ -179,17 +191,20 @@ public class TypeVisitor : IVisitor
     {
         DclVisitor dclVisitor = new DclVisitor(_symbolTable);
         n.Left.Accept(dclVisitor);
-        if (n.Right is null)
-        {
-            n.Type = n.Left.Type;
-            return;
-        }
-
+        n.Left.Type.ArrSize = n.Size;
+        n.Type = n.Left.Type;
+        if (n.Right is null) return;
         n.Right.Type = n.Left.Type;
         n.Right.Accept(this);
-        n.Type = (n.Left.Type != n.Right.Type)
-            ? throw new TypeException(n, $"Type mismatch, type of left: {n.Left.Type}, type of right: {n.Right.Type}")
-            : n.Left.Type;
+        if (n.Right is IdNode idRight && idRight.Type.IsArray) {
+            if (n.Left.Type.ArrSize < idRight.Type.ArrSize) {
+                 throw new TypeException(n, 
+                     $"Array size mismatch, {n.Left.Name} can only fit {n.Left.Type.ArrSize} elements. "+
+                       $"{idRight.Name} has {idRight.Type.ArrSize} elements");
+            }
+        }
+        if (n.Left.Type != n.Right.Type)
+            throw new TypeException(n, $"Type mismatch, type of left: {n.Left.Type}, type of right: {n.Right.Type}");
     }
 
     public void Visit(ArrLiteralNode n)
@@ -203,7 +218,8 @@ public class TypeVisitor : IVisitor
             if (expr.Type.ActualType == n.Type.ActualType) continue;
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException(n,
-                $"Type mismatch, Array type is {n.Type.ActualType}, element type was {expr.Type.ActualType}"); // Type will never be null here
+                $"Type mismatch, Array type is {n.Type.ActualType}, "+
+                  $"element type was {expr.Type.ActualType}"); // Type will never be null here
         }
     }
 
@@ -219,7 +235,8 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException(n,
-                $"Type mismatch, expected array index to be of type {TypeVal.Number}, actual type is {n.Index.Type}");
+                $"Type mismatch, expected array index to be of type {TypeVal.Number},"+
+                  $" actual type is {n.Index.Type}");
         }
         // Index is expression node, should we "calculate" the expression if possible to check if
         // index is >= 0 and < ArrSize?
@@ -268,6 +285,14 @@ public class TypeVisitor : IVisitor
         AssVisitor assVisitor = new AssVisitor(_symbolTable);
         n.Id.Accept(assVisitor);
         n.Expr.Accept(this);
+        // Prevent copying larger array into smaller
+        if (n.Id.Type.IsArray && n.Expr.Type.IsArray) {
+            if (n.Id.Type.ArrSize < n.Expr.Type.ArrSize) {
+                throw new TypeException(n, 
+                    $"Array size mismatch, {n.Id} can only fit {n.Id.Type.ArrSize} elements. " +
+                      $"{((IdNode)n.Expr).Name} has {n.Expr.Type.ArrSize} elements");
+            }
+        }
         if (n.Id.Type.ActualType is TypeVal.Analogpin or TypeVal.Digitalpin)
         {
             throw new TypeException(n, "Cannot reassign values to pin variables");
@@ -291,8 +316,16 @@ public class TypeVisitor : IVisitor
 
     public virtual void Visit(IdNode n)
     {
-        var symbol = _symbolTable.RetrieveSymbol(n.Id);
-        n.Type = symbol?.Type ?? throw new SymbolNotDeclaredException(n.Id);
+        var symbol = _symbolTable.RetrieveSymbol(n.Name);
+        if (symbol is null)
+        {
+            throw new SymbolNotDeclaredException(n.Name);
+        }
+        if(n.AttributesRef is null)
+        {
+            n.AttributesRef = symbol;
+        }
+        n.Type = symbol.Type;
     }
 
     public void Visit(PlusNode n)
@@ -392,13 +425,14 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException(n,
-                $"Type mismatch, expected value to be of type {TypeVal.Number}, actual type is {n.Left.Type.ActualType}");
+                $"Type mismatch, expected value to be of type {TypeVal.Number}, "+
+                  $"actual type is {n.Left.Type.ActualType}");
         }
     }
 
     public void Visit(WhileNode n)
     {
-        _symbolTable.OpenScope();
+        EnterScope();
         n.Condition.Accept(this);
         if (n.Condition.Type.ActualType == TypeVal.Boolean)
         {
@@ -408,20 +442,22 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException(n,
-                $"Type mismatch, expected condition to be of type {TypeVal.Boolean}, actual type is {n.Condition.Type.ActualType}");
+                $"Type mismatch, expected condition to be of type {TypeVal.Boolean},"+
+                  $" actual type is {n.Condition.Type.ActualType}");
         }
 
         foreach (var stmtNode in n.Body)
         {
             stmtNode.Accept(this);
+            stmtNode.Type.ScopeLevel = _scopeLevel;
         }
 
-        _symbolTable.CloseScope();
+        ExitScope();
     }
 
     public void Visit(ForNode n)
     {
-        _symbolTable.OpenScope();
+        EnterScope();
         n.Initializer.Accept(this);
         n.Limit.Accept(this);
         n.Update.Accept(this);
@@ -441,49 +477,53 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException(n,
-                $"Type mismatch, expected for-parameters to be of types (Number, Number, Number), actual types are ({n.Initializer.Type.ActualType}, {n.Limit.Type.ActualType}, {n.Update.Type.ActualType})");
+                "Type mismatch, expected for-parameters to be of types (Number, Number, Number),"+
+                   $" actual types are ({n.Initializer.Type.ActualType}, {n.Limit.Type.ActualType},"+
+                   $" {n.Update.Type.ActualType})");
         }
 
         foreach (var stmtNode in n.Body)
         {
             stmtNode.Accept(this);
+            stmtNode.Type.ScopeLevel = _scopeLevel;
         }
 
-        _symbolTable.CloseScope();
+        ExitScope();
     }
 
     public void Visit(ContNode n) { }
     public void Visit(BreakNode n) { }
     
     public void Visit(LoopNode n) {
-        _symbolTable.OpenScope();
+        EnterScope();
         foreach (var stmt in n.Stmts)
         {
             stmt.Accept(this);
+            stmt.Type.ScopeLevel = _scopeLevel;
         }
 
-        _symbolTable.CloseScope();
+        ExitScope();
     }
 
     public void Visit(FuncDefNode n)
     {
-        if (_symbolTable.IsDeclaredLocally(n.Name.Id))
+        if (_symbolTable.IsDeclaredLocally(n.Id.Name))
         {
-            throw new DuplicateDeclarationException("An id of this name have already been declared", n.Name.Id);
+            throw new DuplicateDeclarationException("An id of this name have already been declared", n.Id.Name);
         }
 
-        _symbolTable.OpenScope();
-        foreach (var param in n.FormalParams)
-        {
-            _symbolTable.EnterSymbol(param.Id, param.Type);
+        EnterScope();
+        foreach (var param in n.FormalParams) {
+            _symbolTable.EnterSymbol(param);
         }
 
         foreach (var stmtNode in n.Stmts)
         {
             stmtNode.Accept(this); // Should throw exception if return doesn't match type
+            stmtNode.Type.ScopeLevel = _scopeLevel;
         }
 
-        _symbolTable.CloseScope();
+        ExitScope();
 
         n.Type = n.ReturnType;
         _symbolTable.EnterSymbol(n);
@@ -491,18 +531,20 @@ public class TypeVisitor : IVisitor
 
     public void Visit(FuncExprNode n)
     {
-        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id);
+        var symbol = _symbolTable.RetrieveSymbol(n.Id.Name);
         if (symbol is not FunctionSymTableEntry funcEntry)
         {
             // FuncEntry is now symbol as FunctionSymTableEntry
             if (symbol is null)
             {
-                throw new TypeException(n, $"The symbol {n.Id.Id} does not exist in any current scope");
+                throw new TypeException(n, $"The symbol {n.Id.Name} does not exist in any current scope");
             }
-
-            throw new TypeException(n, $"The retrieved symbol {n.Id.Id} was not a function symbol table entry");
+            throw new TypeException(n, $"The retrieved symbol {n.Id.Name} was not a function symbol table entry");
         }
-
+        if (n.Id.AttributesRef is null)
+        {
+            n.Id.AttributesRef = funcEntry;
+        }
         n.Type = funcEntry.Type;
         var parameterTypes = funcEntry.Parameters.Values.ToArray();
         var i = 0;
@@ -514,7 +556,8 @@ public class TypeVisitor : IVisitor
             {
                 n.Type.ActualType = TypeVal.Error;
                 throw new TypeException(n,
-                    $"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, actual type is {param.Type.ActualType}");
+                    $"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]},"+
+                      $" actual type is {param.Type.ActualType}");
             }
 
             i++;
@@ -523,18 +566,20 @@ public class TypeVisitor : IVisitor
 
     public void Visit(FuncStmtNode n)
     {
-        var symbol = _symbolTable.RetrieveSymbol(n.Id.Id);
+        var symbol = _symbolTable.RetrieveSymbol(n.Id.Name);
         if (symbol is not FunctionSymTableEntry funcEntry)
         {
             // FuncEntry is now symbol as FunctionSymTableEntry
             if (symbol is null)
             {
-                throw new TypeException(n, $"The symbol {n.Id.Id} does not exist in any current scope");
+                throw new TypeException(n, $"The symbol {n.Id.Name} does not exist in any current scope");
             }
-
-            throw new TypeException(n, $"The retrieved symbol {n.Id.Id} was not a function symbol table entry");
+            throw new TypeException(n, $"The retrieved symbol {n.Id.Name} was not a function symbol table entry");
         }
-
+        if (n.Id.AttributesRef is null)
+        {
+            n.Id.AttributesRef = funcEntry;
+        }
         n.Type = funcEntry.Type;
         var parameterTypes = funcEntry.Parameters.Values.ToArray();
         var i = 0;
@@ -546,7 +591,8 @@ public class TypeVisitor : IVisitor
             {
                 n.Type.ActualType = TypeVal.Error;
                 throw new TypeException(n,
-                    $"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, actual type is {param.Type.ActualType}");
+                    $"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, "+
+                      $"actual type is {param.Type.ActualType}");
             }
 
             i++;
@@ -570,6 +616,10 @@ public class TypeVisitor : IVisitor
         else
         {
             n.RetVal.Accept(this);
+            // Mark arrays that are returned from functions for later
+            if (n.RetVal.Type.IsArray) {
+                n.RetVal.Type.IsReturned = true;
+            }
             if (n.SurroundingFuncType == n.RetVal.Type)
             {
                 n.Type.ActualType = TypeVal.Ok;
@@ -578,7 +628,8 @@ public class TypeVisitor : IVisitor
             {
                 n.Type.ActualType = TypeVal.Error;
                 throw new TypeException(n,
-                    $"Type mismatch, expected return value to be of type {n.SurroundingFuncType}, actual type is {n.RetVal.Type}");
+                    $"Type mismatch, expected return value to be of type {n.SurroundingFuncType}, "+
+                      $" actual type is {n.RetVal.Type}");
             }
         }
     }
@@ -595,23 +646,32 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException(n,
-                $"Type mismatch, expected condition to be of type {TypeVal.Boolean}, actual type is {n.Condition.Type}");
+                $"Type mismatch, expected condition to be of type {TypeVal.Boolean}, "+
+                  $"actual type is {n.Condition.Type}");
         }
 
-        _symbolTable.OpenScope();
+        EnterScope();
         foreach (var node in n.ThenClause)
         {
             node.Accept(this);
+            node.Type.ScopeLevel = _scopeLevel;
+        }
+        ExitScope();
+        
+        foreach (var node in n.ElseIfClauses) {
+            node.Accept(this);
+            node.Type.ScopeLevel = _scopeLevel;
         }
 
-        _symbolTable.CloseScope();
-        _symbolTable.OpenScope();
+        EnterScope();
         foreach (var node in n.ElseClause)
         {
             node.Accept(this);
+            node.Type.ScopeLevel = _scopeLevel;
         }
-
-        _symbolTable.CloseScope();
+        ExitScope();
+        
+        
     }
 
     public void Visit(ElseIfNode n)
@@ -624,13 +684,14 @@ public class TypeVisitor : IVisitor
         }
 
         n.Type.ActualType = TypeVal.Ok;
-        _symbolTable.OpenScope();
+        
+        EnterScope();
         foreach (var stmt in n.Body)
         {
             stmt.Accept(this);
+            stmt.Type.ScopeLevel = _scopeLevel;
         }
-
-        _symbolTable.CloseScope();
+        ExitScope();
     }
 
     public void Visit(VarsNode n)
@@ -638,6 +699,7 @@ public class TypeVisitor : IVisitor
         foreach (var node in n.Dcls)
         {
             node.Accept(this);
+            node.Type.ScopeLevel = _scopeLevel;
         }
     }
 
@@ -651,12 +713,12 @@ public class TypeVisitor : IVisitor
 
     public void Visit(SetupNode n)
     {
-        _symbolTable.OpenScope();
+        EnterScope();
         foreach (var node in n.Stmts)
         {
             node.Accept(this);
+            node.Type.ScopeLevel = _scopeLevel;
         }
-
-        _symbolTable.CloseScope();
+        ExitScope();
     }
 }

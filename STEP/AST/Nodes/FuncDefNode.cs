@@ -2,7 +2,7 @@
 
 public class FuncDefNode : AstNode
 {
-    public IdNode Name { get; set; }
+    public IdNode Id { get; set; }
     public Type ReturnType { get; init; } = new();
     public List<IdNode> FormalParams { get; init; } = new();
     public List<StmtNode> Stmts { get; set; }
@@ -16,7 +16,7 @@ public class FuncDefNode : AstNode
     {
         if (obj is FuncDefNode other)
         {
-            return Equals(other.Name, Name)
+            return Equals(other.Id, Id)
                    && Equals(other.ReturnType, ReturnType)
                    && FormalParams.SequenceEqual(other.FormalParams)
                    && Stmts.SequenceEqual(other.Stmts);
