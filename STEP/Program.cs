@@ -10,7 +10,7 @@ class Program
     /* The main function takes a file path as its first argument.
      * It takes additional optional arguments:
      * -pp for pretty-printing the AST */
-    private static void Main(string[] args)
+    private static void Main(string[] args) // TODO: ADD COM PORT SELECTION WITH DEFAULT
     {
         if (args.Length < 1)
             Exit("Usage: STEP.exe filename [Optional: -pp] [Optional: -up]");

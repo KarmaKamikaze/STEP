@@ -599,6 +599,9 @@ public class CodeGenerationVisitor : IVisitor
         n.VarsBlock?.Accept(this);
         n.FuncsBlock?.Accept(this);
         EmitLine("void setup() {");
+        // Add declared pinModes from variables scope
+        if (_pinSetup.ToString() != String.Empty)
+            EmitLine(_pinSetup.ToString());
         n.SetupBlock?.Accept(this);
         EmitLine("}");
         EmitLine("void loop() {");
@@ -609,10 +612,6 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(SetupNode n)
     {
         EnterScope();
-        // Add declared pinModes from variables scope
-        if (_pinSetup.ToString() != String.Empty)
-            EmitLine(_pinSetup.ToString());
-
         foreach (var stmt in n.Stmts)
         {
             stmt.Accept(this);

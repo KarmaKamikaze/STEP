@@ -78,18 +78,18 @@ public class ArduinoCompiler
             {
                 throw new ApplicationException("Arduino compiler error. compiled.hex file was not generated.");
             }
-            
+
             // Enable upload logging
             var nlogConfig = new LoggingConfiguration();
 
-            nlogConfig.AddRule(minLevel: LogLevel.Trace, maxLevel: LogLevel.Fatal, 
-                target: new ConsoleTarget("consoleTarget") 
+            nlogConfig.AddRule(minLevel: LogLevel.Trace, maxLevel: LogLevel.Fatal,
+                target: new ConsoleTarget("consoleTarget")
                 {
                     Layout = "${longdate} level=${level} message=${message}"
                 });
 
             LogManager.Configuration = nlogConfig;
-            
+
             // Update compiled hex file to Arduino board
             ArduinoSketchUploader uploader = new ArduinoSketchUploader(new ArduinoSketchUploaderOptions()
             {
@@ -117,7 +117,7 @@ public class ArduinoCompiler
             }
         }
     }
-    
+
     private class NLogArduinoUploaderLogger : IArduinoUploaderLogger
     {
         private readonly bool _error;
@@ -125,7 +125,7 @@ public class ArduinoCompiler
         private readonly bool _info;
         private readonly bool _debug;
         private readonly bool _trace;
-        
+
         public NLogArduinoUploaderLogger(bool error = false, bool warn = false, bool info = false, bool debug = false,
             bool trace = false)
         {
@@ -135,7 +135,7 @@ public class ArduinoCompiler
             _debug = debug;
             _trace = trace;
         }
-        
+
         private static readonly Logger Logger = LogManager.GetLogger("ArduinoSketchUploader");
 
         public void Error(string message, Exception exception)
