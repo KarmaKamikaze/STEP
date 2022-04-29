@@ -15,11 +15,11 @@ public class CodeGenerationVisitor : IVisitor
     private readonly List<Tuple<int, ArrDclNode>>
         _arrDclsPerScope = new(); // Keeps track of array declarations per scope
 
-    public void OutputToBaseFile()
+    public void OutputToBaseFile(string filename)
     {
         InitProgramFileHelper();
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        File.WriteAllText(directoryPath + "/compiled.c", Output);
+        File.WriteAllText(directoryPath + $"/{filename}.c", Output);
     }
 
     public string OutputToString()

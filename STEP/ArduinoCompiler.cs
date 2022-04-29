@@ -16,7 +16,7 @@ public class ArduinoCompiler
     /// It first compiles the STEP compiler's output to avr, then converts this output to Intel HEX format.
     /// The .hex file is then uploaded directly to the connected Arduino Uno board.
     /// </summary>
-    public void Upload()
+    public void Upload(string filename)
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -38,18 +38,19 @@ public class ArduinoCompiler
                     $"{directoryPath}/avr-destination/bin/avr-gcc.exe -O2 -Wall -mmcu=atmega328p " +
                     $"-I {directoryPath}/avr-destination/Arduino-Core/cores/arduino " +
                     $"-I {directoryPath}/avr-destination/Arduino-Core/variants/standard " +
-                    $"{directoryPath}/compiled.c -o {directoryPath}/compiled.out");
+                    $"{directoryPath}/{filename}.c -o {directoryPath}/{filename}.out");
 
                 compiler?.WaitForExit();
 
-                if (!File.Exists(directoryPath + "/compiled.out"))
+                if (!File.Exists(directoryPath + $"/{filename}.out"))
                 {
-                    throw new ApplicationException("Arduino compiler error. compiled.out file was not generated.");
+                    throw new ApplicationException($"Arduino compiler error. {filename}.out file was not generated.");
                 }
 
                 Process hexConverter = Process.Start("cmd.exe",
                     "/C " +
-                    $"{directoryPath}/avr-destination/bin/avr-objcopy.exe -j .text -j .data -O ihex {directoryPath}/compiled.out {directoryPath}/compiled.hex");
+                    $"{directoryPath}/avr-destination/bin/avr-objcopy.exe -j .text -j .data -O ihex " +
+                    $"{directoryPath}/{filename}.out {directoryPath}/{filename}.hex");
 
                 hexConverter?.WaitForExit();
             }
@@ -59,24 +60,24 @@ public class ArduinoCompiler
                     $"avr-gcc -O2 -Wall -mmcu=atmega328p " +
                     $"-I {directoryPath}/avr-destination/Arduino-Core/cores/arduino " +
                     $"-I {directoryPath}/avr-destination/Arduino-Core/variants/standard " +
-                    $"{directoryPath}/compiled.c -o {directoryPath}/compiled.out");
+                    $"{directoryPath}/{filename}.c -o {directoryPath}/{filename}.out");
 
                 compiler?.WaitForExit();
 
-                if (!File.Exists(directoryPath + "/compiled.out"))
+                if (!File.Exists(directoryPath + $"/{filename}.out"))
                 {
-                    throw new ApplicationException("Arduino compiler error. compiled.out file was not generated.");
+                    throw new ApplicationException($"Arduino compiler error. {filename}.out file was not generated.");
                 }
 
                 Process hexConverter = Process.Start("/bin/bash",
-                    $"avr-objcopy -O ihex {directoryPath}/compiled.out {directoryPath}/compiled.hex");
+                    $"avr-objcopy -O ihex {directoryPath}/{filename}.out {directoryPath}/{filename}.hex");
 
                 hexConverter?.WaitForExit();
             }
 
-            if (!File.Exists(directoryPath + "/compiled.hex"))
+            if (!File.Exists(directoryPath + $"/{filename}.hex"))
             {
-                throw new ApplicationException("Arduino compiler error. compiled.hex file was not generated.");
+                throw new ApplicationException($"Arduino compiler error. {filename}.hex file was not generated.");
             }
 
             // Enable upload logging
@@ -93,7 +94,7 @@ public class ArduinoCompiler
             // Update compiled hex file to Arduino board
             ArduinoSketchUploader uploader = new ArduinoSketchUploader(new ArduinoSketchUploaderOptions()
             {
-                FileName = directoryPath + "/compiled.hex",
+                FileName = directoryPath + $"/{filename}.hex",
                 PortName = "COM3", // Can be omitted to try to auto-detect the COM port.
                 ArduinoModel = ArduinoModel.UnoR3
             }, new NLogArduinoUploaderLogger(error: true, warn: true, info: true));
@@ -106,14 +107,14 @@ public class ArduinoCompiler
         finally
         {
             // Clean up
-            if (File.Exists(directoryPath + "/compiled.out"))
+            if (File.Exists(directoryPath + $"/{filename}.out"))
             {
-                File.Delete(directoryPath + "/compiled.out");
+                File.Delete(directoryPath + $"/{filename}.out");
             }
 
-            if (File.Exists(directoryPath + "/compiled.hex"))
+            if (File.Exists(directoryPath + $"/{filename}.hex"))
             {
-                File.Delete(directoryPath + "/compiled.hex");
+                File.Delete(directoryPath + $"/{filename}.hex");
             }
         }
     }

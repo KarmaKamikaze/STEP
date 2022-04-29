@@ -12,8 +12,8 @@ class Program
      * -pp for pretty-printing the AST */
     private static void Main(string[] args)
     {
-        if (args.Length < 1)
-            Exit("Usage: STEP.exe filename [Optional: -pp] [Optional: -up]");
+        if (args.Length < 1 || args.Contains("-help"))
+            Exit("Usage: STEP.exe filename [Optional: -print] [Optional: -upload]");
 
         // Stream reader opens source file
         AntlrFileStream streamReader = new AntlrFileStream(args[0]);
@@ -38,7 +38,7 @@ class Program
             TypeVisitor typeVisitor = new();
             root.Accept(typeVisitor);
 
-            if (args.Length > 1 && args.Contains("-pp"))
+            if (args.Length > 1 && args.Contains("-print"))
             {
                 // Print AST
                 AstPrintVisitor printer = new AstPrintVisitor();
@@ -48,13 +48,13 @@ class Program
             // Generate code and output to .c file
             CodeGenerationVisitor codeGen = new CodeGenerationVisitor();
             root.Accept(codeGen);
-            codeGen.OutputToBaseFile();
+            codeGen.OutputToBaseFile(Path.GetFileNameWithoutExtension(args[0]));
 
-            if (args.Length > 1 && args.Contains("-up"))
+            if (args.Length > 1 && args.Contains("-upload"))
             {
                 // Upload compiled hex program to Arduino board
                 ArduinoCompiler arduinoCompiler = new ArduinoCompiler();
-                arduinoCompiler.Upload();
+                arduinoCompiler.Upload(Path.GetFileNameWithoutExtension(args[0]));
             }
         }
         catch (Exception e)
