@@ -11,6 +11,7 @@
     <ItemGroup>
       <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.3" />
       <PackageReference Include="ArduinoUploader" Version="3.2.0" />
+      <PackageReference Include="IntelHexFormatReader" Version="2.2.3" />
     </ItemGroup>
 
     <ItemGroup>

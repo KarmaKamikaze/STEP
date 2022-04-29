@@ -46,7 +46,7 @@ public class ArduinoCompiler
 
                 Process hexConverter = Process.Start("cmd.exe",
                     "/C " +
-                    $"{directoryPath}/avr-destination/bin/avr-objcopy.exe -O ihex {directoryPath}/compiled.out {directoryPath}/compiled.hex");
+                    $"{directoryPath}/avr-destination/bin/avr-objcopy.exe -j .text -j .data -O ihex {directoryPath}/compiled.out {directoryPath}/compiled.hex");
 
                 hexConverter?.WaitForExit();
             }
