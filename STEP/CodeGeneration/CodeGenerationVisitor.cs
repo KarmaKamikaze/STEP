@@ -603,16 +603,8 @@ public class CodeGenerationVisitor : IVisitor
         // TODO: library inclusion?
         n.VarsBlock?.Accept(this);
         n.FuncsBlock?.Accept(this);
-        if(n.SetupBlock is null)
-        {
-            n.SetupBlock = new SetupNode { Stmts = new() };
-        }
-        n.SetupBlock.Accept(this);
-        if (n.LoopBlock is null)
-        {
-            n.LoopBlock = new LoopNode { Stmts = new() };
-        }
-        n.LoopBlock.Accept(this);
+        n.SetupBlock?.Accept(this);
+        n.LoopBlock?.Accept(this);
     }
 
     public void Visit(SetupNode n)
