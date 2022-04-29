@@ -14,6 +14,7 @@ public class ArrDclNode : VarDclNode
         if (obj is ArrDclNode other)
         {
             return other.Size == Size
+                   && Equals(other.Left, Left)
                    && Equals(other.Right, Right);
         }
 

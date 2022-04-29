@@ -42,7 +42,8 @@ public class TypeVisitor : IVisitor
         else
         {
             n.Type.ActualType = TypeVal.Error;
-            throw new TypeException(n, new Type() {ActualType = TypeVal.Boolean}, n.Left.Type, n.Right.Type);
+            throw new TypeException(n, new Type() {ActualType = TypeVal.Boolean}, 
+                                  n.Left.Type, n.Right.Type);
         }
     }
 
@@ -195,10 +196,12 @@ public class TypeVisitor : IVisitor
         if (n.Right is null) return;
         n.Right.Type = n.Left.Type;
         n.Right.Accept(this);
-        if (n.Right is IdNode idRight) {
-            if (idRight.Type.IsArray) {
-                if (n.Left.Type.ArrSize < idRight.Type.ArrSize) throw new TypeException(n, $"Array size mismatch, {n.Left.Id} can only fit {n.Left.Type.ArrSize} elements. {idRight.Id} has {idRight.Type.ArrSize} elements");
-            } 
+        if (n.Right is IdNode idRight && idRight.Type.IsArray) {
+            if (n.Left.Type.ArrSize < idRight.Type.ArrSize) {
+                 throw new TypeException(n, 
+                     $"Array size mismatch, {n.Left.Id} can only fit {n.Left.Type.ArrSize} elements. "+
+                       $"{idRight.Id} has {idRight.Type.ArrSize} elements");
+            }
         }
         if (n.Left.Type != n.Right.Type)
             throw new TypeException(n, $"Type mismatch, type of left: {n.Left.Type}, type of right: {n.Right.Type}");
@@ -215,7 +218,8 @@ public class TypeVisitor : IVisitor
             if (expr.Type.ActualType == n.Type.ActualType) continue;
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException(n,
-                $"Type mismatch, Array type is {n.Type.ActualType}, element type was {expr.Type.ActualType}"); // Type will never be null here
+                $"Type mismatch, Array type is {n.Type.ActualType}, "+
+                  $"element type was {expr.Type.ActualType}"); // Type will never be null here
         }
     }
 
@@ -231,7 +235,8 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException(n,
-                $"Type mismatch, expected array index to be of type {TypeVal.Number}, actual type is {n.Index.Type}");
+                $"Type mismatch, expected array index to be of type {TypeVal.Number},"+
+                  $" actual type is {n.Index.Type}");
         }
         // Index is expression node, should we "calculate" the expression if possible to check if
         // index is >= 0 and < ArrSize?
@@ -282,7 +287,11 @@ public class TypeVisitor : IVisitor
         n.Expr.Accept(this);
         // Prevent copying larger array into smaller
         if (n.Id.Type.IsArray && n.Expr.Type.IsArray) {
-            if (n.Id.Type.ArrSize < n.Expr.Type.ArrSize) throw new TypeException(n, $"Array size mismatch, {n.Id} can only fit {n.Id.Type.ArrSize} elements. {((IdNode)n.Expr).Id} has {n.Expr.Type.ArrSize} elements");
+            if (n.Id.Type.ArrSize < n.Expr.Type.ArrSize) {
+                throw new TypeException(n, 
+                    $"Array size mismatch, {n.Id} can only fit {n.Id.Type.ArrSize} elements. " +
+                      $"{((IdNode)n.Expr).Id} has {n.Expr.Type.ArrSize} elements");
+            }
         }
         if (n.Id.Type.ActualType is TypeVal.Analogpin or TypeVal.Digitalpin)
         {
@@ -408,7 +417,8 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException(n,
-                $"Type mismatch, expected value to be of type {TypeVal.Number}, actual type is {n.Left.Type.ActualType}");
+                $"Type mismatch, expected value to be of type {TypeVal.Number}, "+
+                  $"actual type is {n.Left.Type.ActualType}");
         }
     }
 
@@ -424,7 +434,8 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException(n,
-                $"Type mismatch, expected condition to be of type {TypeVal.Boolean}, actual type is {n.Condition.Type.ActualType}");
+                $"Type mismatch, expected condition to be of type {TypeVal.Boolean},"+
+                  $" actual type is {n.Condition.Type.ActualType}");
         }
 
         foreach (var stmtNode in n.Body)
@@ -458,7 +469,9 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException(n,
-                $"Type mismatch, expected for-parameters to be of types (Number, Number, Number), actual types are ({n.Initializer.Type.ActualType}, {n.Limit.Type.ActualType}, {n.Update.Type.ActualType})");
+                "Type mismatch, expected for-parameters to be of types (Number, Number, Number),"+
+                   $" actual types are ({n.Initializer.Type.ActualType}, {n.Limit.Type.ActualType},"+
+                   $" {n.Update.Type.ActualType})");
         }
 
         foreach (var stmtNode in n.Body)
@@ -534,7 +547,8 @@ public class TypeVisitor : IVisitor
             {
                 n.Type.ActualType = TypeVal.Error;
                 throw new TypeException(n,
-                    $"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, actual type is {param.Type.ActualType}");
+                    $"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]},"+
+                      $" actual type is {param.Type.ActualType}");
             }
 
             i++;
@@ -566,7 +580,8 @@ public class TypeVisitor : IVisitor
             {
                 n.Type.ActualType = TypeVal.Error;
                 throw new TypeException(n,
-                    $"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, actual type is {param.Type.ActualType}");
+                    $"Type mismatch, expected parameter {i} to be of type {parameterTypes[i]}, "+
+                      $"actual type is {param.Type.ActualType}");
             }
 
             i++;
@@ -602,7 +617,8 @@ public class TypeVisitor : IVisitor
             {
                 n.Type.ActualType = TypeVal.Error;
                 throw new TypeException(n,
-                    $"Type mismatch, expected return value to be of type {n.SurroundingFuncType}, actual type is {n.RetVal.Type}");
+                    $"Type mismatch, expected return value to be of type {n.SurroundingFuncType}, "+
+                      $" actual type is {n.RetVal.Type}");
             }
         }
     }
@@ -619,7 +635,8 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeException(n,
-                $"Type mismatch, expected condition to be of type {TypeVal.Boolean}, actual type is {n.Condition.Type}");
+                $"Type mismatch, expected condition to be of type {TypeVal.Boolean}, "+
+                  $"actual type is {n.Condition.Type}");
         }
 
         EnterScope();
