@@ -12,18 +12,21 @@ public class CodeGenerationVisitor : IVisitor
     private readonly StringBuilder _pinSetup = new();
     private int _scopeLevel;
     private readonly List<IdNode> _arrDclsInScope = new(); // Keeps track of array declarations currently in scope
-    public void OutputToBaseFile()
+    
+    public void OutputToBaseFile(string filename)
     {
+        InitProgramFileHelper();
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        File.WriteAllText(directoryPath + "/compiled.c", Output);
+        File.WriteAllText(directoryPath + $"/{filename}.c", Output);
     }
 
     public string OutputToString()
     {
         return Output;
     }
-    
-    private void EmitLine(string line) {
+
+    private void EmitLine(string line)
+    {
         _stringBuilder.AppendLine(line);
     }
 
@@ -36,7 +39,7 @@ public class CodeGenerationVisitor : IVisitor
     {
         if (type.IsConstant)
             EmitAppend("const" + suffix);
-        
+
         switch (type.ActualType)
         {
             case TypeVal.Number:
@@ -54,7 +57,8 @@ public class CodeGenerationVisitor : IVisitor
         }
     }
 
-    private void EnterScope() {
+    private void EnterScope()
+    {
         _scopeLevel++;
     }
     
@@ -90,7 +94,7 @@ public class CodeGenerationVisitor : IVisitor
         var id = n.Right as IdNode;
         EmitLine($"memcpy({n.Left.Name}, {id.Name}, sizeof({id.Name}[0])*{Math.Min(n.Left.Type.ArrSize, id.Type.ArrSize)});");
     }
-    
+
     public void Visit(AndNode n)
     {
         // E.g.: x and true -> x && true 
@@ -220,7 +224,7 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(ArrayAccessNode n)
     {
         n.Array.Accept(this);
-        EmitAppend("[");
+        EmitAppend("[(int) ");
         n.Index.Accept(this);
         EmitAppend("]");
     }
@@ -272,8 +276,10 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend(n.Name);
     }
 
-    public void Visit(PlusNode n) {
-        switch (n.Type.ActualType) {
+    public void Visit(PlusNode n)
+    {
+        switch (n.Type.ActualType)
+        {
             // If the overall expression has type string, we must convert any non-string children to strings
             case TypeVal.String when n.Left.Type.ActualType != TypeVal.String:
                 // String(left) + right
@@ -562,7 +568,8 @@ public class CodeGenerationVisitor : IVisitor
         n.Condition.Accept(this);
         EmitLine(") {");
         EnterScope();
-        foreach(var stmt in n.ThenClause) {
+        foreach (var stmt in n.ThenClause)
+        {
             stmt.Accept(this);
         }
 
@@ -585,6 +592,7 @@ public class CodeGenerationVisitor : IVisitor
             {
                 stmt.Accept(this);
             }
+
             ExitScope();
             EmitLine("}");
         }
@@ -600,40 +608,39 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ProgNode n)
     {
-        // TODO: library inclusion?
         n.VarsBlock?.Accept(this);
         n.FuncsBlock?.Accept(this);
+        EmitLine("void setup() {");
+        // Add declared pinModes from variables scope
+        if (_pinSetup.ToString() != String.Empty)
+            EmitLine(_pinSetup.ToString());
         n.SetupBlock?.Accept(this);
+        EmitLine("}");
+        EmitLine("void loop() {");
         n.LoopBlock?.Accept(this);
+        EmitLine("}");
     }
 
     public void Visit(SetupNode n)
     {
-        EmitLine("void setup() {");
         EnterScope();
-        // Add declared pinModes from variables scope
-        if (_pinSetup.ToString() != String.Empty)
-            EmitLine(_pinSetup.ToString());
-
         foreach (var stmt in n.Stmts)
         {
             stmt.Accept(this);
         }
 
         ExitScope();
-        EmitLine("}");
     }
 
     public void Visit(LoopNode n)
     {
-        EmitLine("void loop() {");
         EnterScope();
-        foreach(var stmt in n.Stmts) {
+        foreach (var stmt in n.Stmts)
+        {
             stmt.Accept(this);
         }
 
         ExitScope();
-        EmitLine("}");
     }
 
     public void Visit(ElseIfNode n)
@@ -644,7 +651,7 @@ public class CodeGenerationVisitor : IVisitor
             n.Condition.Accept(this);
             EmitLine(") {");
             EnterScope();
-            foreach(var stmt in n.Body)
+            foreach (var stmt in n.Body)
             {
                 stmt.Accept(this);
             }
@@ -682,9 +689,34 @@ public class CodeGenerationVisitor : IVisitor
         }
 
         _pinSetup.Append(");\r\n");
-        
+
         // Save variable names as constant declarations and prepend to generated code
         string variableConstant = $"#define {n.Left.Name} {pinVisitor.GetPinCode()}\r\n";
         _stringBuilder.Insert(0, variableConstant);
+    }
+
+    private void InitProgramFileHelper()
+    {
+        // Insert main
+        // This main function is a modified main.cpp, which is included in the Arduino library.
+        _stringBuilder.Insert(0, "#include <Arduino.h>\n\n" +
+                                 "// Weak empty variant initialization function.\n" +
+                                 "// May be redefined by variant files.\n" +
+                                 "void initVariant() __attribute__((weak));\n" +
+                                 "void initVariant() { }\n\n" +
+                                 "void setupUSB() __attribute__((weak));\n" +
+                                 "void setupUSB() { }\n\n" +
+                                 "int main(void)\n" +
+                                 "{\n" +
+                                 "initVariant();\n\n" +
+                                 "#if defined(USBCON)\n" +
+                                 "USBDevice.attach();\n" +
+                                 "#endif\n\n" +
+                                 "setup();\n\n" +
+                                 "for (;;) {\n" +
+                                 "loop();\n" +
+                                 "}\n\n" +
+                                 "return 0;\n" +
+                                 "}\n");
     }
 }
