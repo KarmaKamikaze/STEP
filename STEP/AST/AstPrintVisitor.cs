@@ -276,14 +276,7 @@ public class AstPrintVisitor : IVisitor
             Print(n.Left.Type.ActualType.ToString().ToLower() + $"[{n.Size}] ");
             n.Left.Accept(this);
             Print(" = ");
-            if (n.IsId)
-            {
-                n.IdRight.Accept(this);
-            }
-            else
-            {
-                n.Right.Accept(this);
-            }
+            n.Right.Accept(this);
         }
     }
 
