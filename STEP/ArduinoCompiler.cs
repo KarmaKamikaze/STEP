@@ -54,9 +54,9 @@ public class ArduinoCompiler
             {
                 Process compiler = Process.Start("/bin/bash",
                     $"{directoryPath}/avr-destination/bin/avr-gcc.exe -O2 -Wall -mmcu=atmega328p " +
-                            $"-I {directoryPath}/avr-destination/Arduino-Core/cores/arduino " +
-                            $"-I {directoryPath}/avr-destination/Arduino-Core/variants/standard " +
-                            $"{directoryPath}/compiled.c -o {directoryPath}/compiled.out");
+                    $"-I {directoryPath}/avr-destination/Arduino-Core/cores/arduino " +
+                    $"-I {directoryPath}/avr-destination/Arduino-Core/variants/standard " +
+                    $"{directoryPath}/compiled.c -o {directoryPath}/compiled.out");
 
                 compiler?.WaitForExit();
 
@@ -79,7 +79,7 @@ public class ArduinoCompiler
             ArduinoSketchUploader uploader = new ArduinoSketchUploader(new ArduinoSketchUploaderOptions()
             {
                 FileName = directoryPath + "/compiled.hex",
-                //PortName = "COM3", // Can be omitted to try to auto-detect the COM port.
+                PortName = "COM3", // Can be omitted to try to auto-detect the COM port.
                 ArduinoModel = ArduinoModel.UnoR3
             });
             uploader.UploadSketch();
@@ -95,7 +95,7 @@ public class ArduinoCompiler
             {
                 File.Delete(directoryPath + "/compiled.out");
             }
-            
+
             if (File.Exists(directoryPath + "/compiled.hex"))
             {
                 File.Delete(directoryPath + "/compiled.hex");
