@@ -52,10 +52,23 @@ public class ArduinoCompiler
             }
             else
             {
-                Process.Start("/bin/bash",
-                    $"{directoryPath}/avr-destination/bin/avr-gcc.exe -O2 -Wall -mmcu=atmega328p {directoryPath}/compiled.c -o {directoryPath}/compiled.out");
-                Process.Start("/bin/bash",
+                Process compiler = Process.Start("/bin/bash",
+                    $"{directoryPath}/avr-destination/bin/avr-gcc.exe -O2 -Wall -mmcu=atmega328p " +
+                            $"-I {directoryPath}/avr-destination/Arduino-Core/cores/arduino " +
+                            $"-I {directoryPath}/avr-destination/Arduino-Core/variants/standard " +
+                            $"{directoryPath}/compiled.c -o {directoryPath}/compiled.out");
+
+                compiler?.WaitForExit();
+
+                if (!File.Exists(directoryPath + "/compiled.out"))
+                {
+                    throw new ApplicationException("Arduino compiler error. compiled.out file was not generated.");
+                }
+
+                Process hexConverter = Process.Start("/bin/bash",
                     $"{directoryPath}/avr-destination/bin/avr-objcopy.exe -O ihex {directoryPath}/compiled.out {directoryPath}/compiled.hex");
+
+                hexConverter?.WaitForExit();
             }
 
             if (!File.Exists(directoryPath + "/compiled.hex"))
