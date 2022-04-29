@@ -96,7 +96,7 @@ public class ArduinoCompiler
                 FileName = directoryPath + "/compiled.hex",
                 PortName = "COM3", // Can be omitted to try to auto-detect the COM port.
                 ArduinoModel = ArduinoModel.UnoR3
-            }, new NLogArduinoUploaderLogger());
+            }, new NLogArduinoUploaderLogger(error: true, warn: true, info: true));
             uploader.UploadSketch();
         }
         catch (ApplicationException e)
@@ -120,31 +120,47 @@ public class ArduinoCompiler
     
     private class NLogArduinoUploaderLogger : IArduinoUploaderLogger
     {
+        private readonly bool _error;
+        private readonly bool _warn;
+        private readonly bool _info;
+        private readonly bool _debug;
+        private readonly bool _trace;
+        
+        public NLogArduinoUploaderLogger(bool error = false, bool warn = false, bool info = false, bool debug = false,
+            bool trace = false)
+        {
+            _error = error;
+            _warn = warn;
+            _info = info;
+            _debug = debug;
+            _trace = trace;
+        }
+        
         private static readonly Logger Logger = LogManager.GetLogger("ArduinoSketchUploader");
 
         public void Error(string message, Exception exception)
         {
-            Logger.Error(exception, message);
+            if (_error) Logger.Error(exception, message);
         }
 
         public void Warn(string message)
         {
-            Logger.Warn(message);
+            if (_warn) Logger.Warn(message);
         }
 
         public void Info(string message)
         {
-            Logger.Info(message);
+            if (_info) Logger.Info(message);
         }
 
         public void Debug(string message)
         {
-            // Logger.Debug(message);
+            if (_debug) Logger.Debug(message);
         }
 
         public void Trace(string message)
         {
-            // Logger.Trace(message);
+            if (_trace) Logger.Trace(message);
         }
     }
 }
