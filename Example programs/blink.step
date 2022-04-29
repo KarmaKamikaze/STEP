@@ -4,8 +4,8 @@ variables
 end variables
 
 loop
-  WriteToDigitalPin(BuiltInLED, High)
+  WriteToDigitalPin(BuiltInLED, On)
   Wait(1000)
-  WriteToDigitalPin(BuiltInLED, Low)
+  WriteToDigitalPin(BuiltInLED, Off)
   Wait(1000)
 end loop
