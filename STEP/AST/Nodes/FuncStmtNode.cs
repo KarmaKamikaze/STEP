@@ -4,7 +4,9 @@ public class FuncStmtNode : StmtNode
 {
     public IdNode Id { get; set; }
     public List<ExprNode> Params { get; set; }
-    public override void Accept(IVisitor v) {
+
+    public override void Accept(IVisitor v)
+    {
         v.Visit(this);
     }
 
@@ -13,8 +15,9 @@ public class FuncStmtNode : StmtNode
         if (obj is FuncStmtNode other)
         {
             return Equals(other.Id, Id)
-                && Params.SequenceEqual(other.Params);
+                   && Params.SequenceEqual(other.Params);
         }
+
         return false;
     }
 }

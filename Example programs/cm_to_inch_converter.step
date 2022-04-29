@@ -1,13 +1,22 @@
 # simple table printing program
 variables
 constant number inch_per_cm = 0.3937 # this is a constant value
+number[69] test
 end variables
 
 setup
-    number[7] a = []
+    number[7] a
     print("Centimeter to inch converter\n")
     print("  CM  |  INCH  \n")
+    if (true)
+        if (true)
+            if (true)
+                a = makeArray()
+            end if
+        end if
+    end if
     repeat for(number i = 1 to 100, change by 1) # 100 steps, 1 to 100
+        number[2] b
         printLine(i + "     " + cmToInch(i))
     end for
     a[2 + 4] = a[3 - 2 - 1]
@@ -25,6 +34,22 @@ functions
     end function
     blank function print(string s)
         return
+    end function
+    number[] function makeArray()
+        number[2] z
+        number[10] y = z
+        number[50] x
+        if(true)
+            if (true)
+                return y
+            end if
+        else if (true)
+            return y
+        end if
+        return z
+    end function
+    blank function usesArray()
+        number[3] q
     end function
 end functions
 

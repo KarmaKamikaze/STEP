@@ -10,7 +10,7 @@ public class SymbolTable : ISymbolTable
     private Stack<Dictionary<string, SymTableEntry>> _scopeStack = new();
     private int _depth = 0;
 
-    public SymbolTable() 
+    public SymbolTable()
     {
         // Push the global scope onto the stack 
         _scopeStack.Push(new Dictionary<string, SymTableEntry>());
@@ -52,26 +52,27 @@ public class SymbolTable : ISymbolTable
         this._depth++;
         _scopeStack.Push(new Dictionary<string, SymTableEntry>());
     }
-    
+
     public void CloseScope()
     {
-        if(this._depth == 0) 
+        if (this._depth == 0)
         {
             throw new CloseGlobalScopeException("Cannot close the global scope (at depth 0)");
         }
+
         this._depth--;
         _scopeStack.Pop();
     }
-    
+
     /// <remarks>In order to search all scopes in the stack, each one is popped and added to a temporary local list.
     /// Afterwards, each scope in this list is pushed back onto the stack to restore the scopes.</remarks>
     public SymTableEntry RetrieveSymbol(string id)
     {
         Stack<Dictionary<string, SymTableEntry>> scopes = new();
         SymTableEntry output = null;
-        
+
         // Search for the id in each scope, from innermost to outermost
-        while(_scopeStack.Count > 0) 
+        while (_scopeStack.Count > 0)
         {
             var scope = _scopeStack.Pop();
             // Save the scope so we can add it back onto the stack
@@ -89,6 +90,7 @@ public class SymbolTable : ISymbolTable
             var scope = scopes.Pop();
             _scopeStack.Push(scope);
         }
+
         return output;
     }
     
@@ -99,7 +101,8 @@ public class SymbolTable : ISymbolTable
         {
             throw new DuplicateDeclarationException("An id of this name have already been declared", node.Id);
         }
-        var symbolEntry = new SymTableEntry 
+
+        var symbolEntry = new SymTableEntry
         {
             Name = node.Id,
             Type = node.Type
@@ -113,7 +116,7 @@ public class SymbolTable : ISymbolTable
     {
         string name = node.Name.Id;
         //exception to check if a symbol is declared locally more than once
-        if(IsDeclaredLocally(name))
+        if (IsDeclaredLocally(name))
         {
             throw new DuplicateDeclarationException("An id of this name have already been declared", name);
         }
@@ -124,8 +127,8 @@ public class SymbolTable : ISymbolTable
         {
             parameters.Add(param.Id, param.Type);
         }
-        
-        var symbolEntry = new FunctionSymTableEntry() 
+
+        var symbolEntry = new FunctionSymTableEntry()
         {
             Name = name,
             Type = node.Type,

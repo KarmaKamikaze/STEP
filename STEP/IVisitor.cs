@@ -1,8 +1,9 @@
 ﻿using STEP.AST.Nodes;
 
-namespace STEP; 
+namespace STEP;
 
-public interface IVisitor {
+public interface IVisitor
+{
     // Logic nodes
     public void Visit(AndNode n);
     public void Visit(OrNode n);
@@ -13,7 +14,7 @@ public interface IVisitor {
     public void Visit(LThanNode n);
     public void Visit(LThanEqNode n);
     public void Visit(NegNode n);
-    
+
     // Expression nodes
     public void Visit(NumberNode n);
     public void Visit(StringNode n);
@@ -32,14 +33,14 @@ public interface IVisitor {
     public void Visit(PowNode n);
     public void Visit(ParenNode n);
     public void Visit(UMinusNode n);
-    
+
     // Loop nodes
     public void Visit(WhileNode n);
     public void Visit(ForNode n);
     public void Visit(ContNode n);
     public void Visit(BreakNode n);
     public void Visit(LoopNode n);
-    
+
     // General nodes
     public void Visit(FuncDefNode n);
     public void Visit(FuncExprNode n);

@@ -19,7 +19,7 @@ public class AstPrintVisitor : IVisitor
             Console.Write("  ");
         }
     }
-    
+
     public void Visit(ProgNode node)
     {
         if (node != null)
@@ -45,6 +45,7 @@ public class AstPrintVisitor : IVisitor
                 stmt.Accept(this);
                 Print("\n");
             }
+
             _ind--;
         }
     }
@@ -55,11 +56,12 @@ public class AstPrintVisitor : IVisitor
         {
             Print("VarsNode\n");
             _ind++;
-            foreach(VarDclNode dcl in node.Dcls)
+            foreach (VarDclNode dcl in node.Dcls)
             {
                 dcl.Accept(this);
                 Print("\n");
             }
+
             _ind--;
             Print("end VarsNode\n");
         }
@@ -76,6 +78,7 @@ public class AstPrintVisitor : IVisitor
                 stmt.Accept(this);
                 Print("\n");
             }
+
             _ind--;
             Print("end SetupNode\n");
         }
@@ -86,10 +89,11 @@ public class AstPrintVisitor : IVisitor
         if (node != null)
         {
             Indent();
-            if(node.Left.Type.IsConstant)
+            if (node.Left.Type.IsConstant)
             {
                 Print("constant ");
             }
+
             Print(node.Left.Type.ActualType.ToString().ToLower() + " ");
             node.Left.Accept(this);
             Print(" = ");
@@ -102,8 +106,11 @@ public class AstPrintVisitor : IVisitor
         if (node != null)
         {
             Indent();
-            Print(((PinType)node.Type).Mode.ToString().ToLower() + " ");
-            Print(node.Left.Type.ActualType.ToString().ToLower() + " "); // Print Id node's type (analogpin or digitalpin)
+            Print(((PinType) node.Type).Mode.ToString().ToLower() + " ");
+            
+            // Print Id node's type (analogpin or digitalpin)
+            Print(node.Left.Type.ActualType.ToString().ToLower() + " ");
+            
             node.Left.Accept(this);
             Print(" = ");
             node.Right.Accept(this);
@@ -121,6 +128,7 @@ public class AstPrintVisitor : IVisitor
                 stmt.Accept(this);
                 Print("\n");
             }
+
             _ind--;
             Print("end LoopNode\n");
         }
@@ -136,6 +144,7 @@ public class AstPrintVisitor : IVisitor
             {
                 funcdef.Accept(this);
             }
+
             _ind--;
             Print("end FuncsNode\n");
         }
@@ -263,31 +272,27 @@ public class AstPrintVisitor : IVisitor
             {
                 Print("constant ");
             }
+
             Print(n.Left.Type.ActualType.ToString().ToLower() + $"[{n.Size}] ");
             n.Left.Accept(this);
             Print(" = ");
-            if (n.IsId)
-            {
-                n.IdRight.Accept(this);
-            }
-            else
-            {
-                n.Right.Accept(this);
-            }
+            n.Right.Accept(this);
         }
     }
 
     public void Visit(ArrLiteralNode n)
     {
         Print("[");
-        if (n.Elements.Any()) {
+        if (n.Elements.Any())
+        {
             n.Elements[0].Accept(this);
-            for(int i = 1; i<n.Elements.Count; i++)
+            for (int i = 1; i < n.Elements.Count; i++)
             {
                 Print(", ");
-                n.Elements[i].Accept(this);                
+                n.Elements[i].Accept(this);
             }
         }
+
         Print("]");
     }
 
@@ -314,6 +319,7 @@ public class AstPrintVisitor : IVisitor
                 n.ArrIndex.Accept(this);
                 Print("]");
             }
+
             Print(" = ");
             n.Expr.Accept(this);
         }
@@ -411,6 +417,7 @@ public class AstPrintVisitor : IVisitor
                 stmt.Accept(this);
                 Print("\n");
             }
+
             _ind--;
             Indent();
             Print("end while");
@@ -436,6 +443,7 @@ public class AstPrintVisitor : IVisitor
                 stmt.Accept(this);
                 Print("\n");
             }
+
             _ind--;
             Indent();
             Print("end for");
@@ -444,7 +452,7 @@ public class AstPrintVisitor : IVisitor
 
     public void Visit(ContNode n)
     {
-        if(n != null)
+        if (n != null)
         {
             Indent();
             Print("continue");
@@ -468,8 +476,9 @@ public class AstPrintVisitor : IVisitor
             Print(n.ReturnType.ActualType.ToString().ToLower());
             if (n.ReturnType.IsArray)
             {
-                Print("[]");    
+                Print("[]");
             }
+
             Print(" function " + n.Name.Id + "(");
             if (n.FormalParams.Count != 0)
             {
@@ -503,16 +512,16 @@ public class AstPrintVisitor : IVisitor
                 stmt.Accept(this);
                 Print("\n");
             }
+
             _ind--;
-            
+
             Indent();
             Print("end function\n");
-            
         }
     }
 
     public void Visit(FuncExprNode n)
-    { 
+    {
         if (n != null)
         {
             n.Id.Accept(this);
@@ -523,6 +532,7 @@ public class AstPrintVisitor : IVisitor
                 Print(", ");
                 n.Params[i].Accept(this);
             }
+
             Print(")");
         }
     }
@@ -540,6 +550,7 @@ public class AstPrintVisitor : IVisitor
                 Print(", ");
                 n.Params[i].Accept(this);
             }
+
             Print(")");
         }
     }
@@ -571,13 +582,14 @@ public class AstPrintVisitor : IVisitor
                 stmt.Accept(this);
                 Print("\n");
             }
+
             _ind--;
-            
+
             foreach (ElseIfNode elseIf in n.ElseIfClauses)
             {
                 elseIf.Accept(this);
             }
-            
+
             Indent();
             Print("else\n");
             _ind++;
@@ -586,10 +598,10 @@ public class AstPrintVisitor : IVisitor
                 stmt.Accept(this);
                 Print("\n");
             }
+
             _ind--;
             Indent();
             Print("end if");
         }
     }
 }
-

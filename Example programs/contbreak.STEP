@@ -5,26 +5,35 @@ setup
 	        break
         end if
 	end while
-	boolean sarmiGay = false
-	if(kiss(sarmi, man))
-	    sarmiGay = true
+	boolean barx = false
+	if(test(foox))
+	    barx = true
     end if
-    if(ass == 2)
+    if(v == 2)
     end if
     repeat for(a = 2 to 5, change by 1)
-        print("ass")
+        print("hello! ")
     end for
     number[10] a = [1, 2, 5]
 end setup
 
 loop
-    #continue
-    if((ass == penis) and (foo == bar))
+    if((foox == barx) and (boo == far))
     end if
-    if(1+2)
+    if(1+2 == 4)
+        continue
     end if
-    foo(a == 2, b == ass, (c and d))
+    foo(a == 2, b == barx, (c and d))
     boolean a = (b and d)
     boolean b = a and c
     boolean c = 20 > (a == b)
 end loop
+
+functions
+    boolean function foo(boolean a, boolean b, boolean c)
+        return (a and b and c)
+    end function
+    boolean function bar()
+        return false
+    end function
+end functions

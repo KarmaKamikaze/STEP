@@ -1,7 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using System.Threading.Channels;
-using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
+﻿using Antlr4.Runtime;
 using STEP.AST;
 using STEP.AST.Nodes;
 using STEP.CodeGeneration;
@@ -23,24 +20,24 @@ class Program
 
         // Read the source code file
         STEPLexer lexer = new STEPLexer(streamReader);
-            
+
         // Get token stream
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-            
+
         // Parse the source code
         STEPParser parser = new STEPParser(tokenStream);
 
         try
         {
             STEPParser.ProgramContext tree = parser.program(); // Parse the input starting at the "program" rule.
-            
+
             // Build AST
             AstBuilderVisitor astBuilder = new AstBuilderVisitor();
             AstNode root = astBuilder.Build(tree);
             // Decorate the AST
             TypeVisitor typeVisitor = new();
             root.Accept(typeVisitor);
-            
+
             if (args.Length > 1 && args.Contains("-pp"))
             {
                 // Print AST
@@ -51,12 +48,12 @@ class Program
             // Rename symbols from the standard environment to their respective Arduino alias
             StandardEnvironmentVisitor stdEnvVisitor = new StandardEnvironmentVisitor();
             root.Accept(stdEnvVisitor);
-            
+
             // Generate code and output to .c file
             CodeGenerationVisitor codeGen = new CodeGenerationVisitor();
             root.Accept(codeGen);
             codeGen.OutputToBaseFile();
-            
+
             if (args.Length > 1 && args.Contains("-up"))
             {
                 // Upload compiled hex program to Arduino board

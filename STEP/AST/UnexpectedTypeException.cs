@@ -1,5 +1,8 @@
-﻿namespace STEP.AST; 
+﻿namespace STEP.AST;
 
-public class UnexpectedTypeException : Exception {
-    public UnexpectedTypeException(string msg) : base(msg) {}
+public class UnexpectedTypeException : Exception
+{
+    public UnexpectedTypeException(string msg) : base(msg)
+    {
+    }
 }

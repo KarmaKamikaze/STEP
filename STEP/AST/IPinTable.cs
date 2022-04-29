@@ -1,9 +1,9 @@
 ﻿using STEP.AST.Nodes;
 
-namespace STEP.AST; 
+namespace STEP.AST;
 
-public interface IPinTable {
-    
+public interface IPinTable
+{
     /// <summary>
     /// Registers the pin variable if it has not already been declared
     /// </summary>

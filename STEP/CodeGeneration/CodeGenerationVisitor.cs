@@ -10,7 +10,8 @@ public class CodeGenerationVisitor : IVisitor
     private readonly StringBuilder _stringBuilder = new();
     private string Output => _stringBuilder.ToString();
     private readonly StringBuilder _pinSetup = new();
-
+    private int _scopeLevel;
+    private readonly List<IdNode> _arrDclsInScope = new(); // Keeps track of array declarations currently in scope
     public void OutputToBaseFile()
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -22,8 +23,7 @@ public class CodeGenerationVisitor : IVisitor
         return Output;
     }
     
-    private void EmitLine(string line)
-    {
+    private void EmitLine(string line) {
         _stringBuilder.AppendLine(line);
     }
 
@@ -32,26 +32,63 @@ public class CodeGenerationVisitor : IVisitor
         _stringBuilder.Append(line);
     }
 
-    private void EmitAppend(Type type)
+    private void EmitAppend(Type type, string suffix = " ")
     {
         if (type.IsConstant)
-            EmitAppend("const ");
+            EmitAppend("const" + suffix);
         
         switch (type.ActualType)
         {
             case TypeVal.Number:
-                EmitAppend("double ");
+                EmitAppend("double" + suffix);
                 break;
             case TypeVal.String:
-                EmitAppend("String ");
+                EmitAppend("String" + suffix);
                 break;
             case TypeVal.Boolean:
-                EmitAppend("boolean ");
+                EmitAppend("boolean" + suffix);
                 break;
             case TypeVal.Blank:
-                EmitAppend("void ");
+                EmitAppend("void" + suffix);
                 break;
         }
+    }
+
+    private void EnterScope() {
+        _scopeLevel++;
+    }
+    
+    private void ExitScope() {
+        _scopeLevel--;
+        FreeArrays(_scopeLevel);
+    }
+
+    // Called upon exiting any scope
+    private void FreeArrays(int scopeLevel) {
+        var arrsToRemove = new List<IdNode>();
+        foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel)) {
+            if (!id.Type.IsReturned) {
+                EmitLine($"free({id.Id});");
+            }
+            arrsToRemove.Add(id);
+        }
+        arrsToRemove.ForEach(id => _arrDclsInScope.Remove(id));
+    }
+    
+    // Called upon exiting array function, handles freeing excess arrays
+    private void FreeArrays(int scopeLevel, IdNode exemptId, bool shouldRemove) {
+        var arrsToRemove = new List<IdNode>();
+        foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel && !n.Equals(exemptId))) {
+            EmitLine($"free({id.Id});");
+            arrsToRemove.Add(id);
+        }
+        if(shouldRemove) arrsToRemove.ForEach(id => _arrDclsInScope.Remove(id));
+    }
+
+    private void CopyArrayHelper(ArrDclNode n) {
+        // Copies array from RHS into LHS
+        var id = n.Right as IdNode;
+        EmitLine($"memcpy({n.Left.Id}, {id.Id}, sizeof({id.Id}[0])*{Math.Min(n.Left.Type.ArrSize, id.Type.ArrSize)});");
     }
     
     public void Visit(AndNode n)
@@ -140,26 +177,24 @@ public class CodeGenerationVisitor : IVisitor
     {
         EmitAppend(n.Value.ToString().ToLowerInvariant());
     }
-    
+
     public void Visit(ArrDclNode n)
     {
-        // Type id[size] = { elements };
-        EmitAppend(n.Type);
-
+        // e.g. double* studentAges = (double*)malloc(5 * sizeof(double));
+        // equivalent to double[5] studentAges;
+        EmitAppend(n.Type, "* ");
         n.Left.Accept(this);
-        EmitAppend($"[{n.Size}]");
-        if (n.IsId)
-        {
-            EmitAppend(" = ");
-            n.IdRight.Accept(this);
-        }
-        else if (n.Right is not null)
-        {
-            EmitAppend(" = ");
-            n.Right.Accept(this);
+        EmitAppend($" = (");
+        EmitAppend(n.Type, "*");
+        EmitAppend($")malloc({n.Size} * sizeof(");
+        EmitAppend(n.Type, "))");
+        EmitLine(";");
+        // Copy array
+        if (n.Right is IdNode) {
+            CopyArrayHelper(n);
         }
 
-        EmitLine(";");
+        _arrDclsInScope.Add(n.Left);
     }
 
     public void Visit(ArrLiteralNode n)
@@ -167,15 +202,18 @@ public class CodeGenerationVisitor : IVisitor
         int count = n.Elements.Count;
         if (count == 0) return;
         EmitAppend("{");
+        EnterScope();
         for (int i = 0; i < count; i++)
         {
             n.Elements[i].Accept(this);
-            if (i < count-1)
+            if (i < count - 1)
             {
                 // Add comma after all but the last element
                 EmitAppend(", ");
             }
         }
+
+        ExitScope();
         EmitAppend("}");
     }
 
@@ -202,9 +240,13 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend(" = ");
         n.Right.Accept(this);
     }
-    
+
     public void Visit(AssNode n)
     {
+        // If assigning new pointer to array pointer, free previously allocated memory
+        if (n.Id.Type.IsArray && n.ArrIndex is null) {
+            EmitLine($"free({n.Id.Id});");
+        }
         AssNodeGen(n);
         EmitLine(";");
     }
@@ -220,40 +262,39 @@ public class CodeGenerationVisitor : IVisitor
             n.ArrIndex.Accept(this);
             EmitAppend("]");
         }
+
         EmitAppend(" = ");
         n.Expr.Accept(this);
     }
-    
+
     public void Visit(IdNode n)
     {
         EmitAppend(n.Id);
     }
 
-    public void Visit(PlusNode n)
-    {
-        // If the overall expression has type string, we must convert any non-string children to strings
-        if (n.Type.ActualType is TypeVal.String && n.Left.Type.ActualType != TypeVal.String)
-        {
-            // String(left) + right
-            EmitAppend("String(");
-            n.Left.Accept(this);
-            EmitAppend(") + ");
-            n.Right.Accept(this);
-        }
-        else if (n.Type.ActualType is TypeVal.String && n.Right.Type.ActualType != TypeVal.String)
-        {
-            // left + String(right)
-            n.Left.Accept(this);
-            EmitAppend(" + String(");
-            n.Right.Accept(this);
-            EmitAppend(")");
-        }
-        else
-        {
-            // left + right
-            n.Left.Accept(this);
-            EmitAppend(" + ");
-            n.Right.Accept(this);
+    public void Visit(PlusNode n) {
+        switch (n.Type.ActualType) {
+            // If the overall expression has type string, we must convert any non-string children to strings
+            case TypeVal.String when n.Left.Type.ActualType != TypeVal.String:
+                // String(left) + right
+                EmitAppend("String(");
+                n.Left.Accept(this);
+                EmitAppend(") + ");
+                n.Right.Accept(this);
+                break;
+            case TypeVal.String when n.Right.Type.ActualType != TypeVal.String:
+                // left + String(right)
+                n.Left.Accept(this);
+                EmitAppend(" + String(");
+                n.Right.Accept(this);
+                EmitAppend(")");
+                break;
+            default:
+                // left + right
+                n.Left.Accept(this);
+                EmitAppend(" + ");
+                n.Right.Accept(this);
+                break;
         }
     }
 
@@ -313,10 +354,13 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend("while(");
         n.Condition.Accept(this);
         EmitLine(") {");
+        EnterScope();
         foreach (StmtNode statement in n.Body)
         {
             statement.Accept(this);
         }
+
+        ExitScope();
         EmitLine("}");
     }
 
@@ -326,7 +370,7 @@ public class CodeGenerationVisitor : IVisitor
         // for(int x = 0; i < n; i++)
         // VarDcl, AssNode, Identifier, ArrAccessNode
         EmitAppend("for(");
-        
+
         //Each if-statement creates the for-loop header with the relevant type of initializer
         if (n.Initializer is VarDclNode varInit)
         {
@@ -343,16 +387,18 @@ public class CodeGenerationVisitor : IVisitor
             n.Initializer.Accept(this);
             ForNodeHelper(n.Initializer, n);
         }
-        
+
         n.Update.Accept(this);
-        
+
         EmitLine(") {");
+        EnterScope();
         foreach (StmtNode statement in n.Body)
         {
             statement.Accept(this);
         }
+
+        ExitScope();
         EmitLine("}");
-        
     }
 
     private void ForNodeHelper(AstNode node, ForNode n)
@@ -395,7 +441,7 @@ public class CodeGenerationVisitor : IVisitor
             EmitAppend("]");
         }
     }
-    
+
     public void Visit(ContNode n)
     {
         EmitLine("continue;");
@@ -412,7 +458,7 @@ public class CodeGenerationVisitor : IVisitor
          *   statements
          * }
          */
-        EmitAppend(n.ReturnType);
+        EmitAppend(n.ReturnType, n.Type.IsArray ? "* " : " ");
         n.Name.Accept(this);
         EmitAppend("(");
         for (int i = 0; i < n.FormalParams.Count; i++)
@@ -424,17 +470,18 @@ public class CodeGenerationVisitor : IVisitor
             {
                 EmitAppend("[]");
             }
+
             if (i < n.FormalParams.Count - 1)
             {
                 EmitAppend(", ");
             }
         }
+
         EmitLine(") {");
         // Body
-        foreach (StmtNode stmt in n.Stmts)
-        {
-            stmt.Accept(this);
-        }
+        EnterScope();
+        n.Stmts.ForEach(stmt => stmt.Accept(this));
+        ExitScope();
         EmitLine("}");
     }
 
@@ -451,6 +498,7 @@ public class CodeGenerationVisitor : IVisitor
                 EmitAppend(", ");
             }
         }
+
         EmitAppend(")");
     }
 
@@ -467,6 +515,7 @@ public class CodeGenerationVisitor : IVisitor
                 EmitAppend(", ");
             }
         }
+
         EmitLine(");");
     }
 
@@ -478,13 +527,20 @@ public class CodeGenerationVisitor : IVisitor
         }
     }
 
-    public void Visit(RetNode n)
-    {
+    public void Visit(RetNode n) {
         // If no expression, emit empty return
         if (n.RetVal is null) {
             EmitLine("return;");
         }
         else {
+            // If returning from function, free arrays declared in scope
+            if (n.SurroundingFuncType.IsArray) {
+                // If in outer scope, free all arrays except returned and remove from list - else free without removing from list
+                // Typed functions always end on return, so this is where we 'forget' about the obsolete arrays
+                // In inner scopes, we want to free them, but still 'remember' them to free at any returns in outer scopes
+                bool isInOuterScope = n.Type.ScopeLevel - 1 == n.SurroundingFuncType.ScopeLevel;
+                FreeArrays(n.SurroundingFuncType.ScopeLevel, (IdNode) n.RetVal, isInOuterScope);
+            }
             EmitAppend("return ");
             n.RetVal.Accept(this);
             EmitLine(";");
@@ -503,15 +559,18 @@ public class CodeGenerationVisitor : IVisitor
          *   ElseClause
          * }
          */
-        
+
         EmitAppend("if(");
         n.Condition.Accept(this);
         EmitLine(") {");
+        EnterScope();
         foreach(var stmt in n.ThenClause) {
             stmt.Accept(this);
         }
+
+        ExitScope();
         EmitLine("}");
-        
+
         if (n.ElseIfClauses?.Count > 0)
         {
             foreach (var elseIf in n.ElseIfClauses)
@@ -519,21 +578,24 @@ public class CodeGenerationVisitor : IVisitor
                 elseIf.Accept(this);
             }
         }
-        
+
         if (n.ElseClause?.Count > 0)
         {
             EmitLine("else {");
+            EnterScope();
             foreach (var stmt in n.ElseClause)
             {
                 stmt.Accept(this);
             }
+            ExitScope();
             EmitLine("}");
         }
     }
 
     public void Visit(VarsNode n)
     {
-        foreach(var dclNode in n.Dcls) {
+        foreach (var dclNode in n.Dcls)
+        {
             dclNode.Accept(this);
         }
     }
@@ -550,22 +612,29 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(SetupNode n)
     {
         EmitLine("void setup() {");
+        EnterScope();
         // Add declared pinModes from variables scope
         if (_pinSetup.ToString() != String.Empty)
             EmitLine(_pinSetup.ToString());
-        
-        foreach(var stmt in n.Stmts) {
+
+        foreach (var stmt in n.Stmts)
+        {
             stmt.Accept(this);
         }
+
+        ExitScope();
         EmitLine("}");
     }
-    
+
     public void Visit(LoopNode n)
     {
         EmitLine("void loop() {");
+        EnterScope();
         foreach(var stmt in n.Stmts) {
             stmt.Accept(this);
         }
+
+        ExitScope();
         EmitLine("}");
     }
 
@@ -576,10 +645,13 @@ public class CodeGenerationVisitor : IVisitor
             EmitAppend("else if(");
             n.Condition.Accept(this);
             EmitLine(") {");
+            EnterScope();
             foreach(var stmt in n.Body)
             {
                 stmt.Accept(this);
             }
+
+            ExitScope();
             EmitLine("}");
         }
     }
@@ -593,8 +665,15 @@ public class CodeGenerationVisitor : IVisitor
          */
         _pinSetup.Append("pinMode(");
         n.Right.Accept(pinVisitor);
-        _pinSetup.Append(pinVisitor.GetPinCode());
-        switch (((PinType)n.Type).Mode)
+        // Append A if the pin is analog to allow for arduino to
+        // differentiate between analog and digital pins
+        if (n.Left.Type.ActualType is TypeVal.Analogpin)
+        {
+            _pinSetup.Append('A');
+        }
+
+        _pinSetup.Append(pinVisitor.GetPinCode() + ", ");
+        switch (((PinType) n.Type).Mode)
         {
             case PinMode.INPUT:
                 _pinSetup.Append("INPUT");
@@ -603,6 +682,11 @@ public class CodeGenerationVisitor : IVisitor
                 _pinSetup.Append("OUTPUT");
                 break;
         }
+
         _pinSetup.Append(");\r\n");
+        
+        // Save variable names as constant declarations and prepend to generated code
+        string variableConstant = $"#define {n.Left.Id} {pinVisitor.GetPinCode()}\r\n";
+        _stringBuilder.Insert(0, variableConstant);
     }
 }

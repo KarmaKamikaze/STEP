@@ -40,7 +40,7 @@ public static class StandardEnvironment
         {
             {"pin", new PinType() {ActualType = TypeVal.Digitalpin}}
         },
-        Type = new Type() { ActualType = TypeVal.PinLevel, IsConstant = true}
+        Type = new Type() {ActualType = TypeVal.PinLevel, IsConstant = true}
     };
 
     public static StdFuncSymTableEntry DigitalWrite => new()
@@ -52,7 +52,7 @@ public static class StandardEnvironment
             {"pin", new PinType {ActualType = TypeVal.Digitalpin}},
             {"value", new Type {ActualType = TypeVal.PinLevel}}
         },
-        Type = new Type { ActualType = TypeVal.Blank }
+        Type = new Type {ActualType = TypeVal.Blank}
     };
 
     // analagRead(), analogWrite()
@@ -64,7 +64,7 @@ public static class StandardEnvironment
         {
             {"pin", new PinType() {ActualType = TypeVal.Analogpin}}
         },
-        Type = new Type() { ActualType = TypeVal.Number }
+        Type = new Type() {ActualType = TypeVal.Number}
     };
 
     public static StdFuncSymTableEntry AnalogWrite => new()
@@ -76,7 +76,7 @@ public static class StandardEnvironment
             {"pin", new PinType {ActualType = TypeVal.Analogpin}},
             {"value", new Type {ActualType = TypeVal.Number}}
         },
-        Type = new Type { ActualType = TypeVal.Blank }
+        Type = new Type {ActualType = TypeVal.Blank}
     };
 
     // Serial.println(string)
@@ -88,7 +88,7 @@ public static class StandardEnvironment
         {
             {"message", new Type {ActualType = TypeVal.String}}
         },
-        Type = new Type { ActualType = TypeVal.Blank }
+        Type = new Type {ActualType = TypeVal.Blank}
     };
 
     #endregion
@@ -104,7 +104,7 @@ public static class StandardEnvironment
         {
             {"ms", new Type {ActualType = TypeVal.Number}}
         },
-        Type = new Type { ActualType = TypeVal.Blank }
+        Type = new Type {ActualType = TypeVal.Blank}
     };
 
     #endregion
@@ -119,7 +119,7 @@ public static class StandardEnvironment
         {
             {"x", new Type {ActualType = TypeVal.Number}}
         },
-        Type = new Type { ActualType = TypeVal.Number }
+        Type = new Type {ActualType = TypeVal.Number}
     };
 
     public static StdFuncSymTableEntry Constrain => new()
@@ -132,7 +132,7 @@ public static class StandardEnvironment
             {"upperLimit", new Type {ActualType = TypeVal.Number}},
             {"lowerLimit", new Type {ActualType = TypeVal.Number}}
         },
-        Type = new Type { ActualType = TypeVal.Number }
+        Type = new Type {ActualType = TypeVal.Number}
     };
 
     public static StdFuncSymTableEntry Max => new()
@@ -144,7 +144,7 @@ public static class StandardEnvironment
             {"x", new Type {ActualType = TypeVal.Number}},
             {"y", new Type {ActualType = TypeVal.Number}},
         },
-        Type = new Type { ActualType = TypeVal.Number }
+        Type = new Type {ActualType = TypeVal.Number}
     };
 
     public static StdFuncSymTableEntry Min => new()
@@ -156,7 +156,7 @@ public static class StandardEnvironment
             {"x", new Type {ActualType = TypeVal.Number}},
             {"y", new Type {ActualType = TypeVal.Number}},
         },
-        Type = new Type { ActualType = TypeVal.Number }
+        Type = new Type {ActualType = TypeVal.Number}
     };
 
     public static StdFuncSymTableEntry Power => new()
@@ -168,7 +168,7 @@ public static class StandardEnvironment
             {"base", new Type {ActualType = TypeVal.Number}},
             {"exponent", new Type {ActualType = TypeVal.Number}},
         },
-        Type = new Type { ActualType = TypeVal.Number }
+        Type = new Type {ActualType = TypeVal.Number}
     };
 
     public static StdFuncSymTableEntry Squared => new()
@@ -179,7 +179,7 @@ public static class StandardEnvironment
         {
             {"x", new Type {ActualType = TypeVal.Number}},
         },
-        Type = new Type { ActualType = TypeVal.Number }
+        Type = new Type {ActualType = TypeVal.Number}
     };
 
     public static StdFuncSymTableEntry SquareRoot => new()
@@ -190,7 +190,7 @@ public static class StandardEnvironment
         {
             {"x", new Type {ActualType = TypeVal.Number}},
         },
-        Type = new Type { ActualType = TypeVal.Number }
+        Type = new Type {ActualType = TypeVal.Number}
     };
 
     // Trigonometry
@@ -202,7 +202,7 @@ public static class StandardEnvironment
         {
             {"rad", new Type {ActualType = TypeVal.Number}},
         },
-        Type = new Type { ActualType = TypeVal.Number }
+        Type = new Type {ActualType = TypeVal.Number}
     };
 
     public static StdFuncSymTableEntry Sine => new()
@@ -213,7 +213,7 @@ public static class StandardEnvironment
         {
             {"rad", new Type {ActualType = TypeVal.Number}},
         },
-        Type = new Type { ActualType = TypeVal.Number }
+        Type = new Type {ActualType = TypeVal.Number}
     };
 
     public static StdFuncSymTableEntry Tangent => new()
@@ -224,7 +224,7 @@ public static class StandardEnvironment
         {
             {"rad", new Type {ActualType = TypeVal.Number}},
         },
-        Type = new Type { ActualType = TypeVal.Number }
+        Type = new Type {ActualType = TypeVal.Number}
     };
 
     #endregion
@@ -240,7 +240,7 @@ public static class StandardEnvironment
             {"min", new Type {ActualType = TypeVal.Number}},
             {"max", new Type {ActualType = TypeVal.Number}}
         },
-        Type = new Type { ActualType = TypeVal.Number }
+        Type = new Type {ActualType = TypeVal.Number}
     };
 
     public static StdFuncSymTableEntry RandomSeed => new()
@@ -251,7 +251,7 @@ public static class StandardEnvironment
         {
             {"seed", new Type {ActualType = TypeVal.Number}}
         },
-        Type = new Type { ActualType = TypeVal.Blank }
+        Type = new Type {ActualType = TypeVal.Blank}
     };
 
     #endregion

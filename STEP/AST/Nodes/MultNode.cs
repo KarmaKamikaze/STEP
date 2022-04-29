@@ -1,7 +1,9 @@
 ﻿namespace STEP.AST.Nodes;
 
-public class MultNode : ExprNode {
-    public override void Accept(IVisitor v) {
+public class MultNode : ExprNode
+{
+    public override void Accept(IVisitor v)
+    {
         v.Visit(this);
     }
 
@@ -11,6 +13,7 @@ public class MultNode : ExprNode {
         {
             return Equals(other.Left, Left) && Equals(other.Right, Right);
         }
+
         return false;
     }
 }

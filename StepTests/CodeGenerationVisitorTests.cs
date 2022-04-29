@@ -102,7 +102,7 @@ public class CodeGenerationVisitorTests
             Right = multExpr,
             Type = new STEP.Type() {ActualType = TypeVal.Number}
         };
-        var str = new StringNode() {Value = "This is a string", Type = new STEP.Type() {ActualType = TypeVal.String}};
+        var str = new StringNode() {Value = "\"This is a string\"", Type = new STEP.Type() {ActualType = TypeVal.String}};
         var concatExpr = new PlusNode()
         {
             Left = str,
@@ -133,21 +133,21 @@ public class CodeGenerationVisitorTests
         const string expected = "String x = String(true) + \" \" + \"funk\";\r\n";
 
         var trueBool = new BoolNode {Value = true, Type = new STEP.Type {ActualType = TypeVal.Boolean}};
-        var space = new StringNode {Value = " ", Type = new STEP.Type {ActualType = TypeVal.String}};
+        var space = new StringNode {Value = "\" \"", Type = new STEP.Type {ActualType = TypeVal.String}};
         var firstConcat = new PlusNode
         {
             Left = trueBool,
             Right = space,
             Type = new STEP.Type {ActualType = TypeVal.String}
         };
-        var funk = new StringNode {Value = "funk", Type = new STEP.Type {ActualType = TypeVal.String}};
+        var funk = new StringNode {Value = "\"funk\"", Type = new STEP.Type {ActualType = TypeVal.String}};
         var secondConcat = new PlusNode
         {
             Left = firstConcat,
             Right = funk,
             Type = new STEP.Type {ActualType = TypeVal.String}
         };
-        var id = new IdNode {Id = "x"};
+        var id = new IdNode {Id = "x", Type = new STEP.Type(){ActualType = TypeVal.String}};
         var varDcl = new VarDclNode
         {
             Left = id,
@@ -171,7 +171,7 @@ public class CodeGenerationVisitorTests
         // Arrange
         const string expected = "String x = \"foo\" + String(15) + String(30) + \"bar\";\r\n";
 
-        var foo = new StringNode {Value = "foo", Type = new STEP.Type {ActualType = TypeVal.String}};
+        var foo = new StringNode {Value = "\"foo\"", Type = new STEP.Type {ActualType = TypeVal.String}};
         var num15 = new NumberNode {Value = 15, Type = new STEP.Type {ActualType = TypeVal.Number}};
         var firstConcat = new PlusNode
         {
@@ -186,14 +186,14 @@ public class CodeGenerationVisitorTests
             Right = num30,
             Type = new STEP.Type {ActualType = TypeVal.String}
         };
-        var bar = new StringNode {Value = "bar", Type = new STEP.Type {ActualType = TypeVal.String}};
+        var bar = new StringNode {Value = "\"bar\"", Type = new STEP.Type {ActualType = TypeVal.String}};
         var thirdConcat = new PlusNode
         {
             Left = secondConcat,
             Right = bar,
             Type = new STEP.Type {ActualType = TypeVal.String}
         };
-        var id = new IdNode {Id = "x"};
+        var id = new IdNode {Id = "x", Type = new STEP.Type(){ActualType = TypeVal.String}};
         var varDcl = new VarDclNode
         {
             Left = id,
@@ -220,7 +220,7 @@ public class CodeGenerationVisitorTests
         var getDayId = new IdNode {Id = "GetDay"};
         var getDay = new FuncExprNode
             {Id = getDayId, Params = new(), Type = new STEP.Type {ActualType = TypeVal.Number}};
-        var comma = new StringNode {Value = ", ", Type = new STEP.Type {ActualType = TypeVal.String}};
+        var comma = new StringNode {Value = "\", \"", Type = new STEP.Type {ActualType = TypeVal.String}};
         var firstConcat = new PlusNode
         {
             Left = getDay,
@@ -234,7 +234,7 @@ public class CodeGenerationVisitorTests
             Right = month,
             Type = new STEP.Type {ActualType = TypeVal.String}
         };
-        var id = new IdNode {Id = "x"};
+        var id = new IdNode {Id = "x", Type = new STEP.Type(){ActualType = TypeVal.String}};
         var varDcl = new VarDclNode
         {
             Left = id,
@@ -601,11 +601,32 @@ public class CodeGenerationVisitorTests
     public void PinDclNode_InputOutputAnalogpin_ShouldGeneratepinMode(string expectedMode, PinMode givenPinMode)
     {
         // Arrange
-        string expected = $"void setup() {{\r\npinMode(1, {expectedMode});\n\r\n}}\r\n";
+        string expected = $"#define x 1\r\nvoid setup() {{\r\npinMode(1, {expectedMode});\r\n\r\n}}\r\n";
         var n = new NumberNode() {Value = 1};
         var x = new IdNode {Id = "x"};
         var setup = new SetupNode() {Stmts = new List<StmtNode>()};
         var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = givenPinMode}};
+        
+        // Act
+        _visitor.Visit(pinDclNode);
+        _visitor.Visit(setup);
+        string actual = _visitor.OutputToString();
+        
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+    
+    [Theory]
+    [InlineData("pin1", 1)]
+    [InlineData("LEDPIN", 5)]
+    public void PinDclNode_DeclarePinVariableName_ShouldDefinePinConstantVariable(string variableName, int pinNumber)
+    {
+        // Arrange
+        string expected = $"#define {variableName} {pinNumber}\r\nvoid setup() {{\r\npinMode({pinNumber}, INPUT);\r\n\r\n}}\r\n";
+        var n = new NumberNode() {Value = pinNumber};
+        var x = new IdNode {Id = variableName};
+        var setup = new SetupNode() {Stmts = new List<StmtNode>()};
+        var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = PinMode.INPUT}};
         
         // Act
         _visitor.Visit(pinDclNode);

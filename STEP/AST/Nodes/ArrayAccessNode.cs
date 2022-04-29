@@ -4,7 +4,9 @@ public class ArrayAccessNode : ExprNode
 {
     public IdNode Array { get; set; }
     public ExprNode Index { get; set; }
-    public override void Accept(IVisitor v) {
+
+    public override void Accept(IVisitor v)
+    {
         v.Visit(this);
     }
 
@@ -14,6 +16,7 @@ public class ArrayAccessNode : ExprNode
         {
             return Equals(other.Array, Array) && Equals(other.Index, Index);
         }
+
         return false;
     }
 }

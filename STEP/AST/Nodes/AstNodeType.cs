@@ -26,11 +26,13 @@ public enum AstNodeType
     FuncExprNode,
     ArrayAccessNode,
     ArrayLiteralNode,
+
     // Variable Declarations
     ArrDclNode,
     VarDclNode,
     PinDclNode,
     VarsNode,
+
     // Statements
     AssNode,
     FuncStmtNode,
@@ -41,13 +43,16 @@ public enum AstNodeType
     RetNode,
     ContNode,
     BreakNode,
+
     // Function Declarations
     FuncDefNode,
+
     // Program Structure
     ProgNode,
     SetupNode,
     LoopNode,
     FuncsNode,
+
     // Helper nodes
     NodesList
 }

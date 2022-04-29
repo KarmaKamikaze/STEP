@@ -80,7 +80,6 @@ public class StandardEnvironmentVisitor : IVisitor
     {
         n.Left.Accept(this);
         n.Right?.Accept(this);
-        n.IdRight?.Accept(this);
     }
 
     public void Visit(ArrLiteralNode n)
