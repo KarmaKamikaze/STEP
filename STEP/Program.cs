@@ -45,6 +45,10 @@ class Program
                 root.Accept(printer);
             }
 
+            // Rename symbols from the standard environment to their respective Arduino alias
+            StandardEnvironmentVisitor stdEnvVisitor = new StandardEnvironmentVisitor();
+            root.Accept(stdEnvVisitor);
+
             // Generate code and output to .c file
             CodeGenerationVisitor codeGen = new CodeGenerationVisitor();
             root.Accept(codeGen);

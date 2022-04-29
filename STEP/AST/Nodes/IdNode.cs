@@ -2,7 +2,7 @@
 
 public class IdNode : ExprNode
 {
-    public string Id { get; set; }
+    public string Name { get; set; }
     public SymTableEntry AttributesRef { get; set; }
 
     public override void Accept(IVisitor v)
@@ -14,7 +14,7 @@ public class IdNode : ExprNode
     {
         if (obj is IdNode other)
         {
-            return Equals(other.Id, Id)
+            return Equals(other.Name, Name)
                    && Equals(other.AttributesRef, AttributesRef)
                    && Equals(other.Type, Type);
         }

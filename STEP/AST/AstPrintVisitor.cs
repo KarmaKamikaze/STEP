@@ -276,14 +276,7 @@ public class AstPrintVisitor : IVisitor
             Print(n.Left.Type.ActualType.ToString().ToLower() + $"[{n.Size}] ");
             n.Left.Accept(this);
             Print(" = ");
-            if (n.IsId)
-            {
-                n.IdRight.Accept(this);
-            }
-            else
-            {
-                n.Right.Accept(this);
-            }
+            n.Right.Accept(this);
         }
     }
 
@@ -336,7 +329,7 @@ public class AstPrintVisitor : IVisitor
     {
         if (n != null)
         {
-            Print(n.Id);
+            Print(n.Name);
         }
     }
 
@@ -486,7 +479,7 @@ public class AstPrintVisitor : IVisitor
                 Print("[]");
             }
 
-            Print(" function " + n.Name.Id + "(");
+            Print(" function " + n.Id.Name + "(");
             if (n.FormalParams.Count != 0)
             {
                 IdNode param = n.FormalParams[0];
@@ -496,7 +489,7 @@ public class AstPrintVisitor : IVisitor
                     Print("[]");
                 }
 
-                Print(" " + param.Id);
+                Print(" " + param.Name);
 
                 for (int i = 1; i < n.FormalParams.Count; i++)
                 {
@@ -507,7 +500,7 @@ public class AstPrintVisitor : IVisitor
                         Print("[]");
                     }
 
-                    Print(" " + param.Id);
+                    Print(" " + param.Name);
                 }
             }
 

@@ -10,11 +10,9 @@ public class CodeGenerationVisitor : IVisitor
     private readonly StringBuilder _stringBuilder = new();
     private string Output => _stringBuilder.ToString();
     private readonly StringBuilder _pinSetup = new();
-    private int _scopeLevel = 0;
-
-    private readonly List<Tuple<int, ArrDclNode>>
-        _arrDclsPerScope = new(); // Keeps track of array declarations per scope
-
+    private int _scopeLevel;
+    private readonly List<IdNode> _arrDclsInScope = new(); // Keeps track of array declarations currently in scope
+    
     public void OutputToBaseFile(string filename)
     {
         InitProgramFileHelper();
@@ -63,27 +61,38 @@ public class CodeGenerationVisitor : IVisitor
     {
         _scopeLevel++;
     }
-
-    private void ExitScope(bool isArrayFunc = false)
-    {
+    
+    private void ExitScope() {
         _scopeLevel--;
-        var tuplesToRemove = new List<Tuple<int, ArrDclNode>>();
-        // If exiting a function returning an array, do not free declared arrays
-        if (isArrayFunc)
-        {
-            tuplesToRemove.AddRange(_arrDclsPerScope.Where(t => t.Item1 > _scopeLevel));
-        }
-        // Else, when exiting a scope, free all arrays declared in the scope
-        else
-        {
-            foreach (var tuple in _arrDclsPerScope.Where(k => k.Item1 > _scopeLevel))
-            {
-                EmitLine($"free({tuple.Item2.Left.Id});");
-                tuplesToRemove.Add(tuple);
-            }
-        }
+        FreeArrays(_scopeLevel);
+    }
 
-        tuplesToRemove.ForEach(t => _arrDclsPerScope.Remove(t));
+    // Called upon exiting any scope
+    private void FreeArrays(int scopeLevel) {
+        var arrsToRemove = new List<IdNode>();
+        foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel)) {
+            if (!id.Type.IsReturned) {
+                EmitLine($"free({id.Name});");
+            }
+            arrsToRemove.Add(id);
+        }
+        arrsToRemove.ForEach(id => _arrDclsInScope.Remove(id));
+    }
+    
+    // Called upon exiting array function, handles freeing excess arrays
+    private void FreeArrays(int scopeLevel, IdNode exemptId, bool shouldRemove) {
+        var arrsToRemove = new List<IdNode>();
+        foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel && !n.Equals(exemptId))) {
+            EmitLine($"free({id.Name});");
+            arrsToRemove.Add(id);
+        }
+        if(shouldRemove) arrsToRemove.ForEach(id => _arrDclsInScope.Remove(id));
+    }
+
+    private void CopyArrayHelper(ArrDclNode n) {
+        // Copies array from RHS into LHS
+        var id = n.Right as IdNode;
+        EmitLine($"memcpy({n.Left.Name}, {id.Name}, sizeof({id.Name}[0])*{Math.Min(n.Left.Type.ArrSize, id.Type.ArrSize)});");
     }
 
     public void Visit(AndNode n)
@@ -184,7 +193,12 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend($")malloc({n.Size} * sizeof(");
         EmitAppend(n.Type, "))");
         EmitLine(";");
-        _arrDclsPerScope.Add(new Tuple<int, ArrDclNode>(_scopeLevel, n));
+        // Copy array
+        if (n.Right is IdNode) {
+            CopyArrayHelper(n);
+        }
+
+        _arrDclsInScope.Add(n.Left);
     }
 
     public void Visit(ArrLiteralNode n)
@@ -233,6 +247,10 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(AssNode n)
     {
+        // If assigning new pointer to array pointer, free previously allocated memory
+        if (n.Id.Type.IsArray && n.ArrIndex is null) {
+            EmitLine($"free({n.Id.Name});");
+        }
         AssNodeGen(n);
         EmitLine(";");
     }
@@ -255,7 +273,7 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(IdNode n)
     {
-        EmitAppend(n.Id);
+        EmitAppend(n.Name);
     }
 
     public void Visit(PlusNode n)
@@ -354,9 +372,7 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ForNode n)
     {
-        // TODO: this!
         // for(int x = 0; i < n; i++)
-        // VarDcl, AssNode, Identifier, ArrAccessNode
         EmitAppend("for(");
 
         //Each if-statement creates the for-loop header with the relevant type of initializer
@@ -447,7 +463,7 @@ public class CodeGenerationVisitor : IVisitor
          * }
          */
         EmitAppend(n.ReturnType, n.Type.IsArray ? "* " : " ");
-        n.Name.Accept(this);
+        n.Id.Accept(this);
         EmitAppend("(");
         for (int i = 0; i < n.FormalParams.Count; i++)
         {
@@ -468,12 +484,8 @@ public class CodeGenerationVisitor : IVisitor
         EmitLine(") {");
         // Body
         EnterScope();
-        foreach (StmtNode stmt in n.Stmts)
-        {
-            stmt.Accept(this);
-        }
-
-        ExitScope(n.Type.IsArray);
+        n.Stmts.ForEach(stmt => stmt.Accept(this));
+        ExitScope();
         EmitLine("}");
     }
 
@@ -519,15 +531,20 @@ public class CodeGenerationVisitor : IVisitor
         }
     }
 
-    public void Visit(RetNode n)
-    {
+    public void Visit(RetNode n) {
         // If no expression, emit empty return
-        if (n.RetVal is null)
-        {
+        if (n.RetVal is null) {
             EmitLine("return;");
         }
-        else
-        {
+        else {
+            // If returning from function, free arrays declared in scope
+            if (n.SurroundingFuncType.IsArray) {
+                // If in outer scope, free all arrays except returned and remove from list - else free without removing from list
+                // Typed functions always end on return, so this is where we 'forget' about the obsolete arrays
+                // In inner scopes, we want to free them, but still 'remember' them to free at any returns in outer scopes
+                bool isInOuterScope = n.Type.ScopeLevel - 1 == n.SurroundingFuncType.ScopeLevel;
+                FreeArrays(n.SurroundingFuncType.ScopeLevel, (IdNode) n.RetVal, isInOuterScope);
+            }
             EmitAppend("return ");
             n.RetVal.Accept(this);
             EmitLine(";");
@@ -674,7 +691,7 @@ public class CodeGenerationVisitor : IVisitor
         _pinSetup.Append(");\r\n");
 
         // Save variable names as constant declarations and prepend to generated code
-        string variableConstant = $"#define {n.Left.Id} {pinVisitor.GetPinCode()}\n";
+        string variableConstant = $"#define {n.Left.Name} {pinVisitor.GetPinCode()}\r\n";
         _stringBuilder.Insert(0, variableConstant);
     }
 
