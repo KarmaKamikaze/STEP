@@ -366,9 +366,7 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ForNode n)
     {
-        // TODO: this!
         // for(int x = 0; i < n; i++)
-        // VarDcl, AssNode, Identifier, ArrAccessNode
         EmitAppend("for(");
 
         //Each if-statement creates the for-loop header with the relevant type of initializer
@@ -605,8 +603,16 @@ public class CodeGenerationVisitor : IVisitor
         // TODO: library inclusion?
         n.VarsBlock?.Accept(this);
         n.FuncsBlock?.Accept(this);
-        n.SetupBlock?.Accept(this);
-        n.LoopBlock?.Accept(this);
+        if(n.SetupBlock is null)
+        {
+            n.SetupBlock = new SetupNode { Stmts = new() };
+        }
+        n.SetupBlock.Accept(this);
+        if (n.LoopBlock is null)
+        {
+            n.LoopBlock = new LoopNode { Stmts = new() };
+        }
+        n.LoopBlock.Accept(this);
     }
 
     public void Visit(SetupNode n)
