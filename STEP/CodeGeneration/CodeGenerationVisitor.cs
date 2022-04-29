@@ -94,6 +94,7 @@ public class CodeGenerationVisitor : IVisitor
         EmitLine($"memcpy({n.Left.Name}, {id.Name}, sizeof({id.Name}[0])*{Math.Min(n.Left.Type.ArrSize, id.Type.ArrSize)});");
     }
 
+    // Adds tabs to format output code
     private void EmitIndentation() {
         _stringBuilder.Append(' ', _scopeLevel * 4);
     }
