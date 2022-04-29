@@ -5,7 +5,6 @@ String str = "test";
 boolean boo = true;
 void blankfunc(String array[]) {
 String* tempArray = (String*)malloc(3 * sizeof(String));
-array = tempArray;
 free(tempArray);
 }
 String stringfunc(double num, boolean isConstant) {

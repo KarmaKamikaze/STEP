@@ -34,7 +34,6 @@ end loop
 functions 
     blank function blankfunc(string[] array)
         string[3] tempArray = ["test1", "test2", "test3"]
-        array = tempArray
     end function
     string function stringfunc(number num, boolean isConstant)
         string[3] arr = ["t1", "t2", "t3"]
