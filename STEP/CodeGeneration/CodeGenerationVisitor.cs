@@ -199,7 +199,7 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(ArrayAccessNode n)
     {
         n.Array.Accept(this);
-        EmitAppend("[");
+        EmitAppend("[(int) ");
         n.Index.Accept(this);
         EmitAppend("]");
     }
@@ -576,16 +576,38 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ProgNode n)
     {
-        _stringBuilder.Append("#include <Arduino.h>\n");
+        // Insert main
+        _stringBuilder.Append("#include <Arduino.h>\n\n"+
+                              "// Weak empty variant initialization function.\n" +
+                              "// May be redefined by variant files.\n" +
+                              "void initVariant() __attribute__((weak));\n" + 
+                              "void initVariant() { }\n\n" +
+                              "void setupUSB() __attribute__((weak));\n" +
+                              "void setupUSB() { }\n\n" + 
+                              "int main(void)\n" +
+                              "{\n" +
+                              "initVariant();\n\n" +
+                              "#if defined(USBCON)\n" + 
+                              "USBDevice.attach();\n" + 
+                              "#endif\n\n" +
+                              "setup();\n\n" +
+                              "for (;;) {\n" + 
+                              "loop();\n" +
+                              "}\n\n" +
+                              "return 0;\n" + 
+                              "}\n");
         n.VarsBlock?.Accept(this);
         n.FuncsBlock?.Accept(this);
+        EmitLine("void setup() {");
         n.SetupBlock?.Accept(this);
+        EmitLine("}");
+        EmitLine("void loop() {");
         n.LoopBlock?.Accept(this);
+        EmitLine("}");
     }
 
     public void Visit(SetupNode n)
     {
-        EmitLine("void setup() {");
         EnterScope();
         // Add declared pinModes from variables scope
         if (_pinSetup.ToString() != String.Empty)
@@ -597,19 +619,16 @@ public class CodeGenerationVisitor : IVisitor
         }
 
         ExitScope();
-        EmitLine("}");
     }
 
     public void Visit(LoopNode n)
     {
-        EmitLine("void loop() {");
         EnterScope();
         foreach(var stmt in n.Stmts) {
             stmt.Accept(this);
         }
 
         ExitScope();
-        EmitLine("}");
     }
 
     public void Visit(ElseIfNode n)
