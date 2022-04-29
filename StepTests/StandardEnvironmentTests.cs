@@ -16,7 +16,7 @@ public class StandardEnvironmentTests
         /*
          * boolean function x()
          *   input digitalpin p = 1
-         *   if(ReadFromDigitalPin(p) == High)
+         *   if(ReadFromDigitalPin(p) == On)
          *     return true
          *   else
          *     return false
@@ -42,7 +42,7 @@ public class StandardEnvironmentTests
         var condition = new EqNode
         {
             Left = digitalRead,
-            Right = new IdNode {Name = "High"}
+            Right = new IdNode {Name = "On"}
         };
         var ifStmt = new IfNode
         {
@@ -109,7 +109,7 @@ public class StandardEnvironmentTests
         var digitalWrite = new FuncStmtNode
         {
             Id = new IdNode { Name = "WriteToDigitalPin" },
-            Params = new List<ExprNode> { new IdNode { Name = "p" }, new IdNode { Name = "Low" } }
+            Params = new List<ExprNode> { new IdNode { Name = "p" }, new IdNode { Name = "Off" } }
         };
         var pinDcl = new PinDclNode
         {

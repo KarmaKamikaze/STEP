@@ -366,9 +366,7 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ForNode n)
     {
-        // TODO: this!
         // for(int x = 0; i < n; i++)
-        // VarDcl, AssNode, Identifier, ArrAccessNode
         EmitAppend("for(");
 
         //Each if-statement creates the for-loop header with the relevant type of initializer
