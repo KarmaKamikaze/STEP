@@ -43,6 +43,7 @@ functions
         else
             return "not constant " + num
         end if 
+        return "fail"
     end function
 end functions
 

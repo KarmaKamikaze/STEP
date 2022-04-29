@@ -92,7 +92,8 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(ArrayAccessNode n)
     {
-        n.Left.Accept(this);
+        n.Array.Accept(this);
+        n.Index.Accept(this);
     }
 
     public void Visit(VarDclNode n)
