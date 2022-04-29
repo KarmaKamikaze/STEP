@@ -698,6 +698,7 @@ public class CodeGenerationVisitor : IVisitor
     private void InitProgramFileHelper()
     {
         // Insert main
+        // This main function is a modified main.cpp, which is included in the Arduino library.
         _stringBuilder.Insert(0, "#include <Arduino.h>\n\n" +
                                  "// Weak empty variant initialization function.\n" +
                                  "// May be redefined by variant files.\n" +
