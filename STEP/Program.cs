@@ -18,7 +18,7 @@ class Program
         if (args.Length < 1 || args.Contains("-help"))
             Exit("Usage: STEP.exe filename [Optional: -print] [Optional: -upload PORT] [Optional: -output PORT]");
         
-        if (args.Length > 1 && args.Contains("-output"))
+        if (args.Length <= 1 && args.Contains("-output"))
         {
             int portIndex = 0;
 
