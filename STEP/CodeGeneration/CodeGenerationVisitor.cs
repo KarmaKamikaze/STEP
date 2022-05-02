@@ -15,9 +15,9 @@ public class CodeGenerationVisitor : IVisitor
     
     public void OutputToBaseFile(string filename)
     {
-        InitProgramFileHelper();
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        File.WriteAllText(directoryPath + $"/{filename}.c", Output);
+        Directory.CreateDirectory(directoryPath + $"/{filename}/");
+        File.WriteAllText(directoryPath + $"/{filename}/{filename}.ino", Output);
     }
 
     public string OutputToString()
@@ -728,30 +728,5 @@ public class CodeGenerationVisitor : IVisitor
         // Save variable names as constant declarations and prepend to generated code
         string variableConstant = $"#define {n.Left.Name} {pinVisitor.GetPinCode()}\r\n";
         _stringBuilder.Insert(0, variableConstant);
-    }
-
-    private void InitProgramFileHelper()
-    {
-        // Insert main
-        // This main function is a modified main.cpp, which is included in the Arduino library.
-        _stringBuilder.Insert(0, "#include <Arduino.h>\n\n" +
-                                 "// Weak empty variant initialization function.\n" +
-                                 "// May be redefined by variant files.\n" +
-                                 "void initVariant() __attribute__((weak));\n" +
-                                 "void initVariant() { }\n\n" +
-                                 "void setupUSB() __attribute__((weak));\n" +
-                                 "void setupUSB() { }\n\n" +
-                                 "int main(void)\n" +
-                                 "{\n" +
-                                 "initVariant();\n\n" +
-                                 "#if defined(USBCON)\n" +
-                                 "USBDevice.attach();\n" +
-                                 "#endif\n\n" +
-                                 "setup();\n\n" +
-                                 "for (;;) {\n" +
-                                 "loop();\n" +
-                                 "}\n\n" +
-                                 "return 0;\n" +
-                                 "}\n");
     }
 }

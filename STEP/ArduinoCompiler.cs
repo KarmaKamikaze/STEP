@@ -20,103 +20,55 @@ public class ArduinoCompiler
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-        // Check if avr-gcc files are present in correct folder
-        if (!File.Exists($"{directoryPath}/avr-destination/bin/avr-gcc.exe") &&
-            !File.Exists($"{directoryPath}/avr-destination/bin/avr-objcopy.exe"))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            throw new ApplicationException(
-                "Please download the avr8 toolchain and place the contents in the avr-destination folder");
+            // The /C flag means that cmd should execute the following command and exit without waiting for further input.
+            Process compiler = Process.Start("cmd.exe",
+                "/C " +
+                $"{directoryPath}/ArduinoCLI/arduino-cli.exe " +
+                "compile " +
+                "--export-binaries " +
+                "-b arduino:avr:uno " +
+                $"{directoryPath}/{filename}/");
+
+            compiler?.WaitForExit();
+        }
+        else
+        {
+            Process compiler = Process.Start("/bin/bash",
+                $"{directoryPath}/ArduinoCLI/arduino-cli.exe " +
+                "compile " +
+                "--export-binaries " +
+                "-b arduino:avr:uno " +
+                $"{directoryPath}/{filename}/");
+
+            compiler?.WaitForExit();
         }
 
-        try
+        if (!File.Exists(directoryPath + $"/{filename}/build/arduino.avr.uno/{filename}.ino.hex"))
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                // The /C flag means that cmd should execute the following command and exit without waiting for further input.
-                Process compiler = Process.Start("cmd.exe",
-                    "/C " +
-                    $"{directoryPath}/avr-destination/bin/avr-gcc.exe -O2 -Wall -mmcu=atmega328p " +
-                    $"-I {directoryPath}/avr-destination/Arduino-Core/cores/arduino " +
-                    $"-I {directoryPath}/avr-destination/Arduino-Core/variants/standard " +
-                    $"{directoryPath}/{filename}.c -o {directoryPath}/{filename}.out");
-
-                compiler?.WaitForExit();
-
-                if (!File.Exists(directoryPath + $"/{filename}.out"))
-                {
-                    throw new ApplicationException($"Arduino compiler error. {filename}.out file was not generated.");
-                }
-
-                Process hexConverter = Process.Start("cmd.exe",
-                    "/C " +
-                    $"{directoryPath}/avr-destination/bin/avr-objcopy.exe -j .text -j .data -O ihex " +
-                    $"{directoryPath}/{filename}.out {directoryPath}/{filename}.hex");
-
-                hexConverter?.WaitForExit();
-            }
-            else
-            {
-                Process compiler = Process.Start("/bin/bash",
-                    $"avr-gcc -O2 -Wall -mmcu=atmega328p " +
-                    $"-I {directoryPath}/avr-destination/Arduino-Core/cores/arduino " +
-                    $"-I {directoryPath}/avr-destination/Arduino-Core/variants/standard " +
-                    $"{directoryPath}/{filename}.c -o {directoryPath}/{filename}.out");
-
-                compiler?.WaitForExit();
-
-                if (!File.Exists(directoryPath + $"/{filename}.out"))
-                {
-                    throw new ApplicationException($"Arduino compiler error. {filename}.out file was not generated.");
-                }
-
-                Process hexConverter = Process.Start("/bin/bash",
-                    $"avr-objcopy -O ihex {directoryPath}/{filename}.out {directoryPath}/{filename}.hex");
-
-                hexConverter?.WaitForExit();
-            }
-
-            if (!File.Exists(directoryPath + $"/{filename}.hex"))
-            {
-                throw new ApplicationException($"Arduino compiler error. {filename}.hex file was not generated.");
-            }
-
-            // Enable upload logging
-            var nlogConfig = new LoggingConfiguration();
-
-            nlogConfig.AddRule(minLevel: LogLevel.Trace, maxLevel: LogLevel.Fatal,
-                target: new ConsoleTarget("consoleTarget")
-                {
-                    Layout = "${longdate} level=${level} message=${message}"
-                });
-
-            LogManager.Configuration = nlogConfig;
-
-            // Update compiled hex file to Arduino board
-            ArduinoSketchUploader uploader = new ArduinoSketchUploader(new ArduinoSketchUploaderOptions()
-            {
-                FileName = directoryPath + $"/{filename}.hex",
-                PortName = "COM3", // Can be omitted to try to auto-detect the COM port.
-                ArduinoModel = ArduinoModel.UnoR3
-            }, new NLogArduinoUploaderLogger(error: true, warn: true, info: true));
-            uploader.UploadSketch();
+            throw new ApplicationException($"Arduino compiler error. {filename}.ino.hex file was not generated.");
         }
-        catch (ApplicationException e)
+
+        // Enable upload logging
+        var nlogConfig = new LoggingConfiguration();
+
+        nlogConfig.AddRule(minLevel: LogLevel.Trace, maxLevel: LogLevel.Fatal,
+            target: new ConsoleTarget("consoleTarget")
+            {
+                Layout = "${longdate} level=${level} message=${message}"
+            });
+
+        LogManager.Configuration = nlogConfig;
+
+        // Update compiled hex file to Arduino board
+        ArduinoSketchUploader uploader = new ArduinoSketchUploader(new ArduinoSketchUploaderOptions()
         {
-            Console.WriteLine(e);
-        }
-        finally
-        {
-            // Clean up
-            if (File.Exists(directoryPath + $"/{filename}.out"))
-            {
-                File.Delete(directoryPath + $"/{filename}.out");
-            }
-
-            if (File.Exists(directoryPath + $"/{filename}.hex"))
-            {
-                File.Delete(directoryPath + $"/{filename}.hex");
-            }
-        }
+            FileName = directoryPath + $"/{filename}/build/arduino.avr.uno/{filename}.ino.hex",
+            PortName = "COM3", // Can be omitted to try to auto-detect the COM port.
+            ArduinoModel = ArduinoModel.UnoR3
+        }, new NLogArduinoUploaderLogger(error: true, warn: true, info: true));
+        uploader.UploadSketch();
     }
 
     private class NLogArduinoUploaderLogger : IArduinoUploaderLogger
