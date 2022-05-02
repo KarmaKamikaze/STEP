@@ -63,8 +63,8 @@ public class CodeGenerationVisitor : IVisitor
     }
     
     private void ExitScope() {
+        FreeArrays(_scopeLevel - 1);
         _scopeLevel--;
-        FreeArrays(_scopeLevel);
     }
 
     // Called upon exiting any scope
@@ -72,6 +72,7 @@ public class CodeGenerationVisitor : IVisitor
         var arrsToRemove = new List<IdNode>();
         foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel)) {
             if (!id.Type.IsReturned) {
+                EmitIndentation();
                 EmitLine($"free({id.Name});");
             }
             arrsToRemove.Add(id);
@@ -84,6 +85,7 @@ public class CodeGenerationVisitor : IVisitor
         var arrsToRemove = new List<IdNode>();
         foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel && !n.Equals(exemptId))) {
             EmitLine($"free({id.Name});");
+            EmitIndentation();
             arrsToRemove.Add(id);
         }
         if(shouldRemove) arrsToRemove.ForEach(id => _arrDclsInScope.Remove(id));
@@ -92,9 +94,15 @@ public class CodeGenerationVisitor : IVisitor
     private void CopyArrayHelper(ArrDclNode n) {
         // Copies array from RHS into LHS
         var id = n.Right as IdNode;
+        EmitIndentation();
         EmitLine($"memcpy({n.Left.Name}, {id.Name}, sizeof({id.Name}[0])*{Math.Min(n.Left.Type.ArrSize, id.Type.ArrSize)});");
     }
 
+    // Adds tabs to format output code
+    private void EmitIndentation() {
+        _stringBuilder.Append(' ', _scopeLevel * 4);
+    }
+    
     public void Visit(AndNode n)
     {
         // E.g.: x and true -> x && true 
@@ -218,6 +226,7 @@ public class CodeGenerationVisitor : IVisitor
         }
 
         ExitScope();
+        EmitIndentation();
         EmitAppend("}");
     }
 
@@ -250,6 +259,7 @@ public class CodeGenerationVisitor : IVisitor
         // If assigning new pointer to array pointer, free previously allocated memory
         if (n.Id.Type.IsArray && n.ArrIndex is null) {
             EmitLine($"free({n.Id.Name});");
+            EmitIndentation();
         }
         AssNodeGen(n);
         EmitLine(";");
@@ -363,10 +373,12 @@ public class CodeGenerationVisitor : IVisitor
         EnterScope();
         foreach (StmtNode statement in n.Body)
         {
+            EmitIndentation();
             statement.Accept(this);
         }
 
         ExitScope();
+        EmitIndentation();
         EmitLine("}");
     }
 
@@ -398,10 +410,12 @@ public class CodeGenerationVisitor : IVisitor
         EnterScope();
         foreach (StmtNode statement in n.Body)
         {
+            EmitIndentation();
             statement.Accept(this);
         }
 
         ExitScope();
+        EmitIndentation();
         EmitLine("}");
     }
 
@@ -484,9 +498,13 @@ public class CodeGenerationVisitor : IVisitor
         EmitLine(") {");
         // Body
         EnterScope();
-        n.Stmts.ForEach(stmt => stmt.Accept(this));
+        foreach (var stmt in n.Stmts) {
+            EmitIndentation();
+            stmt.Accept(this);
+        }
         ExitScope();
-        EmitLine("}");
+        EmitIndentation();
+        EmitLine("}\r\n");
     }
 
     public void Visit(FuncExprNode n)
@@ -525,6 +543,7 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(FuncsNode n)
     {
+        EmitLine("// Functions");
         foreach (var funDcl in n.FuncDcls)
         {
             funDcl.Accept(this);
@@ -568,42 +587,49 @@ public class CodeGenerationVisitor : IVisitor
         n.Condition.Accept(this);
         EmitLine(") {");
         EnterScope();
-        foreach (var stmt in n.ThenClause)
-        {
+        foreach(var stmt in n.ThenClause) {
+            EmitIndentation();
             stmt.Accept(this);
         }
 
         ExitScope();
+        EmitIndentation();
         EmitLine("}");
 
         if (n.ElseIfClauses?.Count > 0)
         {
             foreach (var elseIf in n.ElseIfClauses)
             {
+                EmitIndentation();
                 elseIf.Accept(this);
             }
         }
-
+        
         if (n.ElseClause?.Count > 0)
         {
+            EmitIndentation();
             EmitLine("else {");
             EnterScope();
             foreach (var stmt in n.ElseClause)
             {
+                EmitIndentation();
                 stmt.Accept(this);
             }
 
             ExitScope();
+            EmitIndentation();
             EmitLine("}");
         }
     }
 
     public void Visit(VarsNode n)
     {
+        if(n.Dcls.Count > 0) EmitLine("// Global variables");
         foreach (var dclNode in n.Dcls)
         {
             dclNode.Accept(this);
         }
+        EmitLine("");
     }
 
     public void Visit(ProgNode n)
@@ -624,23 +650,30 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(SetupNode n)
     {
         EnterScope();
+        // Add declared pinModes from variables scope
+        if (_pinSetup.ToString() != String.Empty)
+            EmitAppend(_pinSetup.ToString());
+
         foreach (var stmt in n.Stmts)
         {
+            EmitIndentation();
             stmt.Accept(this);
         }
 
         ExitScope();
+        EmitIndentation();
     }
 
     public void Visit(LoopNode n)
     {
         EnterScope();
-        foreach (var stmt in n.Stmts)
-        {
+        foreach(var stmt in n.Stmts) {
+            EmitIndentation();
             stmt.Accept(this);
         }
 
         ExitScope();
+        EmitIndentation();
     }
 
     public void Visit(ElseIfNode n)
@@ -653,10 +686,12 @@ public class CodeGenerationVisitor : IVisitor
             EnterScope();
             foreach (var stmt in n.Body)
             {
+                EmitIndentation();
                 stmt.Accept(this);
             }
 
             ExitScope();
+            EmitIndentation();
             EmitLine("}");
         }
     }
@@ -668,7 +703,7 @@ public class CodeGenerationVisitor : IVisitor
          * it must be declared in the variables scope, which is always visited first. Once the code generation
          * reaches the Setup scope, the temporary variables will be used to insert this code in the correct place.
          */
-        _pinSetup.Append("pinMode(");
+        _pinSetup.Append("    pinMode(");
         n.Right.Accept(pinVisitor);
         // Append A if the pin is analog to allow for arduino to
         // differentiate between analog and digital pins
