@@ -102,7 +102,7 @@ public class CodeGenerationVisitor : IVisitor
     private void CopyArrayHelper(ArrDclNode n, ArrLiteralNode lit) {
         // Copies array from arr literal into LHS
         EmitIndentation();
-        string tempName = $"temp{_tempCount - 1}";
+        string tempName = $"__temp{_tempCount - 1}__";
         EmitLine($"memcpy({n.Left.Name}, {tempName}, sizeof({tempName}[0])*{Math.Min(n.Left.Type.ArrSize, lit.Type.ArrSize)});");
     }
 
@@ -225,7 +225,7 @@ public class CodeGenerationVisitor : IVisitor
         int count = n.Elements.Count;
         if (count == 0) return;
         EmitIndentation();
-        EmitAppend($"int temp{_tempCount}[] = {{");
+        EmitAppend($"int __temp{_tempCount}__[] = {{");
         for (int i = 0; i < count; i++)
         {
             n.Elements[i].Accept(this);
