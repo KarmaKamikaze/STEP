@@ -18,7 +18,7 @@ class Program
         if (args.Length < 1 || args.Contains("-help"))
             Exit("Usage: STEP.exe filename [Optional: -print] [Optional: -upload PORT] [Optional: -output PORT]");
         
-        if (args.Length <= 1 && args.Contains("-output"))
+        if (args.Length is 1 or 2 && args.Contains("-output"))
         {
             int portIndex = 0;
 
@@ -97,6 +97,9 @@ class Program
                     // Upload compiled hex program to Arduino board
                     ArduinoCompiler arduinoCompiler = new ArduinoCompiler(port);
                     arduinoCompiler.Upload(Path.GetFileNameWithoutExtension(args[0]));
+
+                    if (args.Contains("-output"))
+                        arduinoCompiler.Monitor();
                 }
                 else
                 {
