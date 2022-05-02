@@ -86,7 +86,8 @@ public class ArduinoCompiler
     public void Monitor()
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        
+
+        Console.WriteLine("\nEntering Output-mode...\n");
         Process compiler = Process.Start("cmd.exe",
             "/C " +
             $"{directoryPath}/ArduinoCLI/arduino-cli.exe " +
