@@ -86,7 +86,7 @@ public static class StandardEnvironment
         ArduinoName = "Serial.println",
         Parameters = new()
         {
-            {"message", new Type {ActualType = TypeVal.String}}
+            {"message", new Type {ActualType = TypeVal.Any}}
         },
         Type = new Type {ActualType = TypeVal.Blank}
     };

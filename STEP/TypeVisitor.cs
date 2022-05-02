@@ -589,7 +589,7 @@ public class TypeVisitor : IVisitor
         foreach (var param in n.Params)
         {
             param.Accept(this);
-            if (param.Type != parameterTypes[i] || param.Type.ActualType == TypeVal.Error)
+            if (parameterTypes[i].ActualType != TypeVal.Any && (param.Type != parameterTypes[i] || param.Type.ActualType == TypeVal.Error))
             {
                 n.Type.ActualType = TypeVal.Error;
                 throw new TypeException(n,

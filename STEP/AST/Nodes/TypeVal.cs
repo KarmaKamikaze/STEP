@@ -6,6 +6,7 @@ public enum TypeVal
     Number,
     String,
     Boolean,
+    Any,
     Analogpin,
     Digitalpin,
     Blank,
