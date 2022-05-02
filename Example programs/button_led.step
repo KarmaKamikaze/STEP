@@ -1,0 +1,12 @@
+variables
+  input digitalpin btn = 4
+  output digitalpin led = 8
+end variables
+
+loop
+  if(ReadFromDigitalPin(btn) == On)
+    WriteToDigitalPin(led, On)
+  else
+    WriteToDigitalPin(led, Off)
+  end if
+end loop
