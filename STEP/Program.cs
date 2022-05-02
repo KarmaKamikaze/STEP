@@ -32,6 +32,8 @@ class Program
             Console.WriteLine("Performing syntactic analysis...");
             STEPParser.ProgramContext tree = parser.program(); // Parse the input starting at the "program" rule.
 
+            // TODO: error listener
+
             // Build AST
             AstBuilderVisitor astBuilder = new AstBuilderVisitor();
             AstNode root = astBuilder.Build(tree);
@@ -73,15 +75,15 @@ class Program
         }
         catch (ArraySizeMismatchException e)
         {
-            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Destination array {e.DestinationArray.Name} has size {e.DestinationArray.Type.ArrSize}, but {e.SourceArray.Name} has size {e.SourceArray.Type.ArrSize})");
+            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Destination array \"{e.DestinationArray.Name}\" has size {e.DestinationArray.Type.ArrSize}, but \"{e.SourceArray.Name}\" has size {e.SourceArray.Type.ArrSize})");
         }
         catch (DuplicatePinDeclarationException e)
         {
-            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier {e.VariableId}, pin {e.Pin})"); // TODO: Distinction between analog and digital pins?
+            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier \"{e.VariableId}\", pin {e.Pin})"); // TODO: Distinction between analog and digital pins?
         }
         catch (DuplicateDeclarationException e)
         {
-            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier {e.VariableId})");
+            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier \"{e.VariableId}\")");
         }
         catch (PinTableUnexpectedTypeException e)
         {
@@ -93,11 +95,11 @@ class Program
         }
         catch (ParameterCountMismatchException e)
         {
-            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier {e.VariableId}. Expected {e.ExpectedCount}, actual was {e.ActualCount})");
+            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} ({(e.VariableId != null ? $"Identifier \"{e.VariableId}\"." : "")}Expected {e.ExpectedCount}, actual was {e.ActualCount})");
         }
         catch (SymbolNotDeclaredException e)
         {
-            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier {e.VariableId})");
+            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier \"{e.VariableId}\")");
         }
         catch (Exception e)
         {

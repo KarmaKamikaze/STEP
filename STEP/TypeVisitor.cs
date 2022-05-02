@@ -571,7 +571,7 @@ public class TypeVisitor : IVisitor
         var parameterTypes = funcEntry.Parameters.Values.ToArray();
         var i = 0;
         if (funcEntry.Parameters.Count != n.Params.Count) 
-            throw new ParameterCountMismatchException("Unexpected number of parameters", n.SourcePosition, funcEntry.Parameters.Count, n.Params.Count);
+            throw new ParameterCountMismatchException("Unexpected number of parameters", n.SourcePosition, funcEntry.Parameters.Count, n.Params.Count, n.Id.Name);
         foreach (var param in n.Params)
         {
             param.Accept(this);
@@ -605,7 +605,7 @@ public class TypeVisitor : IVisitor
         var parameterTypes = funcEntry.Parameters.Values.ToArray();
         var i = 0;
         if (funcEntry.Parameters.Count != n.Params.Count)
-            throw new ParameterCountMismatchException("Unexpected number of parameters", n.SourcePosition, funcEntry.Parameters.Count, n.Params.Count);
+            throw new ParameterCountMismatchException("Unexpected number of parameters", n.SourcePosition, funcEntry.Parameters.Count, n.Params.Count, n.Id.Name);
         foreach (var param in n.Params)
         {
             param.Accept(this);
