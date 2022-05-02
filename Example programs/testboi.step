@@ -4,7 +4,7 @@ output digitalpin pin2 = 2
 end variables
 
 loop
-number[2] thisIsCursed = [1, 2, 3]
+number[3] thisIsCursed = [1, 2, 3]
 end loop
 
 functions
@@ -24,7 +24,7 @@ boolean bool1 = true
   if(bool1)
      return num
   end if
-  return assss
+  return num
 end function
 
 
