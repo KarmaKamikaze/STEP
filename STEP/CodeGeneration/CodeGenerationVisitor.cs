@@ -11,6 +11,7 @@ public class CodeGenerationVisitor : IVisitor
     private string Output => _stringBuilder.ToString();
     private readonly StringBuilder _pinSetup = new();
     private int _scopeLevel;
+    private int _tempCount;
     private readonly List<IdNode> _arrDclsInScope = new(); // Keeps track of array declarations currently in scope
     
     public void OutputToBaseFile(string filename)
@@ -93,9 +94,16 @@ public class CodeGenerationVisitor : IVisitor
 
     private void CopyArrayHelper(ArrDclNode n) {
         // Copies array from RHS into LHS
-        var id = n.Right as IdNode;
         EmitIndentation();
+        var id = n.Right as IdNode;
         EmitLine($"memcpy({n.Left.Name}, {id.Name}, sizeof({id.Name}[0])*{Math.Min(n.Left.Type.ArrSize, id.Type.ArrSize)});");
+    }
+    
+    private void CopyArrayHelper(ArrDclNode n, ArrLiteralNode lit) {
+        // Copies array from arr literal into LHS
+        EmitIndentation();
+        string tempName = $"temp{_tempCount - 1}";
+        EmitLine($"memcpy({n.Left.Name}, {tempName}, sizeof({tempName}[0])*{Math.Min(n.Left.Type.ArrSize, lit.Type.ArrSize)});");
     }
 
     // Adds tabs to format output code
@@ -204,6 +212,9 @@ public class CodeGenerationVisitor : IVisitor
         // Copy array
         if (n.Right is IdNode) {
             CopyArrayHelper(n);
+        } else if (n.Right is ArrLiteralNode lit) {
+            n.Right.Accept(this);
+            CopyArrayHelper(n, lit);
         }
 
         _arrDclsInScope.Add(n.Left);
@@ -213,8 +224,8 @@ public class CodeGenerationVisitor : IVisitor
     {
         int count = n.Elements.Count;
         if (count == 0) return;
-        EmitAppend("{");
-        EnterScope();
+        EmitIndentation();
+        EmitAppend($"int temp{_tempCount}[] = {{");
         for (int i = 0; i < count; i++)
         {
             n.Elements[i].Accept(this);
@@ -224,10 +235,8 @@ public class CodeGenerationVisitor : IVisitor
                 EmitAppend(", ");
             }
         }
-
-        ExitScope();
-        EmitIndentation();
-        EmitAppend("}");
+        EmitLine("};");
+        _tempCount++;
     }
 
     public void Visit(ArrayAccessNode n)
