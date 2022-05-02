@@ -3,10 +3,6 @@ variables
   output digitalpin BuiltInLED = 13
 end variables
 
-setup
-	Print("Hello boi")
-end setup
-
 loop
   WriteToDigitalPin(BuiltInLED, On)
   Wait(1000)
