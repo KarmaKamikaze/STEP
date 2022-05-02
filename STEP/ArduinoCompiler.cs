@@ -19,6 +19,12 @@ public class ArduinoCompiler
     public void Upload(string filename)
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        
+        // Check if avr-gcc files are present in correct folder
+        if (!File.Exists($"{directoryPath}/ArduinoCLI/arduino-cli.exe"))
+        {
+            throw new ApplicationException("Please download the arduino-cli and place it in the ArduinoCLI folder.");
+        }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
