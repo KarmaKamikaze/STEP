@@ -10,7 +10,9 @@ class Program
 {
     /* The main function takes a file path as its first argument.
      * It takes additional optional arguments:
-     * -pp for pretty-printing the AST */
+     * -print for pretty-printing the AST
+     * -upload to upload the compiled STEP program directly to an Arduino board
+     * -output to monitor the serial communications port for terminal output */
     private static void Main(string[] args)
     {
         if (args.Length < 1 || args.Contains("-help"))

@@ -18,7 +18,7 @@ public class ArduinoCompiler
         _port = port;
     }
     /// <summary>
-    /// The Upload method requires the arduino-cli executeable to be present at the host machine.
+    /// The Upload method requires the arduino-cli executable to be present at the host machine.
     /// It first compiles the STEP compiler's output to binaries, then converts this output to Intel HEX format.
     /// The .hex file is then uploaded directly to the connected Arduino Uno board.
     /// </summary>
@@ -48,7 +48,7 @@ public class ArduinoCompiler
         else
         {
             Process compiler = Process.Start("/bin/bash",
-                $"{directoryPath}/ArduinoCLI/arduino-cli.exe " +
+                $"{directoryPath}/ArduinoCLI/arduino-cli " +
                 "compile " +
                 "--export-binaries " +
                 "-b arduino:avr:uno " +

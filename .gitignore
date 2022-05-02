@@ -220,9 +220,6 @@ project.lock.json
 *.feature.xlsx.*
 *.Specs_*.htmlS
 
-# AVR-GCC executables
-#**/avr-destination/*
-
 # arduino-cli executables
 **/ArduinoCLI/*
 
