@@ -20,4 +20,12 @@ functions
         end while
         return arr  
     end function
+    
+    blank function printArray(number[] arr, number arrLen)
+        repeat for(number i = 0 to arrLen, change by 1)
+            if(arr[i] >= 0)
+                Print("Val: " + arr[i])
+            end if
+        end for
+    end function
 end functions
