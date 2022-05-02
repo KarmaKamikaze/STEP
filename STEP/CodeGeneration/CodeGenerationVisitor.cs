@@ -225,7 +225,8 @@ public class CodeGenerationVisitor : IVisitor
         int count = n.Elements.Count;
         if (count == 0) return;
         EmitIndentation();
-        EmitAppend($"int __temp{_tempCount}__[] = {{");
+        EmitAppend(n.Type);
+        EmitAppend($"__temp{_tempCount}__[] = {{");
         for (int i = 0; i < count; i++)
         {
             n.Elements[i].Accept(this);
@@ -266,9 +267,14 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(AssNode n)
     {
         // If assigning new pointer to array pointer, free previously allocated memory
+        // Unless RHS is func expression with array in params
         if (n.Id.Type.IsArray && n.ArrIndex is null) {
-            EmitLine($"free({n.Id.Name});");
-            EmitIndentation();
+            if (n.Expr is FuncExprNode fen) {
+                if (!fen.Params.Any(param => ((IdNode)param).Name.Equals(n.Id.Name))) {
+                    EmitLine($"free({n.Id.Name});");
+                    EmitIndentation();
+                }
+            }
         }
         AssNodeGen(n);
         EmitLine(";");
@@ -281,7 +287,7 @@ public class CodeGenerationVisitor : IVisitor
         n.Id.Accept(this);
         if (n.ArrIndex != null)
         {
-            EmitAppend("[");
+            EmitAppend("[(int)");
             n.ArrIndex.Accept(this);
             EmitAppend("]");
         }
