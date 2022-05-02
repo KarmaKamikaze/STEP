@@ -287,7 +287,7 @@ public class CodeGenerationVisitor : IVisitor
         n.Id.Accept(this);
         if (n.ArrIndex != null)
         {
-            EmitAppend("[(int)");
+            EmitAppend("[(int) ");
             n.ArrIndex.Accept(this);
             EmitAppend("]");
         }
@@ -469,7 +469,7 @@ public class CodeGenerationVisitor : IVisitor
         node.Id.Accept(this);
         if (node.ArrIndex != null)
         {
-            EmitAppend("[");
+            EmitAppend("[(int) ");
             node.ArrIndex.Accept(this);
             EmitAppend("]");
         }
@@ -665,9 +665,6 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(SetupNode n)
     {
         EnterScope();
-        // Add declared pinModes from variables scope
-        if (_pinSetup.ToString() != String.Empty)
-            EmitAppend(_pinSetup.ToString());
 
         foreach (var stmt in n.Stmts)
         {
