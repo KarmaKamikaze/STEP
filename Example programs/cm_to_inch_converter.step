@@ -38,7 +38,7 @@ functions
     number[] function makeArray()
         number[2] z
         number[10] y = z
-        number[50] x
+        number[50] x = [0, 1, 2, 3, 4]
         if(true)
             if (true)
                 return y

@@ -1,0 +1,31 @@
+setup
+    number[5] arr = [1, 2, 3, 4, 5]
+    arr = reverseArray(arr, 4)
+    repeat for(number i = 0 to 4, change by 1)  
+        Print("Val: " + arr[i])
+    end for 
+end setup
+
+functions
+    number[] function reverseArray(number[] arr, number arrLen)
+        number start = 0
+        number end = arrLen
+        number temp = 0
+        repeat while(start < end)
+            temp = arr[start]
+            arr[start] = arr[end]
+            arr[end] = temp
+            start = start + 1
+            end = end - 1
+        end while
+        return arr  
+    end function
+    
+    blank function printArray(number[] arr, number arrLen)
+        repeat for(number i = 0 to arrLen, change by 1)
+            if(arr[i] >= 0)
+                Print("Val: " + arr[i])
+            end if
+        end for
+    end function
+end functions

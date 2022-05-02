@@ -211,7 +211,7 @@ public class TypeVisitor : IVisitor
     {
         // Check if all elements have the same type
         if (!n.Elements.Any()) return;
-        if (n.Elements.Count != n.ExpectedSize) throw new ParameterMismatchException(n);
+        if (n.Elements.Count > n.ExpectedSize) throw new ParameterMismatchException(n);
         foreach (var expr in n.Elements)
         {
             expr.Accept(this);
@@ -221,6 +221,8 @@ public class TypeVisitor : IVisitor
                 $"Type mismatch, Array type is {n.Type.ActualType}, "+
                   $"element type was {expr.Type.ActualType}"); // Type will never be null here
         }
+
+        n.Type.ArrSize = n.Elements.Count;
     }
 
     public void Visit(ArrayAccessNode n)
