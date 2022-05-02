@@ -1,4 +1,5 @@
-﻿using Antlr4.Runtime;
+﻿using System.Text.RegularExpressions;
+using Antlr4.Runtime;
 using STEP.AST;
 using STEP.AST.Nodes;
 using STEP.CodeGeneration;
@@ -13,7 +14,31 @@ class Program
     private static void Main(string[] args)
     {
         if (args.Length < 1 || args.Contains("-help"))
-            Exit("Usage: STEP.exe filename [Optional: -print] [Optional: -upload]");
+            Exit("Usage: STEP.exe filename [Optional: -print] [Optional: -upload PORT] [Optional: -output PORT]");
+        
+        if (args.Length > 1 && args.Contains("-output"))
+        {
+            int portIndex = 0;
+
+            portIndex = args.ToList().IndexOf("-output") + 1;
+            if (portIndex >= args.Length)
+                throw new IndexOutOfRangeException("Please supply a port after the -output parameter.");
+                
+            var port = args[portIndex];
+                
+            Regex regex = new Regex("(COM\\d+|\\/dev\\/ttyACM\\d+)");
+            if (regex.IsMatch(port))
+            {
+                ArduinoCompiler arduinoCompiler = new ArduinoCompiler(port);
+                arduinoCompiler.Monitor();
+            }
+            else
+            {
+                throw new ArgumentException("Please supply a valid port after the -output parameter.");
+            }
+            
+            Exit("Finished!");
+        }
 
         // Stream reader opens source file
         AntlrFileStream streamReader = new AntlrFileStream(args[0]);
@@ -56,9 +81,25 @@ class Program
 
             if (args.Length > 1 && args.Contains("-upload"))
             {
-                // Upload compiled hex program to Arduino board
-                ArduinoCompiler arduinoCompiler = new ArduinoCompiler();
-                arduinoCompiler.Upload(Path.GetFileNameWithoutExtension(args[0]));
+                int portIndex = 0;
+
+                portIndex = args.ToList().IndexOf("-upload") + 1;
+                if (portIndex >= args.Length)
+                    throw new IndexOutOfRangeException("Please supply a port after the -upload parameter.");
+                
+                var port = args[portIndex];
+                
+                Regex regex = new Regex("(COM\\d+|\\/dev\\/ttyACM\\d+)");
+                if (regex.IsMatch(port))
+                {
+                    // Upload compiled hex program to Arduino board
+                    ArduinoCompiler arduinoCompiler = new ArduinoCompiler(port);
+                    arduinoCompiler.Upload(Path.GetFileNameWithoutExtension(args[0]));
+                }
+                else
+                {
+                    throw new ArgumentException("Please supply a valid port after the -upload parameter.");
+                }
             }
         }
         catch (Exception e)

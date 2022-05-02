@@ -11,9 +11,15 @@ namespace STEP;
 
 public class ArduinoCompiler
 {
+    private readonly string _port;
+
+    public ArduinoCompiler(string port)
+    {
+        _port = port;
+    }
     /// <summary>
-    /// The Upload method requires the avr-gcc compiler to be present at the host machine.
-    /// It first compiles the STEP compiler's output to avr, then converts this output to Intel HEX format.
+    /// The Upload method requires the arduino-cli executeable to be present at the host machine.
+    /// It first compiles the STEP compiler's output to binaries, then converts this output to Intel HEX format.
     /// The .hex file is then uploaded directly to the connected Arduino Uno board.
     /// </summary>
     public void Upload(string filename)
@@ -71,10 +77,24 @@ public class ArduinoCompiler
         ArduinoSketchUploader uploader = new ArduinoSketchUploader(new ArduinoSketchUploaderOptions()
         {
             FileName = directoryPath + $"/{filename}/build/arduino.avr.uno/{filename}.ino.hex",
-            PortName = "COM3", // Can be omitted to try to auto-detect the COM port.
+            PortName = _port, // Can be omitted to try to auto-detect the COM port.
             ArduinoModel = ArduinoModel.UnoR3
         }, new NLogArduinoUploaderLogger(error: true, warn: true, info: true));
         uploader.UploadSketch();
+    }
+
+    public void Monitor()
+    {
+        string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        
+        Process compiler = Process.Start("cmd.exe",
+            "/C " +
+            $"{directoryPath}/ArduinoCLI/arduino-cli.exe " +
+            "monitor " +
+            $"-p {_port} " +
+            "-b arduino:avr:uno ");
+
+        compiler?.WaitForExit();
     }
 
     private class NLogArduinoUploaderLogger : IArduinoUploaderLogger
