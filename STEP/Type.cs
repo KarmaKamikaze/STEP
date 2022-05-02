@@ -13,9 +13,8 @@ public class Type : IEquatable<Type>
 
     public bool Equals(Type other)
     {
-        if (ReferenceEquals(null, other)) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return ActualType == other.ActualType && IsArray == other.IsArray;
+        return Equals(ActualType, other.ActualType)
+            && Equals(IsArray, other.IsArray);
     }
 
     public static bool operator ==(Type a, Type b) => a.Equals(b);

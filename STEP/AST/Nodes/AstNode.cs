@@ -7,6 +7,7 @@ public abstract class AstNode
 {
     public AstNodeType NodeType { get; init; }
     public Type Type { get; set; } = new();
+    public SourcePosition SourcePosition { get; set; }
 
     public abstract void Accept(IVisitor v);
 }

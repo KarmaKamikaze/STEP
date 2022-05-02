@@ -99,7 +99,7 @@ public class SymbolTable : ISymbolTable
         //exception to check if a symbol is declared locally more than once
         if(IsDeclaredLocally(node.Name))
         {
-            throw new DuplicateDeclarationException("An id of this name have already been declared", node.Name);
+            throw new DuplicateDeclarationException("An identifier with this name have already been declared", node.SourcePosition, node.Name);
         }
 
         var symbolEntry = new SymTableEntry
@@ -118,7 +118,7 @@ public class SymbolTable : ISymbolTable
         //exception to check if a symbol is declared locally more than once
         if (IsDeclaredLocally(name))
         {
-            throw new DuplicateDeclarationException("An id of this name have already been declared", name);
+            throw new DuplicateDeclarationException("An identifier with this name have already been declared", node.SourcePosition, name);
         }
 
         // Convert formal parameters into a dictionary of strings and TypeVals

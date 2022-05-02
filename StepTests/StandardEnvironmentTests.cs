@@ -92,7 +92,7 @@ public class StandardEnvironmentTests
         var test = () => _typeVisitor.Visit(digitalRead);
 
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
 
     [Fact]
