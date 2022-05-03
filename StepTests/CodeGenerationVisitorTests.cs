@@ -476,7 +476,7 @@ public class CodeGenerationVisitorTests
         NumberNode limitNode = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode updateNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
 
-        ForNode forNode = new ForNode() {Initializer = varInit, Limit = limitNode, Update = updateNode};
+        ForNode forNode = new ForNode() {Initializer = varInit, Limit = limitNode, Update = updateNode, IsUpTo = true};
 
         //Act
         _visitor.Visit(forNode);
@@ -541,7 +541,7 @@ public class CodeGenerationVisitorTests
         NumberNode limitNode = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode updateNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
 
-        ForNode forNode = new ForNode() {Initializer = idNode, Limit = limitNode, Update = updateNode};
+        ForNode forNode = new ForNode() {Initializer = idNode, Limit = limitNode, Update = updateNode, IsUpTo = true};
 
         //Act
         _visitor.Visit(forNode);
@@ -564,7 +564,7 @@ public class CodeGenerationVisitorTests
         NumberNode limitNode = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode updateNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
 
-        ForNode forNode = new ForNode() {Initializer = arraccInit, Limit = limitNode, Update = updateNode};
+        ForNode forNode = new ForNode() {Initializer = arraccInit, Limit = limitNode, Update = updateNode, IsUpTo = true};
 
         //Act
         _visitor.Visit(forNode);
@@ -587,7 +587,8 @@ public class CodeGenerationVisitorTests
         ForNode forNode = new ForNode()
         {
             Initializer = idNode, Limit = limitNode, Update = updateNode,
-            Body = new List<StmtNode>() {breakNode}
+            Body = new List<StmtNode>() {breakNode},
+            IsUpTo = true
         };
 
         //Act
@@ -609,7 +610,7 @@ public class CodeGenerationVisitorTests
     {
         // Arrange
         string expected =
-            $"#define x 1\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    pinMode(1, {expectedMode});\r\n\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
+            $"#define x 1\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    Serial.begin(9600);\r\n    pinMode(1, {expectedMode});\r\n\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
         var n = new NumberNode() {Value = 1};
         var x = new IdNode {Name = "x"};
         var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = givenPinMode}};
@@ -632,7 +633,7 @@ public class CodeGenerationVisitorTests
     {
         // Arrange
         string expected =
-            $"#define {variableName} {pinNumber}\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    pinMode({pinNumber}, INPUT);\r\n\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
+            $"#define {variableName} {pinNumber}\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    Serial.begin(9600);\r\n    pinMode({pinNumber}, INPUT);\r\n\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
         var n = new NumberNode() {Value = pinNumber};
         var x = new IdNode {Name = variableName};
         var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = PinMode.INPUT}};

@@ -469,7 +469,7 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend(" = ");
         node.Accept(this);
         if (n.Update is not UMinusNode) {
-            EmitAppend("+");
+            EmitAppend(" + ");
         }
     }
 
@@ -685,8 +685,7 @@ public class CodeGenerationVisitor : IVisitor
         n.VarsBlock?.Accept(this);
         n.FuncsBlock?.Accept(this);
         EmitLine("void setup() {");
-        EmitIndentation();
-        EmitLine("Serial.begin(9600);");
+        EmitLine("    Serial.begin(9600);");
         // Add declared pinModes from variables scope
         if (_pinSetup.ToString() != String.Empty)
             EmitLine(_pinSetup.ToString());

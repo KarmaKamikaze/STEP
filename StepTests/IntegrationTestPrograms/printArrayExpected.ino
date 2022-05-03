@@ -11,6 +11,7 @@ void printArray(double array[], double count) {
 }
 
 void setup() {
+    Serial.begin(9600);
 }
 void loop() {
 }
