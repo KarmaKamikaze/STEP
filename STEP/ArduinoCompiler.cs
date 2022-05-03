@@ -99,6 +99,16 @@ public class ArduinoCompiler
         monitor?.WaitForExit();
     }
 
+    public void ListPorts()
+    {
+        string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        
+        Process portListener = Process.Start("cmd.exe",
+            $"/C {directoryPath}/ArduinoCLI/arduino-cli.exe board list");
+
+        portListener?.WaitForExit();
+    }
+
     private class NLogArduinoUploaderLogger : IArduinoUploaderLogger
     {
         private readonly bool _error;

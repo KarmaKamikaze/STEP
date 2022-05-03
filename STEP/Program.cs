@@ -16,10 +16,21 @@ class Program
     private static void Main(string[] args)
     {
         if (args.Length < 1 || args.Contains("-help"))
-            Exit("Usage: STEP.exe filename [Optional: -print] [Optional: -upload PORT] [Optional: -output PORT]");
+            Exit("Usage: STEP.exe filename " +
+                 "[Optional: -print] " +
+                 "[Optional: -ports] " +
+                 "[Optional: -upload PORT] " +
+                 "[Optional: -output PORT]");
 
         string port = CheckPort(args);
         
+        if (args.Length is 1 or 2 && args.Contains("-ports"))
+        {
+            ArduinoCompiler arduinoCompiler = new ArduinoCompiler(port);
+            arduinoCompiler.ListPorts();
+            
+            Exit("End of port list!");
+        }
         if (args.Length is 1 or 2 && args.Contains("-output"))
         {
             ArduinoCompiler arduinoCompiler = new ArduinoCompiler(port);
