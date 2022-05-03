@@ -571,15 +571,15 @@ public interface ISTEPListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitArrdcl([NotNull] STEPParser.ArrdclContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="STEPParser.arr_id_or_lit"/>.
+	/// Enter a parse tree produced by <see cref="STEPParser.arrdclrhs"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterArr_id_or_lit([NotNull] STEPParser.Arr_id_or_litContext context);
+	void EnterArrdclrhs([NotNull] STEPParser.ArrdclrhsContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="STEPParser.arr_id_or_lit"/>.
+	/// Exit a parse tree produced by <see cref="STEPParser.arrdclrhs"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitArr_id_or_lit([NotNull] STEPParser.Arr_id_or_litContext context);
+	void ExitArrdclrhs([NotNull] STEPParser.ArrdclrhsContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.arrsizedcl"/>.
 	/// </summary>

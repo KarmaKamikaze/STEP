@@ -61,7 +61,7 @@ public partial class STEPParser : Parser {
 		RULE_logicequal = 41, RULE_logiccomp = 42, RULE_logiccompop = 43, RULE_logicvalue = 44, 
 		RULE_vardcl = 45, RULE_var_options = 46, RULE_numdcl = 47, RULE_stringdcl = 48, 
 		RULE_booldcl = 49, RULE_pindcl = 50, RULE_pinmode = 51, RULE_pintype = 52, 
-		RULE_arrdcl = 53, RULE_arr_id_or_lit = 54, RULE_arrsizedcl = 55;
+		RULE_arrdcl = 53, RULE_arrdclrhs = 54, RULE_arrsizedcl = 55;
 	public static readonly string[] ruleNames = {
 		"program", "setuploop", "setup", "loop", "variables", "var_or_nl", "functions", 
 		"funcdcl", "funcdcl_or_nl", "brackets", "params", "params_content", "params_multi", 
@@ -71,7 +71,7 @@ public partial class STEPParser : Parser {
 		"multi_expr", "retstmt", "arrindex", "expr", "term", "factor", "value", 
 		"constant", "logicexpr", "logicequal", "logiccomp", "logiccompop", "logicvalue", 
 		"vardcl", "var_options", "numdcl", "stringdcl", "booldcl", "pindcl", "pinmode", 
-		"pintype", "arrdcl", "arr_id_or_lit", "arrsizedcl"
+		"pintype", "arrdcl", "arrdclrhs", "arrsizedcl"
 	};
 
 	private static readonly string[] _LiteralNames = {
@@ -4361,8 +4361,8 @@ public partial class STEPParser : Parser {
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode ID() { return GetToken(STEPParser.ID, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode ASSIGN() { return GetToken(STEPParser.ASSIGN, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public Arr_id_or_litContext arr_id_or_lit() {
-			return GetRuleContext<Arr_id_or_litContext>(0);
+		[System.Diagnostics.DebuggerNonUserCode] public ArrdclrhsContext arrdclrhs() {
+			return GetRuleContext<ArrdclrhsContext>(0);
 		}
 		public ArrdclContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -4409,7 +4409,7 @@ public partial class STEPParser : Parser {
 				State = 592;
 				Match(ASSIGN);
 				State = 593;
-				arr_id_or_lit();
+				arrdclrhs();
 				}
 			}
 
@@ -4426,7 +4426,7 @@ public partial class STEPParser : Parser {
 		return _localctx;
 	}
 
-	public partial class Arr_id_or_litContext : ParserRuleContext {
+	public partial class ArrdclrhsContext : ParserRuleContext {
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode ID() { return GetToken(STEPParser.ID, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode LBRACK() { return GetToken(STEPParser.LBRACK, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode RBRACK() { return GetToken(STEPParser.RBRACK, 0); }
@@ -4436,33 +4436,33 @@ public partial class STEPParser : Parser {
 		[System.Diagnostics.DebuggerNonUserCode] public FunccallContext funccall() {
 			return GetRuleContext<FunccallContext>(0);
 		}
-		public Arr_id_or_litContext(ParserRuleContext parent, int invokingState)
+		public ArrdclrhsContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
 		}
-		public override int RuleIndex { get { return RULE_arr_id_or_lit; } }
+		public override int RuleIndex { get { return RULE_arrdclrhs; } }
 		[System.Diagnostics.DebuggerNonUserCode]
 		public override void EnterRule(IParseTreeListener listener) {
 			ISTEPListener typedListener = listener as ISTEPListener;
-			if (typedListener != null) typedListener.EnterArr_id_or_lit(this);
+			if (typedListener != null) typedListener.EnterArrdclrhs(this);
 		}
 		[System.Diagnostics.DebuggerNonUserCode]
 		public override void ExitRule(IParseTreeListener listener) {
 			ISTEPListener typedListener = listener as ISTEPListener;
-			if (typedListener != null) typedListener.ExitArr_id_or_lit(this);
+			if (typedListener != null) typedListener.ExitArrdclrhs(this);
 		}
 		[System.Diagnostics.DebuggerNonUserCode]
 		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
 			ISTEPVisitor<TResult> typedVisitor = visitor as ISTEPVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitArr_id_or_lit(this);
+			if (typedVisitor != null) return typedVisitor.VisitArrdclrhs(this);
 			else return visitor.VisitChildren(this);
 		}
 	}
 
 	[RuleVersion(0)]
-	public Arr_id_or_litContext arr_id_or_lit() {
-		Arr_id_or_litContext _localctx = new Arr_id_or_litContext(Context, State);
-		EnterRule(_localctx, 108, RULE_arr_id_or_lit);
+	public ArrdclrhsContext arrdclrhs() {
+		ArrdclrhsContext _localctx = new ArrdclrhsContext(Context, State);
+		EnterRule(_localctx, 108, RULE_arrdclrhs);
 		int _la;
 		try {
 			State = 603;

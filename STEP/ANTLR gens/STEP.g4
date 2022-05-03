@@ -304,7 +304,7 @@ grammar STEP;
 
 // Lexer Rules (Tokens)
   WHITESPACE                    : (' ' | '\t') -> skip;
-  END_OF_LINE_COMMENT           : '#' EOL_COMMENT_CONTENT* LINE_TERMINATOR? -> skip;
+  END_OF_LINE_COMMENT           : '#' EOL_COMMENT_CONTENT* -> skip;
   MULTILINE_COMMENT             : '##' ML_COMMENT_CONTENT* '##' -> skip;
   LPAREN                        : '(';
   RPAREN                        : ')';

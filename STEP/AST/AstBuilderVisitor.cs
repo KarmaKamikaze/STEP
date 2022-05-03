@@ -291,7 +291,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         return node;
     }
 
-    public override ExprNode VisitArr_id_or_lit([NotNull] STEPParser.Arr_id_or_litContext context)
+    public override ExprNode VisitArrdclrhs([NotNull] STEPParser.ArrdclrhsContext context)
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
         if (children.Count == 1)

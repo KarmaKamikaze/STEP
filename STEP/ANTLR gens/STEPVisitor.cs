@@ -356,11 +356,11 @@ public interface ISTEPVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitArrdcl([NotNull] STEPParser.ArrdclContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="STEPParser.arr_id_or_lit"/>.
+	/// Visit a parse tree produced by <see cref="STEPParser.arrdclrhs"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitArr_id_or_lit([NotNull] STEPParser.Arr_id_or_litContext context);
+	Result VisitArrdclrhs([NotNull] STEPParser.ArrdclrhsContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="STEPParser.arrsizedcl"/>.
 	/// </summary>

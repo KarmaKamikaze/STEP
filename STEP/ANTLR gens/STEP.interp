@@ -191,7 +191,7 @@ pindcl
 pinmode
 pintype
 arrdcl
-arr_id_or_lit
+arrdclrhs
 arrsizedcl
 
 

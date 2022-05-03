@@ -575,7 +575,7 @@ public partial class STEPBaseVisitor<Result> : AbstractParseTreeVisitor<Result>,
 	/// <return>The visitor result.</return>
 	public virtual Result VisitArrdcl([NotNull] STEPParser.ArrdclContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="STEPParser.arr_id_or_lit"/>.
+	/// Visit a parse tree produced by <see cref="STEPParser.arrdclrhs"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -583,7 +583,7 @@ public partial class STEPBaseVisitor<Result> : AbstractParseTreeVisitor<Result>,
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitArr_id_or_lit([NotNull] STEPParser.Arr_id_or_litContext context) { return VisitChildren(context); }
+	public virtual Result VisitArrdclrhs([NotNull] STEPParser.ArrdclrhsContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="STEPParser.arrsizedcl"/>.
 	/// <para>

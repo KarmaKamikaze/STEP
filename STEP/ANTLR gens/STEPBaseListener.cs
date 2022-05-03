@@ -684,17 +684,17 @@ public partial class STEPBaseListener : ISTEPListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitArrdcl([NotNull] STEPParser.ArrdclContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="STEPParser.arr_id_or_lit"/>.
+	/// Enter a parse tree produced by <see cref="STEPParser.arrdclrhs"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterArr_id_or_lit([NotNull] STEPParser.Arr_id_or_litContext context) { }
+	public virtual void EnterArrdclrhs([NotNull] STEPParser.ArrdclrhsContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="STEPParser.arr_id_or_lit"/>.
+	/// Exit a parse tree produced by <see cref="STEPParser.arrdclrhs"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitArr_id_or_lit([NotNull] STEPParser.Arr_id_or_litContext context) { }
+	public virtual void ExitArrdclrhs([NotNull] STEPParser.ArrdclrhsContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="STEPParser.arrsizedcl"/>.
 	/// <para>The default implementation does nothing.</para>

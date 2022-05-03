@@ -248,7 +248,7 @@ public class TypeVisitor : IVisitor
     {
         // Check if all elements have the same type
         if (!n.Elements.Any()) return;
-        if (n.Elements.Count != n.ExpectedSize)
+        if (n.Elements.Count > n.ExpectedSize)
             throw new ParameterCountMismatchException("Unexpected number of parameters", n.SourcePosition,
                 n.ExpectedSize, n.Elements.Count);
         foreach (var expr in n.Elements)
