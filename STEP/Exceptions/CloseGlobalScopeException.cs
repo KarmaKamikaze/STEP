@@ -1,4 +1,4 @@
-namespace STEP.AST;
+namespace STEP;
 
 public class CloseGlobalScopeException : Exception
 {

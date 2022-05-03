@@ -2,6 +2,7 @@
 using Antlr4.Runtime.Misc;
 using STEP.AST.Nodes;
 using System.Globalization;
+using System.Xml.Linq;
 
 namespace STEP.AST;
 
@@ -10,6 +11,16 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public AstNode Build([NotNull] STEPParser.ProgramContext context)
     {
         return context.Accept(this);
+    }
+
+    private static SourcePosition GetSourcePosition(ParserRuleContext context)
+    {
+        return new SourcePosition(context.Start.Line, context.Start.Column);
+    }
+
+    private static SourcePosition GetSourcePosition(Antlr4.Runtime.Tree.ITerminalNode context)
+    {
+        return new SourcePosition(context.Symbol.Line, context.Symbol.Column);
     }
 
     public override ProgNode VisitProgram([NotNull] STEPParser.ProgramContext context)
@@ -21,6 +32,8 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         ProgNode parentNode = (ProgNode) children.Single(child => child is ProgNode);
         List<AstNode> otherChildren = children.Where(child => child is not ProgNode).ToList();
+
+        parentNode.SourcePosition = GetSourcePosition(context);
 
         if (otherChildren.Any(child => child is VarsNode))
         {
@@ -39,6 +52,8 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     {
         ProgNode node = (ProgNode) NodeFactory.MakeNode(AstNodeType.ProgNode);
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
+
+        node.SourcePosition = GetSourcePosition(context);
 
         if (children.Any(child => child is SetupNode))
         {
@@ -61,6 +76,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         SetupNode node = (SetupNode) NodeFactory.MakeNode(AstNodeType.SetupNode);
         node.Stmts = children;
+        node.SourcePosition = GetSourcePosition(context);
 
         return node;
     }
@@ -72,6 +88,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         LoopNode node = (LoopNode) NodeFactory.MakeNode(AstNodeType.LoopNode);
         node.Stmts = children;
+        node.SourcePosition = GetSourcePosition(context);
 
         return node;
     }
@@ -83,6 +100,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         VarsNode node = (VarsNode) NodeFactory.MakeNode(AstNodeType.VarsNode);
         node.Dcls = children;
+        node.SourcePosition = GetSourcePosition(context);
 
         return node;
     }
@@ -95,6 +113,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         FuncsNode node = (FuncsNode) NodeFactory.MakeNode(AstNodeType.FuncsNode);
         node.FuncDcls = children;
+        node.SourcePosition = GetSourcePosition(context);
 
         return node;
     }
@@ -102,10 +121,12 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override PinDclNode VisitPindcl([NotNull] STEPParser.PindclContext context)
     {
         PinDclNode node = (PinDclNode) NodeFactory.MakeNode(AstNodeType.PinDclNode);
+        node.SourcePosition = GetSourcePosition(context);
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Name = context.ID().GetText();
         idNode.Type = new PinType();
+        idNode.SourcePosition = GetSourcePosition(context.ID());
         if (context.pintype().ANALOGPIN() != null)
         {
             idNode.Type.ActualType = TypeVal.Analogpin;
@@ -128,7 +149,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         NumberNode numNode = (NumberNode) NodeFactory.MakeNode(AstNodeType.NumberNode);
         numNode.Value = Int64.Parse(context.INTLITERAL().GetText(), new CultureInfo("en-US"));
-
+        numNode.SourcePosition = GetSourcePosition(context.INTLITERAL());
         node.Right = numNode;
 
         return node;
@@ -160,13 +181,14 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override VarDclNode VisitNumdcl([NotNull] STEPParser.NumdclContext context)
     {
         VarDclNode node = (VarDclNode) NodeFactory.MakeNode(AstNodeType.VarDclNode);
+        node.SourcePosition = GetSourcePosition(context);
         ExprNode exprChild = (ExprNode) context.children.Select(kiddies => kiddies.Accept(this))
             .First(child => child is ExprNode);
         node.Right = exprChild;
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Type.ActualType = TypeVal.Number;
-
+        idNode.SourcePosition = GetSourcePosition(context.ID());
         idNode.Name = context.ID().GetText();
 
         node.Left = idNode;
@@ -177,13 +199,14 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override VarDclNode VisitStringdcl([NotNull] STEPParser.StringdclContext context)
     {
         VarDclNode node = (VarDclNode) NodeFactory.MakeNode(AstNodeType.VarDclNode);
+        node.SourcePosition = GetSourcePosition(context);
         ExprNode exprChild = (ExprNode) context.children.Select(kiddies => kiddies.Accept(this))
             .First(child => child is ExprNode);
         node.Right = exprChild;
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Type.ActualType = TypeVal.String;
-
+        idNode.SourcePosition = GetSourcePosition(context.ID());
         idNode.Name = context.ID().GetText();
 
         node.Left = idNode;
@@ -195,13 +218,14 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override VarDclNode VisitBooldcl([NotNull] STEPParser.BooldclContext context)
     {
         VarDclNode node = (VarDclNode) NodeFactory.MakeNode(AstNodeType.VarDclNode);
+        node.SourcePosition = GetSourcePosition(context);
         ExprNode exprChild = (ExprNode) context.children.Select(kiddies => kiddies.Accept(this))
             .First(child => child is ExprNode);
         node.Right = exprChild;
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Type.ActualType = TypeVal.Boolean;
-
+        idNode.SourcePosition = GetSourcePosition(context.ID());
         idNode.Name = context.ID().GetText();
 
         node.Left = idNode;
@@ -212,9 +236,11 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override ArrDclNode VisitArrdcl([NotNull] STEPParser.ArrdclContext context)
     {
         ArrDclNode node = (ArrDclNode) NodeFactory.MakeNode(AstNodeType.ArrDclNode);
+        node.SourcePosition = GetSourcePosition(context);
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
+        idNode.SourcePosition = GetSourcePosition(context.ID());
 
         switch (context.type().GetText())
         {
@@ -233,11 +259,8 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         }
 
         idNode.Name = context.ID().GetText();
-
         idNode.Type.IsArray = true;
-
         node.Left = idNode;
-
         node.Size = Int32.Parse(context.arrsizedcl().GetText().Trim('[', ']'));
         
         if (children.Any(child => child is IdNode))
@@ -257,6 +280,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
         NodesList node = (NodesList) NodeFactory.MakeNode(AstNodeType.NodesList);
+        node.SourcePosition = GetSourcePosition(context);
         List<ExprNode> exprChildren = children.OfType<ExprNode>().ToList();
 
         foreach (ExprNode child in exprChildren)
@@ -273,6 +297,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (children.Count == 1)
         {
             IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
+            idNode.SourcePosition = GetSourcePosition(context.ID());
             idNode.Name = context.ID().GetText();
             return idNode;
         }
@@ -297,6 +322,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (context.AND() != null)
         {
             AndNode andNode = (AndNode) NodeFactory.MakeNode(AstNodeType.AndNode);
+            andNode.SourcePosition = GetSourcePosition(context);
             andNode.Left = (ExprNode) children.First(child => child is ExprNode);
             andNode.Right = (ExprNode) children.Last(child => child is ExprNode);
             return andNode;
@@ -304,7 +330,8 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         if (context.OR() != null)
         {
-            OrNode orNode = (OrNode) NodeFactory.MakeNode(AstNodeType.OrNode);
+            OrNode orNode = (OrNode)NodeFactory.MakeNode(AstNodeType.OrNode);
+            orNode.SourcePosition = GetSourcePosition(context);
             orNode.Left = (ExprNode) children.First(child => child is ExprNode);
             orNode.Right = (ExprNode) children.Last(child => child is ExprNode);
             return orNode;
@@ -321,6 +348,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (context.EQ() != null)
         {
             EqNode eqNode = (EqNode) NodeFactory.MakeNode(AstNodeType.EqNode);
+            eqNode.SourcePosition = GetSourcePosition(context);
             eqNode.Left = (ExprNode) children.First(child => child is ExprNode);
             eqNode.Right = (ExprNode) children.Last(child => child is ExprNode);
             return eqNode;
@@ -328,7 +356,8 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         if (context.NEQ() != null)
         {
-            NeqNode neqNode = (NeqNode) NodeFactory.MakeNode(AstNodeType.NeqNode);
+            NeqNode neqNode = (NeqNode)NodeFactory.MakeNode(AstNodeType.NeqNode);
+            neqNode.SourcePosition = GetSourcePosition(context);
             neqNode.Left = (ExprNode) children.First(child => child is ExprNode);
             neqNode.Right = (ExprNode) children.Last(child => child is ExprNode);
             return neqNode;
@@ -347,6 +376,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             if (context.logiccompop().GRTHANEQ() != null)
             {
                 GThanEqNode node = (GThanEqNode) NodeFactory.MakeNode(AstNodeType.GThanEqNode);
+                node.SourcePosition = GetSourcePosition(context);
                 node.Left = (ExprNode) children.First(child => child is ExprNode);
                 node.Right = (ExprNode) children.Last(child => child is ExprNode);
                 return node;
@@ -355,6 +385,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             if (context.logiccompop().GRTHAN() != null)
             {
                 GThanNode node = (GThanNode) NodeFactory.MakeNode(AstNodeType.GThanNode);
+                node.SourcePosition = GetSourcePosition(context);
                 node.Left = (ExprNode) children.First(child => child is ExprNode);
                 node.Right = (ExprNode) children.Last(child => child is ExprNode);
                 return node;
@@ -363,6 +394,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             if (context.logiccompop().LTHANEQ() != null)
             {
                 LThanEqNode node = (LThanEqNode) NodeFactory.MakeNode(AstNodeType.LThanEqNode);
+                node.SourcePosition = GetSourcePosition(context);
                 node.Left = (ExprNode) children.First(child => child is ExprNode);
                 node.Right = (ExprNode) children.Last(child => child is ExprNode);
                 return node;
@@ -371,6 +403,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             if (context.logiccompop().LTHAN() != null)
             {
                 LThanNode node = (LThanNode) NodeFactory.MakeNode(AstNodeType.LThanNode);
+                node.SourcePosition = GetSourcePosition(context);
                 node.Left = (ExprNode) children.First(child => child is ExprNode);
                 node.Right = (ExprNode) children.Last(child => child is ExprNode);
                 return node;
@@ -388,6 +421,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (context.NEG() != null)
         {
             NegNode node = (NegNode) NodeFactory.MakeNode(AstNodeType.NegNode);
+            node.SourcePosition = GetSourcePosition(context);
             node.Left = (ExprNode) children.First(child => child is ExprNode);
             node.Right = null;
             return node;
@@ -404,6 +438,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (context.PLUS() != null)
         {
             PlusNode node = (PlusNode) NodeFactory.MakeNode(AstNodeType.PlusNode);
+            node.SourcePosition = GetSourcePosition(context);
             node.Left = (ExprNode) children.First(child => child is ExprNode);
             node.Right = (ExprNode) children.Last(child => child is ExprNode);
             return node;
@@ -412,6 +447,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (context.MINUS() != null)
         {
             MinusNode node = (MinusNode) NodeFactory.MakeNode(AstNodeType.MinusNode);
+            node.SourcePosition = GetSourcePosition(context);
             node.Left = (ExprNode) children.First(child => child is ExprNode);
             node.Right = (ExprNode) children.Last(child => child is ExprNode);
             return node;
@@ -427,6 +463,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (context.MULT() != null)
         {
             MultNode node = (MultNode) NodeFactory.MakeNode(AstNodeType.MultNode);
+            node.SourcePosition = GetSourcePosition(context);
             node.Left = (ExprNode) children.First(child => child is ExprNode);
             node.Right = (ExprNode) children.Last(child => child is ExprNode);
             return node;
@@ -435,6 +472,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (context.DIVIDE() != null)
         {
             DivNode node = (DivNode) NodeFactory.MakeNode(AstNodeType.DivNode);
+            node.SourcePosition = GetSourcePosition(context);
             node.Left = (ExprNode) children.First(child => child is ExprNode);
             node.Right = (ExprNode) children.Last(child => child is ExprNode);
             return node;
@@ -450,6 +488,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (context.POW() != null)
         {
             PowNode node = (PowNode) NodeFactory.MakeNode(AstNodeType.PowNode);
+            node.SourcePosition = GetSourcePosition(context);
             node.Left = (ExprNode) children.First(child => child is ExprNode);
             node.Right = (ExprNode) children.Last(child => child is ExprNode);
             return node;
@@ -468,15 +507,16 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override ExprNode VisitValue([NotNull] STEPParser.ValueContext context)
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
-        UMinusNode uNode = (UMinusNode) NodeFactory.MakeNode(AstNodeType.UMinusNode);
 
         if (context.ID() != null)
         {
             IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
+            idNode.SourcePosition = GetSourcePosition(context.ID());
             idNode.Name = context.ID().GetText();
             if (context.arrindex() != null)
             {
                 ArrayAccessNode node = (ArrayAccessNode) NodeFactory.MakeNode(AstNodeType.ArrayAccessNode);
+                node.SourcePosition = GetSourcePosition(context);
                 node.Array = idNode;
                 node.Index = (ExprNode) children.Last(child => child is ExprNode);
                 return UMinusCheck(context, node);
@@ -488,6 +528,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (context.logicexpr() != null)
         {
             ParenNode node = (ParenNode) NodeFactory.MakeNode(AstNodeType.ParenNode);
+            node.SourcePosition = GetSourcePosition(context);
             node.Left = (ExprNode) children.First(child => child is ExprNode);
             return UMinusCheck(context, node);
         }
@@ -498,9 +539,10 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     // Helper function
     private ExprNode UMinusCheck([NotNull] STEPParser.ValueContext context, ExprNode node)
     {
-        UMinusNode uNode = (UMinusNode) NodeFactory.MakeNode(AstNodeType.UMinusNode);
         if (context.MINUS() != null)
         {
+            UMinusNode uNode = (UMinusNode)NodeFactory.MakeNode(AstNodeType.UMinusNode);
+            uNode.SourcePosition = GetSourcePosition(context);
             uNode.Left = node;
             return uNode;
         }
@@ -516,6 +558,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         {
             NumberNode numNode = (NumberNode) NodeFactory.MakeNode(AstNodeType.NumberNode);
             numNode.Value = Double.Parse(context.NUMLITERAL().GetText(), new CultureInfo("en-US"));
+            numNode.SourcePosition = GetSourcePosition(context.NUMLITERAL());
 
             return numNode;
         }
@@ -524,6 +567,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             // TODO: Should this be a special IntNode/PinNode?
             NumberNode numNode = (NumberNode) NodeFactory.MakeNode(AstNodeType.NumberNode);
             numNode.Value = int.Parse(context.INTLITERAL().GetText(), new CultureInfo("en-US"));
+            numNode.SourcePosition = GetSourcePosition(context.INTLITERAL());
 
             return numNode;
         }
@@ -531,12 +575,16 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         {
             StringNode node = (StringNode) NodeFactory.MakeNode(AstNodeType.StringNode);
             node.Value = context.STRLITERAL().GetText();
+            node.SourcePosition = GetSourcePosition(context.STRLITERAL());
+
             return node;
         }
         else // boolean literal is not null
         {
             BoolNode node = (BoolNode) NodeFactory.MakeNode(AstNodeType.BoolNode);
             node.Value = context.BOOLLITERAL().GetText().ToLower() == "true";
+            node.SourcePosition = GetSourcePosition(context.BOOLLITERAL());
+
             return node;
         }
     }
@@ -546,6 +594,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Name = context.ID().GetText();
+        idNode.SourcePosition = GetSourcePosition(context.ID());
 
         List<ExprNode> parameters = new();
 
@@ -557,17 +606,17 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             FuncExprNode exprNode = (FuncExprNode) NodeFactory.MakeNode(AstNodeType.FuncExprNode);
             exprNode.Id = idNode;
             exprNode.Params = parameters;
+            exprNode.SourcePosition = GetSourcePosition(context);
             return exprNode;
         }
-
-        if (context.Parent is STEPParser.StmtsContext or STEPParser.Loop_stmtsContext)
+        else if (context.Parent is STEPParser.StmtsContext or STEPParser.Loop_stmtsContext)
         {
             FuncStmtNode stmtNode = (FuncStmtNode) NodeFactory.MakeNode(AstNodeType.FuncStmtNode);
             stmtNode.Id = idNode;
             stmtNode.Params = parameters;
+            stmtNode.SourcePosition = GetSourcePosition(context);
             return stmtNode;
         }
-
         else
         {
             throw new InvalidOperationException("Funccall nodes should be a child of either Value or Stmt nodes.");
@@ -578,9 +627,11 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
         AssNode node = (AssNode) NodeFactory.MakeNode(AstNodeType.AssNode);
+        node.SourcePosition = GetSourcePosition(context);
 
         IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.Name = context.ID().GetText();
+        idNode.SourcePosition = GetSourcePosition(context.ID());
 
         node.Id = idNode;
         if (context.arrindex() != null)
@@ -627,7 +678,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
         WhileNode node = (WhileNode) NodeFactory.MakeNode(AstNodeType.WhileNode);
-
+        node.SourcePosition = GetSourcePosition(context);
         node.Condition = (ExprNode) children.First(child => child is ExprNode);
         node.Body = children.OfType<StmtNode>().ToList();
 
@@ -638,6 +689,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     {
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
         ForNode node = (ForNode) NodeFactory.MakeNode(AstNodeType.ForNode);
+        node.SourcePosition = GetSourcePosition(context);
 
         node.Initializer = children.First(child => child != null);
         children.Remove(node.Initializer);
@@ -660,11 +712,12 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         if (context.ID() != null)
         {
             IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
+            idNode.SourcePosition = GetSourcePosition(context.ID());
             idNode.Name = context.ID().GetText();
             if (children.Any(child => child is ExprNode))
             {
                 ArrayAccessNode node = (ArrayAccessNode) NodeFactory.MakeNode(AstNodeType.ArrayAccessNode);
-
+                node.SourcePosition = GetSourcePosition(context);
                 node.Array = idNode;
                 node.Index = (ExprNode) children.First(child => child is ExprNode);
                 return node;
@@ -685,6 +738,8 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override IfNode VisitIfstmt([NotNull] STEPParser.IfstmtContext context)
     {
         IfNode node = (IfNode) NodeFactory.MakeNode(AstNodeType.IfNode);
+        node.SourcePosition = GetSourcePosition(context);
+
         // Get condition
         node.Condition = (ExprNode) context.logicexpr().Accept(this);
 
@@ -722,6 +777,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override ElseIfNode VisitElseifstmt([NotNull] STEPParser.ElseifstmtContext context)
     {
         var node = (ElseIfNode) NodeFactory.MakeNode(AstNodeType.ElseIfNode);
+        node.SourcePosition = GetSourcePosition(context);
         node.Condition = (ExprNode) context.logicexpr().Accept(this);
         node.Body = new List<StmtNode>();
         foreach (var stmt in context.stmt())
@@ -738,6 +794,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override IfNode VisitLoopifstmt([NotNull] STEPParser.LoopifstmtContext context)
     {
         IfNode node = (IfNode) NodeFactory.MakeNode(AstNodeType.IfNode);
+        node.SourcePosition = GetSourcePosition(context);
         // Get condition
         node.Condition = (ExprNode) context.logicexpr().Accept(this);
 
@@ -746,11 +803,15 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         {
             if (stmt.BREAK() != null)
             {
-                node.ThenClause.Add((BreakNode) NodeFactory.MakeNode(AstNodeType.BreakNode));
+                var breakNode = (BreakNode)NodeFactory.MakeNode(AstNodeType.BreakNode);
+                breakNode.SourcePosition = GetSourcePosition(stmt.BREAK());
+                node.ThenClause.Add(breakNode);
             }
             else if (stmt.CONTINUE() != null)
             {
-                node.ThenClause.Add((ContNode) NodeFactory.MakeNode(AstNodeType.ContNode));
+                var contNode = (ContNode)NodeFactory.MakeNode(AstNodeType.ContNode);
+                contNode.SourcePosition = GetSourcePosition(stmt.CONTINUE());
+                node.ThenClause.Add(contNode);
             }
             else if (stmt.Accept(this) is StmtNode stmtNode)
             {
@@ -774,11 +835,15 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             {
                 if (stmt.BREAK() != null)
                 {
-                    node.ElseClause.Add((BreakNode) NodeFactory.MakeNode(AstNodeType.BreakNode));
+                    var breakNode = (BreakNode)NodeFactory.MakeNode(AstNodeType.BreakNode);
+                    breakNode.SourcePosition = GetSourcePosition(stmt.BREAK());
+                    node.ThenClause.Add(breakNode);
                 }
                 else if (stmt.CONTINUE() != null)
                 {
-                    node.ElseClause.Add((ContNode) NodeFactory.MakeNode(AstNodeType.ContNode));
+                    var contNode = (ContNode)NodeFactory.MakeNode(AstNodeType.ContNode);
+                    contNode.SourcePosition = GetSourcePosition(stmt.CONTINUE());
+                    node.ThenClause.Add(contNode);
                 }
                 else if (stmt.Accept(this) is StmtNode stmtNode)
                 {
@@ -793,6 +858,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     public override ElseIfNode VisitLoopelseifstmt([NotNull] STEPParser.LoopelseifstmtContext context)
     {
         var node = (ElseIfNode) NodeFactory.MakeNode(AstNodeType.ElseIfNode);
+        node.SourcePosition = GetSourcePosition(context);
         node.Condition = (ExprNode) context.logicexpr().Accept(this);
         node.Body = new List<StmtNode>();
 
@@ -800,11 +866,15 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         {
             if (stmt.BREAK() != null)
             {
-                node.Body.Add((BreakNode) NodeFactory.MakeNode(AstNodeType.BreakNode));
+                var breakNode = (BreakNode)NodeFactory.MakeNode(AstNodeType.BreakNode);
+                breakNode.SourcePosition = GetSourcePosition(stmt.BREAK());
+                node.Body.Add(breakNode);
             }
             else if (stmt.CONTINUE() != null)
             {
-                node.Body.Add((ContNode) NodeFactory.MakeNode(AstNodeType.ContNode));
+                var contNode = (ContNode)NodeFactory.MakeNode(AstNodeType.ContNode);
+                contNode.SourcePosition = GetSourcePosition(stmt.CONTINUE());
+                node.Body.Add(contNode);
             }
             else if (stmt.Accept(this) is StmtNode stmtNode)
             {
@@ -821,12 +891,15 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         if (context.BREAK() != null)
         {
-            return (BreakNode) NodeFactory.MakeNode(AstNodeType.BreakNode);
+            var breakNode = (BreakNode)NodeFactory.MakeNode(AstNodeType.BreakNode);
+            breakNode.SourcePosition = GetSourcePosition(context.BREAK());
+            return breakNode;
         }
-
-        if (context.CONTINUE() != null)
+        else if (context.CONTINUE() != null)
         {
-            return (ContNode) NodeFactory.MakeNode(AstNodeType.ContNode);
+            var contNode = (ContNode)NodeFactory.MakeNode(AstNodeType.ContNode);
+            contNode.SourcePosition = GetSourcePosition(context.CONTINUE());
+            return contNode;
         }
 
         if (children.Any(child => child is StmtNode))
@@ -852,6 +925,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         STEPParser.FuncdclContext funcParent = (STEPParser.FuncdclContext) parent;
 
         RetNode node = (RetNode) NodeFactory.MakeNode(AstNodeType.RetNode);
+        node.SourcePosition = GetSourcePosition(context);
         if (funcParent.BLANK() == null)
         {
             node.RetVal = (ExprNode) children.First(child => child is ExprNode);
@@ -875,8 +949,10 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         List<AstNode> children = context.children.Select(kiddies => kiddies.Accept(this)).ToList();
 
         FuncDefNode node = (FuncDefNode) NodeFactory.MakeNode(AstNodeType.FuncDefNode);
+        node.SourcePosition = GetSourcePosition(context);
 
-        IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
+        IdNode idNode = (IdNode)NodeFactory.MakeNode(AstNodeType.IdNode);
+        idNode.SourcePosition = GetSourcePosition(context.ID());
         idNode.Name = context.ID().GetText();
         node.Id = idNode;
 
@@ -925,6 +1001,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         IdNode node = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         node.Name = context.ID().GetText();
+        node.SourcePosition = GetSourcePosition(context.ID());
 
         string type = context.paramstype().GetText().ToLower();
         node.Type.ActualType = type == "number" ? TypeVal.Number :
@@ -952,6 +1029,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     {
         IdNode node = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         node.Name = context.ID().GetText();
+        node.SourcePosition = GetSourcePosition(context.ID());
 
         string type = context.paramstype().GetText().ToLower();
         node.Type.ActualType = type == "number" ? TypeVal.Number :

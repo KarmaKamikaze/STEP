@@ -186,7 +186,7 @@ public class TypeCheckerTests {
         var test = () => uMinusNode.Accept(_typeVisitor);
         
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
 
     [Fact]
@@ -200,7 +200,7 @@ public class TypeCheckerTests {
         var test = () => _typeVisitor.Visit(negNode);
          
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Fact]
@@ -237,7 +237,7 @@ public class TypeCheckerTests {
         var test = () => _typeVisitor.Visit(multNode);
          
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
 
     [Fact]
@@ -279,7 +279,7 @@ public class TypeCheckerTests {
         var test = () => _typeVisitor.Visit(divNode);
          
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
 
     [Fact]
@@ -321,7 +321,7 @@ public class TypeCheckerTests {
         var test = () => _typeVisitor.Visit(powNode);
          
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
 
     [Fact]
@@ -363,7 +363,7 @@ public class TypeCheckerTests {
         var test = () => _typeVisitor.Visit(minusNode);
          
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
 
     [Fact]
@@ -439,7 +439,7 @@ public class TypeCheckerTests {
         var test = () => _typeVisitor.Visit(plusNode);
          
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     //TODO: Function call expression
@@ -483,7 +483,7 @@ public class TypeCheckerTests {
         var test = () => _typeVisitor.Visit(andNode);
          
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Fact]
@@ -525,7 +525,7 @@ public class TypeCheckerTests {
         var test = () => _typeVisitor.Visit(orNode);
          
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Theory]
@@ -566,7 +566,7 @@ public class TypeCheckerTests {
         var test = () => _typeVisitor.Visit(eqNode);
          
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Theory]
@@ -607,7 +607,7 @@ public class TypeCheckerTests {
         var test = () => _typeVisitor.Visit(neqNode);
          
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Theory]
@@ -626,7 +626,7 @@ public class TypeCheckerTests {
         // Act
         var test = () => gThanNode.Accept(_typeVisitor);
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Fact]
@@ -662,7 +662,7 @@ public class TypeCheckerTests {
         // Act
         var test = () => gThanEqNode.Accept(_typeVisitor);
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Fact]
@@ -700,7 +700,7 @@ public class TypeCheckerTests {
         var test = () => lThanNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Fact]
@@ -740,7 +740,7 @@ public class TypeCheckerTests {
         var test = () => lThanEqNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Fact]
@@ -805,7 +805,7 @@ public class TypeCheckerTests {
         var test = () => arrAccNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
 
     [Theory]
@@ -881,7 +881,7 @@ public class TypeCheckerTests {
         var test = () => funcExprNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
 
     [Fact]
@@ -898,7 +898,7 @@ public class TypeCheckerTests {
         var action = () => funcExprNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<TypeException>(action);
+        Assert.Throws<SymbolNotDeclaredException>(action);
     }
     
     [Fact]
@@ -968,7 +968,7 @@ public class TypeCheckerTests {
         var test = () => funcExprNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Theory]
@@ -1011,7 +1011,7 @@ public class TypeCheckerTests {
         var test = () => arrLiteralNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     #endregion
     
@@ -1063,7 +1063,7 @@ public class TypeCheckerTests {
         var test = () => varDclNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Theory]
@@ -1088,7 +1088,7 @@ public class TypeCheckerTests {
         var test = () => varDclNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
 
     [Fact]
@@ -1131,7 +1131,7 @@ public class TypeCheckerTests {
         var test = () => arrDclNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Theory]
@@ -1154,7 +1154,7 @@ public class TypeCheckerTests {
         var test = () => arrDclNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
 
     [Fact]
@@ -1265,7 +1265,7 @@ public class TypeCheckerTests {
     [Theory]
     [InlineData(TypeVal.Analogpin)]
     [InlineData(TypeVal.Digitalpin)]
-    public void PinDclNode_PinAlreadyDeclared_ThrowsDuplicateDeclarationException(TypeVal type) { 
+    public void PinDclNode_PinAlreadyDeclared_ThrowsDuplicatePinDeclarationException(TypeVal type) { 
     // Arrange
     var pinDclNode1 = new PinDclNode() {
         Left = new IdNode() {Name = "a", Type = new Type() {ActualType = type}},
@@ -1286,7 +1286,7 @@ public class TypeCheckerTests {
     var test = () => varsNode.Accept(_typeVisitor);
 
     // Assert
-    Assert.Throws<DuplicateDeclarationException>(test);
+    Assert.Throws<DuplicatePinDeclarationException>(test);
     }
     
     [Theory]
@@ -1371,7 +1371,7 @@ public class TypeCheckerTests {
         var test = () => assNode.Accept(_typeVisitor);
         
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Theory]
@@ -1393,7 +1393,7 @@ public class TypeCheckerTests {
         var test = () => ifNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Fact]
@@ -1413,7 +1413,7 @@ public class TypeCheckerTests {
         try {
             ifNode.Accept(_typeVisitor);
         }
-        catch (TypeException e) {
+        catch (TypeMismatchException e) {
             Assert.True(false, $"Did not expect exception, but received {e.Message}");
         }
     }
@@ -1436,7 +1436,7 @@ public class TypeCheckerTests {
         var test = () => whileNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Fact]
@@ -1455,7 +1455,7 @@ public class TypeCheckerTests {
         try {
             whileNode.Accept(_typeVisitor);
         }
-        catch (TypeException e) {
+        catch (TypeMismatchException e) {
             Assert.True(false, $"Did not expect exception, but received {e.Message}");
         }
     }
@@ -1485,7 +1485,7 @@ public class TypeCheckerTests {
         var test = () => forNode.Accept(_typeVisitor);
         
         //Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Fact]
@@ -1506,7 +1506,7 @@ public class TypeCheckerTests {
         try {
             forNode.Accept(_typeVisitor);
         }
-        catch (TypeException e) {
+        catch (TypeMismatchException e) {
             Assert.True(false, $"Did not expect exception, but received {e.Message}");
         }
     }
@@ -1557,7 +1557,7 @@ public class TypeCheckerTests {
         var test = () => assNode.Accept(_typeVisitor);
 
         //Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
 
     [Theory]
@@ -1577,7 +1577,7 @@ public class TypeCheckerTests {
         var test = () => assNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
 
     [Theory]
@@ -1619,7 +1619,7 @@ public class TypeCheckerTests {
         var test = () => retNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
 
     [Fact]
@@ -1704,7 +1704,7 @@ public class TypeCheckerTests {
         var test = () => funcExprNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<TypeMismatchException>(test);
     }
     
     [Fact]
@@ -1721,7 +1721,7 @@ public class TypeCheckerTests {
         var test = () => funcExprNode.Accept(_typeVisitor);
 
         // Assert
-        Assert.Throws<TypeException>(test);
+        Assert.Throws<SymbolNotDeclaredException>(test);
     }
 
     #endregion Statements
