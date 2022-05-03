@@ -461,14 +461,16 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend("; ");
         //Generate Limit Condition
         node.Accept(this);
-        EmitAppend(" <= ");
+        EmitAppend(n.IsUpTo ? " <= " : " >= ");
         n.Limit.Accept(this);
         EmitAppend("; ");
         //Generate part of the Update Condition
         node.Accept(this);
         EmitAppend(" = ");
         node.Accept(this);
-        EmitAppend(" + ");
+        if (n.Update is not UMinusNode) {
+            EmitAppend("+");
+        }
     }
 
     private void ForNodeHelperAssNode(AssNode node, ForNode n)
@@ -683,6 +685,7 @@ public class CodeGenerationVisitor : IVisitor
         n.VarsBlock?.Accept(this);
         n.FuncsBlock?.Accept(this);
         EmitLine("void setup() {");
+        EmitIndentation();
         EmitLine("Serial.begin(9600);");
         // Add declared pinModes from variables scope
         if (_pinSetup.ToString() != String.Empty)

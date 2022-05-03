@@ -696,6 +696,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         node.Limit = (ExprNode) children.First(child => child is ExprNode);
         children.Remove(node.Limit);
+        node.IsUpTo = context.UPTO() != null;
 
         node.Update = (ExprNode) children.First(child => child is ExprNode);
         children.Remove(node.Update);
