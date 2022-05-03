@@ -14,7 +14,7 @@ public class Type : IEquatable<Type>
     public bool Equals(Type other)
     {
         return Equals(ActualType, other.ActualType)
-            && Equals(IsArray, other.IsArray);
+               && Equals(IsArray, other.IsArray);
     }
 
     public static bool operator ==(Type a, Type b) => a.Equals(b);

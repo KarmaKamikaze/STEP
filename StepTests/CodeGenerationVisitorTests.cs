@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using STEP;
-
 using STEP.AST.Nodes;
 using Xunit;
 
@@ -17,6 +16,7 @@ public class CodeGenerationVisitorTests
     private readonly CodeGenerationVisitor _visitor = new();
 
     #region FuncDefNode
+
     [Fact]
     public void FuncDefNode_WithMultipleParameters_OutputsCorrectCode()
     {
@@ -26,7 +26,7 @@ public class CodeGenerationVisitorTests
          * double x(double a, double b) {
          * }
          */
-        
+
         // Arrange
         const string expected = "double x(double a, double b) {\r\n}\r\n\r\n";
         var param1 = new IdNode {Name = "a", Type = new STEP.Type {ActualType = TypeVal.Number}};
@@ -34,12 +34,12 @@ public class CodeGenerationVisitorTests
         var funcId = new IdNode {Name = "x", Type = new STEP.Type {ActualType = TypeVal.Number}};
         var funcDcl = new FuncDefNode
         {
-            Id = funcId, 
-            Stmts = new List<StmtNode>(), 
+            Id = funcId,
+            Stmts = new List<StmtNode>(),
             FormalParams = new List<IdNode> {param1, param2},
             ReturnType = new STEP.Type {ActualType = TypeVal.Number}
         };
-        
+
         // Act
         _visitor.Visit(funcDcl);
         string actual = _visitor.OutputToString();
@@ -47,7 +47,7 @@ public class CodeGenerationVisitorTests
         // Assert
         Assert.Equal(expected, actual);
     }
-    
+
     [Fact]
     public void FuncDefNode_NoParameters_OutputsCorrectCode()
     {
@@ -57,14 +57,14 @@ public class CodeGenerationVisitorTests
          * double x() {
          * }
          */
-        
+
         // Arrange
         const string expected = "double x() {\r\n}\r\n\r\n";
         var funcId = new IdNode {Name = "x", Type = new STEP.Type {ActualType = TypeVal.Number}};
         var funcDcl = new FuncDefNode
         {
-            Id = funcId, 
-            Stmts = new List<StmtNode>(), 
+            Id = funcId,
+            Stmts = new List<StmtNode>(),
             FormalParams = new List<IdNode>(),
             ReturnType = new STEP.Type {ActualType = TypeVal.Number}
         };
@@ -76,8 +76,9 @@ public class CodeGenerationVisitorTests
         // Assert
         Assert.Equal(expected, actual);
     }
+
     #endregion
-    
+
     #region String concatenation
 
     [Fact]
@@ -102,7 +103,8 @@ public class CodeGenerationVisitorTests
             Right = multExpr,
             Type = new STEP.Type() {ActualType = TypeVal.Number}
         };
-        var str = new StringNode() {Value = "\"This is a string\"", Type = new STEP.Type() {ActualType = TypeVal.String}};
+        var str = new StringNode()
+            {Value = "\"This is a string\"", Type = new STEP.Type() {ActualType = TypeVal.String}};
         var concatExpr = new PlusNode()
         {
             Left = str,
@@ -114,7 +116,7 @@ public class CodeGenerationVisitorTests
         {
             Left = id,
             Right = concatExpr,
-            Type = new STEP.Type() { ActualType = TypeVal.String, IsConstant = false}
+            Type = new STEP.Type() {ActualType = TypeVal.String, IsConstant = false}
         };
         // Act
         _visitor.Visit(varDcl);
@@ -147,7 +149,7 @@ public class CodeGenerationVisitorTests
             Right = funk,
             Type = new STEP.Type {ActualType = TypeVal.String}
         };
-        var id = new IdNode {Name = "x", Type = new STEP.Type(){ActualType = TypeVal.String}};
+        var id = new IdNode {Name = "x", Type = new STEP.Type() {ActualType = TypeVal.String}};
         var varDcl = new VarDclNode
         {
             Left = id,
@@ -193,7 +195,7 @@ public class CodeGenerationVisitorTests
             Right = bar,
             Type = new STEP.Type {ActualType = TypeVal.String}
         };
-        var id = new IdNode {Name = "x", Type = new STEP.Type(){ActualType = TypeVal.String}};
+        var id = new IdNode {Name = "x", Type = new STEP.Type() {ActualType = TypeVal.String}};
         var varDcl = new VarDclNode
         {
             Left = id,
@@ -234,7 +236,7 @@ public class CodeGenerationVisitorTests
             Right = month,
             Type = new STEP.Type {ActualType = TypeVal.String}
         };
-        var id = new IdNode {Name = "x", Type = new STEP.Type(){ActualType = TypeVal.String}};
+        var id = new IdNode {Name = "x", Type = new STEP.Type() {ActualType = TypeVal.String}};
         var varDcl = new VarDclNode
         {
             Left = id,
@@ -253,8 +255,8 @@ public class CodeGenerationVisitorTests
     #endregion
 
 
- 
     #region IfNode, ElseIfNode
+
     [Fact]
     public void IfNode_OnlyThenClause_OutputsOnlyThenClause()
     {
@@ -264,7 +266,7 @@ public class CodeGenerationVisitorTests
          * if(true) {
          * }
          */
-        
+
         // Arrange
         const string expected = "if(true) {\r\n}\r\n";
         var condition = new BoolNode {Value = true, Type = new STEP.Type {ActualType = TypeVal.Boolean}};
@@ -277,9 +279,8 @@ public class CodeGenerationVisitorTests
         // Assert
         Assert.Equal(expected, actual);
     }
-    
-    
-      
+
+
     [Fact]
     public void IfNode_ThenAndElseClause_OutputsBothClauses()
     {
@@ -296,7 +297,7 @@ public class CodeGenerationVisitorTests
          *   return b;
          * }
          */
-        
+
         // Arrange
         const string expected = "if(true) {\r\n    return a;\r\n}\r\nelse {\r\n    return b;\r\n}\r\n";
         var condition = new BoolNode {Value = true, Type = new STEP.Type {ActualType = TypeVal.Boolean}};
@@ -306,7 +307,7 @@ public class CodeGenerationVisitorTests
         var retStmt2 = new RetNode {RetVal = b};
         var ifStmt = new IfNode
         {
-            Condition = condition, 
+            Condition = condition,
             ThenClause = new List<StmtNode> {retStmt1},
             ElseClause = new List<StmtNode> {retStmt2}
         };
@@ -318,7 +319,7 @@ public class CodeGenerationVisitorTests
         // Assert
         Assert.Equal(expected, actual);
     }
-    
+
     [Fact]
     public void IfNode_ThenAndTwoElseIfClauses_OutputsAllThreeClauses()
     {
@@ -340,9 +341,10 @@ public class CodeGenerationVisitorTests
          *   return z;
          * }
          */
-        
+
         // Arrange
-        const string expected = "if(x) {\r\n    return x;\r\n}\r\nelse if(y) {\r\n    return y;\r\n}\r\nelse if(z) {\r\n    return z;\r\n}\r\n";
+        const string expected =
+            "if(x) {\r\n    return x;\r\n}\r\nelse if(y) {\r\n    return y;\r\n}\r\nelse if(z) {\r\n    return z;\r\n}\r\n";
         var x = new IdNode {Name = "x"};
         var retx = new RetNode {RetVal = x};
         var y = new IdNode {Name = "y"};
@@ -353,7 +355,7 @@ public class CodeGenerationVisitorTests
         var elseIf2 = new ElseIfNode {Condition = z, Body = new List<StmtNode> {retz}};
         var ifStmt = new IfNode
         {
-            Condition = x, 
+            Condition = x,
             ThenClause = new List<StmtNode> {retx},
             ElseIfClauses = new List<ElseIfNode> {elseIf1, elseIf2}
         };
@@ -365,7 +367,7 @@ public class CodeGenerationVisitorTests
         // Assert
         Assert.Equal(expected, actual);
     }
-    
+
     [Fact]
     public void IfNode_HasAllClauses_OutputsAllClauses()
     {
@@ -392,9 +394,10 @@ public class CodeGenerationVisitorTests
          *   return q;
          * }
          */
-        
+
         // Arrange
-        const string expected = "if(x) {\r\n    return x;\r\n}\r\nelse if(y) {\r\n    return y;\r\n}\r\nelse if(z) {\r\n    return z;\r\n}\r\nelse {\r\n    return q;\r\n}\r\n";
+        const string expected =
+            "if(x) {\r\n    return x;\r\n}\r\nelse if(y) {\r\n    return y;\r\n}\r\nelse if(z) {\r\n    return z;\r\n}\r\nelse {\r\n    return q;\r\n}\r\n";
         var x = new IdNode {Name = "x"};
         var retx = new RetNode {RetVal = x};
         var y = new IdNode {Name = "y"};
@@ -407,7 +410,7 @@ public class CodeGenerationVisitorTests
         var retq = new RetNode {RetVal = q};
         var ifStmt = new IfNode
         {
-            Condition = x, 
+            Condition = x,
             ThenClause = new List<StmtNode> {retx},
             ElseIfClauses = new List<ElseIfNode> {elseIf1, elseIf2},
             ElseClause = new List<StmtNode> {retq}
@@ -420,8 +423,8 @@ public class CodeGenerationVisitorTests
         // Assert
         Assert.Equal(expected, actual);
     }
-    
-  [Fact]
+
+    [Fact]
     public void IfNode_EmptyElseIfClause_ShouldNotGenerateCode()
     {
         // This is kind of an optimization - if a clause is empty, there is no point in generating code for it.
@@ -434,7 +437,7 @@ public class CodeGenerationVisitorTests
          *   return x;
          * }
          */
-        
+
         // Arrange
         const string expected = "if(x) {\r\n    return x;\r\n}\r\n";
         var x = new IdNode {Name = "x"};
@@ -443,7 +446,7 @@ public class CodeGenerationVisitorTests
         var elseIf1 = new ElseIfNode {Condition = y, Body = new List<StmtNode>()};
         var ifStmt = new IfNode
         {
-            Condition = x, 
+            Condition = x,
             ThenClause = new List<StmtNode> {retx},
             ElseIfClauses = new List<ElseIfNode> {elseIf1},
         };
@@ -455,9 +458,9 @@ public class CodeGenerationVisitorTests
         // Assert
         Assert.Equal(expected, actual);
     }
-  
+
     #endregion
-    
+
     #region ForNode
 
     [Fact]
@@ -465,41 +468,42 @@ public class CodeGenerationVisitorTests
     {
         //Arrange
         const string expected = "for(double i = 0; i <= 10; i = i + 1) {\r\n}\r\n";
-        IdNode idNode = new IdNode() { Name = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
-        NumberNode exprNode = new NumberNode() { Value = 0, Type = new STEP.Type() { ActualType = TypeVal.Number }};
-        VarDclNode varInit = new VarDclNode() { Left = idNode, Right = exprNode, Type = new STEP.Type() { ActualType = TypeVal.Number}};
-        
-        NumberNode limitNode = new NumberNode() { Value = 10, Type = new STEP.Type() { ActualType = TypeVal.Number }};
-        NumberNode updateNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        IdNode idNode = new IdNode() {Name = "i", Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        NumberNode exprNode = new NumberNode() {Value = 0, Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        VarDclNode varInit = new VarDclNode()
+            {Left = idNode, Right = exprNode, Type = new STEP.Type() {ActualType = TypeVal.Number}};
 
-        ForNode forNode = new ForNode() { Initializer = varInit, Limit = limitNode, Update = updateNode};
-        
+        NumberNode limitNode = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        NumberNode updateNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
+
+        ForNode forNode = new ForNode() {Initializer = varInit, Limit = limitNode, Update = updateNode};
+
         //Act
         _visitor.Visit(forNode);
         string actual = _visitor.OutputToString();
-        
+
         //Assert
         Assert.Equal(expected, actual);
     }
 
-  [Fact]
+    [Fact]
     public void ForNodeIdAssNodeInitializerIsCreatedCorrectly()
     {
         //Arrange
         const string expected = "for(i = 0; i <= 10; i = i + 1) {\r\n}\r\n";
-        IdNode idNode = new IdNode() { Name = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
-        NumberNode exprNode = new NumberNode() { Value = 0, Type = new STEP.Type() { ActualType = TypeVal.Number }};
-        AssNode assInit = new AssNode() { Id = idNode, Expr = exprNode };
-        
-        NumberNode limitNode = new NumberNode() { Value = 10, Type = new STEP.Type() { ActualType = TypeVal.Number }};
-        NumberNode updateNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        IdNode idNode = new IdNode() {Name = "i", Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        NumberNode exprNode = new NumberNode() {Value = 0, Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        AssNode assInit = new AssNode() {Id = idNode, Expr = exprNode};
 
-        ForNode forNode = new ForNode() { Initializer = assInit, Limit = limitNode, Update = updateNode};
-        
+        NumberNode limitNode = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        NumberNode updateNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
+
+        ForNode forNode = new ForNode() {Initializer = assInit, Limit = limitNode, Update = updateNode};
+
         //Act
         _visitor.Visit(forNode);
         string actual = _visitor.OutputToString();
-        
+
         //Assert
         Assert.Equal(expected, actual);
     }
@@ -509,21 +513,21 @@ public class CodeGenerationVisitorTests
     {
         //Arrange
         const string expected = "for(i[(int) 1] = 0; i[(int) 1] <= 10; i[(int) 1] = i[(int) 1] + 1) {\r\n}\r\n";
-        IdNode idNode = new IdNode() { Name = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
-        NumberNode exprNode = new NumberNode() { Value = 0, Type = new STEP.Type() { ActualType = TypeVal.Number }};
-        NumberNode indexNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        IdNode idNode = new IdNode() {Name = "i", Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        NumberNode exprNode = new NumberNode() {Value = 0, Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        NumberNode indexNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
 
-        AssNode assInit = new AssNode() { Id = idNode, Expr = exprNode, ArrIndex = indexNode};
-        
-        NumberNode limitNode = new NumberNode() { Value = 10, Type = new STEP.Type() { ActualType = TypeVal.Number }};
-        NumberNode updateNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        AssNode assInit = new AssNode() {Id = idNode, Expr = exprNode, ArrIndex = indexNode};
 
-        ForNode forNode = new ForNode() { Initializer = assInit, Limit = limitNode, Update = updateNode};
-        
+        NumberNode limitNode = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        NumberNode updateNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
+
+        ForNode forNode = new ForNode() {Initializer = assInit, Limit = limitNode, Update = updateNode};
+
         //Act
         _visitor.Visit(forNode);
         string actual = _visitor.OutputToString();
-        
+
         //Assert
         Assert.Equal(expected, actual);
     }
@@ -533,60 +537,63 @@ public class CodeGenerationVisitorTests
     {
         //Arrange
         const string expected = "for(i; i <= 10; i = i + 1) {\r\n}\r\n";
-        IdNode idNode = new IdNode() { Name = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
-        NumberNode limitNode = new NumberNode() { Value = 10, Type = new STEP.Type() { ActualType = TypeVal.Number }};
-        NumberNode updateNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        IdNode idNode = new IdNode() {Name = "i", Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        NumberNode limitNode = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        NumberNode updateNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
 
-        ForNode forNode = new ForNode() { Initializer = idNode, Limit = limitNode, Update = updateNode};
-        
+        ForNode forNode = new ForNode() {Initializer = idNode, Limit = limitNode, Update = updateNode};
+
         //Act
         _visitor.Visit(forNode);
         string actual = _visitor.OutputToString();
-        
+
         //Assert
         Assert.Equal(expected, actual);
     }
-  
+
     [Fact]
     public void ForNodeArrAccInitializerIsCreatedCorrectly()
     {
         //Arrange
         const string expected = "for(i[(int) 1]; i[(int) 1] <= 10; i[(int) 1] = i[(int) 1] + 1) {\r\n}\r\n";
-        IdNode idNode = new IdNode() { Name = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
-        NumberNode indexNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        IdNode idNode = new IdNode() {Name = "i", Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        NumberNode indexNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
 
-        ArrayAccessNode arraccInit = new ArrayAccessNode() { Array = idNode, Index = indexNode};
-        
-        NumberNode limitNode = new NumberNode() { Value = 10, Type = new STEP.Type() { ActualType = TypeVal.Number }};
-        NumberNode updateNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        ArrayAccessNode arraccInit = new ArrayAccessNode() {Array = idNode, Index = indexNode};
 
-        ForNode forNode = new ForNode() { Initializer = arraccInit, Limit = limitNode, Update = updateNode};
-        
+        NumberNode limitNode = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        NumberNode updateNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
+
+        ForNode forNode = new ForNode() {Initializer = arraccInit, Limit = limitNode, Update = updateNode};
+
         //Act
         _visitor.Visit(forNode);
         string actual = _visitor.OutputToString();
-        
+
         //Assert
         Assert.Equal(expected, actual);
     }
-  
+
     [Fact]
     public void ForNodeBodyIsCreatedCorrectly()
     {
         //Arrange
         const string expected = "for(i; i <= 10; i = i + 1) {\r\n    break;\r\n}\r\n";
-        IdNode idNode = new IdNode() { Name = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
-        NumberNode limitNode = new NumberNode() { Value = 10, Type = new STEP.Type() { ActualType = TypeVal.Number }};
-        NumberNode updateNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
+        IdNode idNode = new IdNode() {Name = "i", Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        NumberNode limitNode = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
+        NumberNode updateNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
         BreakNode breakNode = new BreakNode();
-        
-        ForNode forNode = new ForNode() { Initializer = idNode, Limit = limitNode, Update = updateNode,
-            Body = new List<StmtNode>(){ breakNode }};
-        
+
+        ForNode forNode = new ForNode()
+        {
+            Initializer = idNode, Limit = limitNode, Update = updateNode,
+            Body = new List<StmtNode>() {breakNode}
+        };
+
         //Act
         _visitor.Visit(forNode);
         string actual = _visitor.OutputToString();
-        
+
         //Assert
         Assert.Equal(expected, actual);
     }
@@ -601,49 +608,45 @@ public class CodeGenerationVisitorTests
     public void PinDclNode_InputOutputAnalogpin_ShouldGeneratepinMode(string expectedMode, PinMode givenPinMode)
     {
         // Arrange
-        string expected = $"#define x 1\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    pinMode(1, {expectedMode});\r\n\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
+        string expected =
+            $"#define x 1\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    pinMode(1, {expectedMode});\r\n\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
         var n = new NumberNode() {Value = 1};
         var x = new IdNode {Name = "x"};
         var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = givenPinMode}};
         var setup = new SetupNode() {Stmts = new List<StmtNode>()};
         var vars = new VarsNode() {Dcls = new List<VarDclNode>() {pinDclNode}};
         var prog = new ProgNode() {SetupBlock = setup, VarsBlock = vars};
-        
+
         // Act
         _visitor.Visit(prog);
         string actual = _visitor.OutputToString();
-        
+
         // Assert
         Assert.Equal(expected, actual);
     }
-    
+
     [Theory]
     [InlineData("pin1", 1)]
     [InlineData("LEDPIN", 5)]
     public void PinDclNode_DeclarePinVariableName_ShouldDefinePinConstantVariable(string variableName, int pinNumber)
     {
         // Arrange
-        string expected = $"#define {variableName} {pinNumber}\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    pinMode({pinNumber}, INPUT);\r\n\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
+        string expected =
+            $"#define {variableName} {pinNumber}\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    pinMode({pinNumber}, INPUT);\r\n\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
         var n = new NumberNode() {Value = pinNumber};
         var x = new IdNode {Name = variableName};
         var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = PinMode.INPUT}};
         var setup = new SetupNode() {Stmts = new List<StmtNode>()};
         var vars = new VarsNode() {Dcls = new List<VarDclNode>() {pinDclNode}};
         var prog = new ProgNode() {SetupBlock = setup, VarsBlock = vars};
-        
+
         // Act
         _visitor.Visit(prog);
         string actual = _visitor.OutputToString();
-        
+
         // Assert
         Assert.Equal(expected, actual);
     }
-    
 
     #endregion
 }
-
-
-
-
-

@@ -22,21 +22,21 @@ public class StandardEnvironmentTests
          *     return false
          * end function
          */
-        
+
         // Arrange
-        var retFalse = new RetNode 
+        var retFalse = new RetNode
         {
             RetVal = new BoolNode {Value = false},
             SurroundingFuncType = new Type {ActualType = TypeVal.Boolean}
         };
         var retTrue = new RetNode
         {
-            RetVal = new BoolNode { Value = true},
-            SurroundingFuncType = new Type { ActualType = TypeVal.Boolean }
+            RetVal = new BoolNode {Value = true},
+            SurroundingFuncType = new Type {ActualType = TypeVal.Boolean}
         };
         var digitalRead = new FuncExprNode
         {
-            Id = new IdNode {Name = "ReadFromDigitalPin" },
+            Id = new IdNode {Name = "ReadFromDigitalPin"},
             Params = new List<ExprNode> {new IdNode {Name = "p"}}
         };
         var condition = new EqNode
@@ -52,7 +52,7 @@ public class StandardEnvironmentTests
         };
         var pinDcl = new PinDclNode
         {
-            Left = new IdNode 
+            Left = new IdNode
             {
                 Name = "p",
                 Type = new PinType
@@ -71,7 +71,7 @@ public class StandardEnvironmentTests
             FormalParams = new List<IdNode>(),
             ReturnType = new Type {ActualType = TypeVal.Boolean}
         };
-        
+
         // Act, assert
         _typeVisitor.Visit(funcDcl);
     }
@@ -84,10 +84,10 @@ public class StandardEnvironmentTests
         // Arrange
         var digitalRead = new FuncExprNode
         {
-            Id = new IdNode { Name = "ReadFromDigitalPin" },
-            Params = new List<ExprNode> { new NumberNode { Value = 1 } }
+            Id = new IdNode {Name = "ReadFromDigitalPin"},
+            Params = new List<ExprNode> {new NumberNode {Value = 1}}
         };
-        
+
         // Act
         var test = () => _typeVisitor.Visit(digitalRead);
 
@@ -108,8 +108,8 @@ public class StandardEnvironmentTests
         // Arrange
         var digitalWrite = new FuncStmtNode
         {
-            Id = new IdNode { Name = "WriteToDigitalPin" },
-            Params = new List<ExprNode> { new IdNode { Name = "p" }, new IdNode { Name = "Off" } }
+            Id = new IdNode {Name = "WriteToDigitalPin"},
+            Params = new List<ExprNode> {new IdNode {Name = "p"}, new IdNode {Name = "Off"}}
         };
         var pinDcl = new PinDclNode
         {
@@ -123,14 +123,14 @@ public class StandardEnvironmentTests
                     Mode = PinMode.INPUT
                 }
             },
-            Right = new NumberNode { Value = 1 }
+            Right = new NumberNode {Value = 1}
         };
         var funcDcl = new FuncDefNode
         {
-            Id = new IdNode { Name = "x" },
-            Stmts = new List<StmtNode> { pinDcl, digitalWrite },
+            Id = new IdNode {Name = "x"},
+            Stmts = new List<StmtNode> {pinDcl, digitalWrite},
             FormalParams = new List<IdNode>(),
-            ReturnType = new Type { ActualType = TypeVal.Blank }
+            ReturnType = new Type {ActualType = TypeVal.Blank}
         };
 
         // Act, assert

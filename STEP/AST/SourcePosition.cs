@@ -16,4 +16,3 @@ public class SourcePosition
         return $"(Line {Line}, position {Index})";
     }
 }
-
