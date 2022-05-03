@@ -231,6 +231,8 @@ public class TypeVisitor : IVisitor
             //n.Type.ActualType = TypeVal.Error;
             throw new TypeMismatchException("Unexpected element type in array declaration", expr.SourcePosition, expr.Type, n.Type);
         }
+
+        n.Type.ArrSize = n.Elements.Count;
     }
 
     public void Visit(ArrayAccessNode n)
@@ -609,7 +611,7 @@ public class TypeVisitor : IVisitor
         foreach (var param in n.Params)
         {
             param.Accept(this);
-            if (param.Type != parameterTypes[i] || param.Type.ActualType == TypeVal.Error)
+            if (parameterTypes[i].ActualType != TypeVal.Any && (param.Type != parameterTypes[i] || param.Type.ActualType == TypeVal.Error))
             {
                 n.Type.ActualType = TypeVal.Error;
                 throw new TypeMismatchException("Unexpected type in parameter", param.SourcePosition, param.Type, parameterTypes[i]);

@@ -508,7 +508,7 @@ public class CodeGenerationVisitorTests
     public void ForNodeArrAccAssNodeInitializerIsCreatedCorrectly()
     {
         //Arrange
-        const string expected = "for(i[1] = 0; i[1] <= 10; i[1] = i[1] + 1) {\r\n}\r\n";
+        const string expected = "for(i[(int) 1] = 0; i[(int) 1] <= 10; i[(int) 1] = i[(int) 1] + 1) {\r\n}\r\n";
         IdNode idNode = new IdNode() { Name = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
         NumberNode exprNode = new NumberNode() { Value = 0, Type = new STEP.Type() { ActualType = TypeVal.Number }};
         NumberNode indexNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
@@ -551,7 +551,7 @@ public class CodeGenerationVisitorTests
     public void ForNodeArrAccInitializerIsCreatedCorrectly()
     {
         //Arrange
-        const string expected = "for(i[1]; i[1] <= 10; i[1] = i[1] + 1) {\r\n}\r\n";
+        const string expected = "for(i[(int) 1]; i[(int) 1] <= 10; i[(int) 1] = i[(int) 1] + 1) {\r\n}\r\n";
         IdNode idNode = new IdNode() { Name = "i", Type = new STEP.Type() { ActualType = TypeVal.Number}};
         NumberNode indexNode = new NumberNode() { Value = 1, Type = new STEP.Type() { ActualType = TypeVal.Number }};
 
@@ -601,15 +601,16 @@ public class CodeGenerationVisitorTests
     public void PinDclNode_InputOutputAnalogpin_ShouldGeneratepinMode(string expectedMode, PinMode givenPinMode)
     {
         // Arrange
-        string expected = $"#define x 1\r\nvoid setup() {{\r\n    pinMode(1, {expectedMode});\r\n}}\r\n\r\n";
+        string expected = $"#define x 1\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    pinMode(1, {expectedMode});\r\n\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
         var n = new NumberNode() {Value = 1};
         var x = new IdNode {Name = "x"};
-        var setup = new SetupNode() {Stmts = new List<StmtNode>()};
         var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = givenPinMode}};
+        var setup = new SetupNode() {Stmts = new List<StmtNode>()};
+        var vars = new VarsNode() {Dcls = new List<VarDclNode>() {pinDclNode}};
+        var prog = new ProgNode() {SetupBlock = setup, VarsBlock = vars};
         
         // Act
-        _visitor.Visit(pinDclNode);
-        _visitor.Visit(setup);
+        _visitor.Visit(prog);
         string actual = _visitor.OutputToString();
         
         // Assert
@@ -622,15 +623,16 @@ public class CodeGenerationVisitorTests
     public void PinDclNode_DeclarePinVariableName_ShouldDefinePinConstantVariable(string variableName, int pinNumber)
     {
         // Arrange
-        string expected = $"#define {variableName} {pinNumber}\r\nvoid setup() {{\r\n    pinMode({pinNumber}, INPUT);\r\n}}\r\n\r\n";
+        string expected = $"#define {variableName} {pinNumber}\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    pinMode({pinNumber}, INPUT);\r\n\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
         var n = new NumberNode() {Value = pinNumber};
         var x = new IdNode {Name = variableName};
-        var setup = new SetupNode() {Stmts = new List<StmtNode>()};
         var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = PinMode.INPUT}};
+        var setup = new SetupNode() {Stmts = new List<StmtNode>()};
+        var vars = new VarsNode() {Dcls = new List<VarDclNode>() {pinDclNode}};
+        var prog = new ProgNode() {SetupBlock = setup, VarsBlock = vars};
         
         // Act
-        _visitor.Visit(pinDclNode);
-        _visitor.Visit(setup);
+        _visitor.Visit(prog);
         string actual = _visitor.OutputToString();
         
         // Assert
