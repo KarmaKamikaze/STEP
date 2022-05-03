@@ -21,6 +21,7 @@ class Program
         if (args.Length is 1 or 2 && args.Contains("-output"))
         {
             int portIndex = args.ToList().IndexOf("-output") + 1;
+            // If no port is specified, the arduino uploader will attempt to guess the correct one.
             if (portIndex >= args.Length)
             {
                 ArduinoCompiler arduinoCompiler = new ArduinoCompiler(null);
@@ -88,6 +89,7 @@ class Program
             if (args.Length > 1 && args.Contains("-upload"))
             {
                 int portIndex = args.ToList().IndexOf("-upload") + 1;
+                // If no port is specified, the arduino uploader will attempt to guess the correct one.
                 if (portIndex >= args.Length)
                 {
                     ArduinoCompiler arduinoCompiler = new ArduinoCompiler(null);
