@@ -15,14 +15,17 @@ public class PinTable : IPinTable
         {
             case TypeVal.Analogpin:
                 if (!_analogTable.Add(pinVal))
-                    throw new DuplicatePinDeclarationException($"Analog pin has already been declared", pinDcl.SourcePosition, pinDcl.Left.Name, pinVal);
+                    throw new DuplicatePinDeclarationException($"Analog pin has already been declared",
+                        pinDcl.SourcePosition, pinDcl.Left.Name, pinVal);
                 break;
             case TypeVal.Digitalpin:
                 if (!_digitalTable.Add(pinVal))
-                    throw new DuplicatePinDeclarationException($"Digital pin has already been declared", pinDcl.SourcePosition, pinDcl.Left.Name, pinVal);
+                    throw new DuplicatePinDeclarationException($"Digital pin has already been declared",
+                        pinDcl.SourcePosition, pinDcl.Left.Name, pinVal);
                 break;
             default:
-                throw new PinTableUnexpectedTypeException($"Unexpected data type in Pin Table", type, new TypeVal[] { TypeVal.Digitalpin, TypeVal.Analogpin });
+                throw new PinTableUnexpectedTypeException($"Unexpected data type in Pin Table", type,
+                    new TypeVal[] {TypeVal.Digitalpin, TypeVal.Analogpin});
         }
     }
 }

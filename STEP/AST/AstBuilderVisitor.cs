@@ -262,7 +262,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         idNode.Type.IsArray = true;
         node.Left = idNode;
         node.Size = Int32.Parse(context.arrsizedcl().GetText().Trim('[', ']'));
-        
+
         if (children.Any(child => child is IdNode))
         {
             node.Right = (IdNode) children.First(child => child is IdNode);
@@ -330,7 +330,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         if (context.OR() != null)
         {
-            OrNode orNode = (OrNode)NodeFactory.MakeNode(AstNodeType.OrNode);
+            OrNode orNode = (OrNode) NodeFactory.MakeNode(AstNodeType.OrNode);
             orNode.SourcePosition = GetSourcePosition(context);
             orNode.Left = (ExprNode) children.First(child => child is ExprNode);
             orNode.Right = (ExprNode) children.Last(child => child is ExprNode);
@@ -356,7 +356,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         if (context.NEQ() != null)
         {
-            NeqNode neqNode = (NeqNode)NodeFactory.MakeNode(AstNodeType.NeqNode);
+            NeqNode neqNode = (NeqNode) NodeFactory.MakeNode(AstNodeType.NeqNode);
             neqNode.SourcePosition = GetSourcePosition(context);
             neqNode.Left = (ExprNode) children.First(child => child is ExprNode);
             neqNode.Right = (ExprNode) children.Last(child => child is ExprNode);
@@ -541,7 +541,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
     {
         if (context.MINUS() != null)
         {
-            UMinusNode uNode = (UMinusNode)NodeFactory.MakeNode(AstNodeType.UMinusNode);
+            UMinusNode uNode = (UMinusNode) NodeFactory.MakeNode(AstNodeType.UMinusNode);
             uNode.SourcePosition = GetSourcePosition(context);
             uNode.Left = node;
             return uNode;
@@ -598,7 +598,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         List<ExprNode> parameters = new();
 
-        NodesList nodesList = (NodesList)children.FirstOrDefault(child => child is NodesList);
+        NodesList nodesList = (NodesList) children.FirstOrDefault(child => child is NodesList);
         if (nodesList != null) parameters.AddRange(nodesList.Nodes.Cast<ExprNode>());
 
         if (context.Parent is STEPParser.ValueContext)
@@ -803,13 +803,13 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         {
             if (stmt.BREAK() != null)
             {
-                var breakNode = (BreakNode)NodeFactory.MakeNode(AstNodeType.BreakNode);
+                var breakNode = (BreakNode) NodeFactory.MakeNode(AstNodeType.BreakNode);
                 breakNode.SourcePosition = GetSourcePosition(stmt.BREAK());
                 node.ThenClause.Add(breakNode);
             }
             else if (stmt.CONTINUE() != null)
             {
-                var contNode = (ContNode)NodeFactory.MakeNode(AstNodeType.ContNode);
+                var contNode = (ContNode) NodeFactory.MakeNode(AstNodeType.ContNode);
                 contNode.SourcePosition = GetSourcePosition(stmt.CONTINUE());
                 node.ThenClause.Add(contNode);
             }
@@ -835,13 +835,13 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
             {
                 if (stmt.BREAK() != null)
                 {
-                    var breakNode = (BreakNode)NodeFactory.MakeNode(AstNodeType.BreakNode);
+                    var breakNode = (BreakNode) NodeFactory.MakeNode(AstNodeType.BreakNode);
                     breakNode.SourcePosition = GetSourcePosition(stmt.BREAK());
                     node.ThenClause.Add(breakNode);
                 }
                 else if (stmt.CONTINUE() != null)
                 {
-                    var contNode = (ContNode)NodeFactory.MakeNode(AstNodeType.ContNode);
+                    var contNode = (ContNode) NodeFactory.MakeNode(AstNodeType.ContNode);
                     contNode.SourcePosition = GetSourcePosition(stmt.CONTINUE());
                     node.ThenClause.Add(contNode);
                 }
@@ -866,13 +866,13 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         {
             if (stmt.BREAK() != null)
             {
-                var breakNode = (BreakNode)NodeFactory.MakeNode(AstNodeType.BreakNode);
+                var breakNode = (BreakNode) NodeFactory.MakeNode(AstNodeType.BreakNode);
                 breakNode.SourcePosition = GetSourcePosition(stmt.BREAK());
                 node.Body.Add(breakNode);
             }
             else if (stmt.CONTINUE() != null)
             {
-                var contNode = (ContNode)NodeFactory.MakeNode(AstNodeType.ContNode);
+                var contNode = (ContNode) NodeFactory.MakeNode(AstNodeType.ContNode);
                 contNode.SourcePosition = GetSourcePosition(stmt.CONTINUE());
                 node.Body.Add(contNode);
             }
@@ -891,13 +891,13 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         if (context.BREAK() != null)
         {
-            var breakNode = (BreakNode)NodeFactory.MakeNode(AstNodeType.BreakNode);
+            var breakNode = (BreakNode) NodeFactory.MakeNode(AstNodeType.BreakNode);
             breakNode.SourcePosition = GetSourcePosition(context.BREAK());
             return breakNode;
         }
         else if (context.CONTINUE() != null)
         {
-            var contNode = (ContNode)NodeFactory.MakeNode(AstNodeType.ContNode);
+            var contNode = (ContNode) NodeFactory.MakeNode(AstNodeType.ContNode);
             contNode.SourcePosition = GetSourcePosition(context.CONTINUE());
             return contNode;
         }
@@ -951,7 +951,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
         FuncDefNode node = (FuncDefNode) NodeFactory.MakeNode(AstNodeType.FuncDefNode);
         node.SourcePosition = GetSourcePosition(context);
 
-        IdNode idNode = (IdNode)NodeFactory.MakeNode(AstNodeType.IdNode);
+        IdNode idNode = (IdNode) NodeFactory.MakeNode(AstNodeType.IdNode);
         idNode.SourcePosition = GetSourcePosition(context.ID());
         idNode.Name = context.ID().GetText();
         node.Id = idNode;

@@ -15,7 +15,8 @@ public class DclVisitor : TypeVisitor
     public override void Visit(IdNode n)
     {
         var symbol = _symbolTable.RetrieveSymbol(n.Name);
-        if (symbol is null) {
+        if (symbol is null)
+        {
             _symbolTable.EnterSymbol(n);
         }
         else

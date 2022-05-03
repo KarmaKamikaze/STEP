@@ -77,7 +77,7 @@ public class SymbolTable : ISymbolTable
             var scope = _scopeStack.Pop();
             // Save the scope so we can add it back onto the stack
             scopes.Push(scope);
-            if(scope.TryGetValue(id, out SymTableEntry value))
+            if (scope.TryGetValue(id, out SymTableEntry value))
             {
                 output = value;
                 break;
@@ -85,7 +85,7 @@ public class SymbolTable : ISymbolTable
         }
 
         // adds the scope from scopes list back in to the scope stack
-        while(scopes.Count > 0)
+        while (scopes.Count > 0)
         {
             var scope = scopes.Pop();
             _scopeStack.Push(scope);
@@ -93,13 +93,14 @@ public class SymbolTable : ISymbolTable
 
         return output;
     }
-    
+
     public void EnterSymbol(IdNode node)
     {
         //exception to check if a symbol is declared locally more than once
-        if(IsDeclaredLocally(node.Name))
+        if (IsDeclaredLocally(node.Name))
         {
-            throw new DuplicateDeclarationException("An identifier with this name have already been declared", node.SourcePosition, node.Name);
+            throw new DuplicateDeclarationException("An identifier with this name have already been declared",
+                node.SourcePosition, node.Name);
         }
 
         var symbolEntry = new SymTableEntry
@@ -118,7 +119,8 @@ public class SymbolTable : ISymbolTable
         //exception to check if a symbol is declared locally more than once
         if (IsDeclaredLocally(name))
         {
-            throw new DuplicateDeclarationException("An identifier with this name have already been declared", node.SourcePosition, name);
+            throw new DuplicateDeclarationException("An identifier with this name have already been declared",
+                node.SourcePosition, name);
         }
 
         // Convert formal parameters into a dictionary of strings and TypeVals

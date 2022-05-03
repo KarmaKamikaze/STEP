@@ -17,7 +17,7 @@ public class ArduinoCompiler
     {
         _port = port;
     }
-    
+
     /// <summary>
     /// The Upload method requires the arduino-cli executable to be present at the host machine.
     /// It first compiles the STEP compiler's output to binaries, then converts this output to Intel HEX format.
@@ -26,7 +26,7 @@ public class ArduinoCompiler
     public void Upload(string filename)
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        
+
         // Check if arduino-cli files are present in correct folder
         if (!File.Exists($"{directoryPath}/ArduinoCLI/arduino-cli.exe"))
         {
@@ -102,7 +102,7 @@ public class ArduinoCompiler
     public void ListPorts()
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        
+
         Process portListener = Process.Start("cmd.exe",
             $"/C {directoryPath}/ArduinoCLI/arduino-cli.exe board list");
 

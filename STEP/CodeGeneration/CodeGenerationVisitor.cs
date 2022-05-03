@@ -13,7 +13,7 @@ public class CodeGenerationVisitor : IVisitor
     private int _scopeLevel;
     private int _tempCount;
     private readonly List<IdNode> _arrDclsInScope = new(); // Keeps track of array declarations currently in scope
-    
+
     public void OutputToBaseFile(string filename)
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -62,55 +62,69 @@ public class CodeGenerationVisitor : IVisitor
     {
         _scopeLevel++;
     }
-    
-    private void ExitScope() {
+
+    private void ExitScope()
+    {
         FreeArrays(_scopeLevel - 1);
         _scopeLevel--;
     }
 
     // Called upon exiting any scope
-    private void FreeArrays(int scopeLevel) {
+    private void FreeArrays(int scopeLevel)
+    {
         var arrsToRemove = new List<IdNode>();
-        foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel)) {
-            if (!id.Type.IsReturned) {
+        foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel))
+        {
+            if (!id.Type.IsReturned)
+            {
                 EmitIndentation();
                 EmitLine($"free({id.Name});");
             }
+
             arrsToRemove.Add(id);
         }
+
         arrsToRemove.ForEach(id => _arrDclsInScope.Remove(id));
     }
-    
+
     // Called upon exiting array function, handles freeing excess arrays
-    private void FreeArrays(int scopeLevel, IdNode exemptId, bool shouldRemove) {
+    private void FreeArrays(int scopeLevel, IdNode exemptId, bool shouldRemove)
+    {
         var arrsToRemove = new List<IdNode>();
-        foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel && !n.Equals(exemptId))) {
+        foreach (var id in _arrDclsInScope.Where(n => n.Type.ScopeLevel > scopeLevel && !n.Equals(exemptId)))
+        {
             EmitLine($"free({id.Name});");
             EmitIndentation();
             arrsToRemove.Add(id);
         }
-        if(shouldRemove) arrsToRemove.ForEach(id => _arrDclsInScope.Remove(id));
+
+        if (shouldRemove) arrsToRemove.ForEach(id => _arrDclsInScope.Remove(id));
     }
 
-    private void CopyArrayHelper(ArrDclNode n) {
+    private void CopyArrayHelper(ArrDclNode n)
+    {
         // Copies array from RHS into LHS
         EmitIndentation();
         var id = n.Right as IdNode;
-        EmitLine($"memcpy({n.Left.Name}, {id.Name}, sizeof({id.Name}[0])*{Math.Min(n.Left.Type.ArrSize, id.Type.ArrSize)});");
+        EmitLine(
+            $"memcpy({n.Left.Name}, {id.Name}, sizeof({id.Name}[0])*{Math.Min(n.Left.Type.ArrSize, id.Type.ArrSize)});");
     }
-    
-    private void CopyArrayHelper(ArrDclNode n, ArrLiteralNode lit) {
+
+    private void CopyArrayHelper(ArrDclNode n, ArrLiteralNode lit)
+    {
         // Copies array from arr literal into LHS
         EmitIndentation();
         string tempName = $"__temp{_tempCount - 1}__";
-        EmitLine($"memcpy({n.Left.Name}, {tempName}, sizeof({tempName}[0])*{Math.Min(n.Left.Type.ArrSize, lit.Type.ArrSize)});");
+        EmitLine(
+            $"memcpy({n.Left.Name}, {tempName}, sizeof({tempName}[0])*{Math.Min(n.Left.Type.ArrSize, lit.Type.ArrSize)});");
     }
 
     // Adds tabs to format output code
-    private void EmitIndentation() {
+    private void EmitIndentation()
+    {
         _stringBuilder.Append(' ', _scopeLevel * 4);
     }
-    
+
     public void Visit(AndNode n)
     {
         // E.g.: x and true -> x && true 
@@ -210,9 +224,12 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend(n.Type, "))");
         EmitLine(";");
         // Copy array
-        if (n.Right is IdNode) {
+        if (n.Right is IdNode)
+        {
             CopyArrayHelper(n);
-        } else if (n.Right is ArrLiteralNode lit) {
+        }
+        else if (n.Right is ArrLiteralNode lit)
+        {
             n.Right.Accept(this);
             CopyArrayHelper(n, lit);
         }
@@ -236,6 +253,7 @@ public class CodeGenerationVisitor : IVisitor
                 EmitAppend(", ");
             }
         }
+
         EmitLine("};");
         _tempCount++;
     }
@@ -268,14 +286,18 @@ public class CodeGenerationVisitor : IVisitor
     {
         // If assigning new pointer to array pointer, free previously allocated memory
         // Unless RHS is func expression with array in params
-        if (n.Id.Type.IsArray && n.ArrIndex is null) {
-            if (n.Expr is FuncExprNode fen) {
-                if (!fen.Params.Any(param => ((IdNode)param).Name.Equals(n.Id.Name))) {
+        if (n.Id.Type.IsArray && n.ArrIndex is null)
+        {
+            if (n.Expr is FuncExprNode fen)
+            {
+                if (!fen.Params.Any(param => ((IdNode) param).Name.Equals(n.Id.Name)))
+                {
                     EmitLine($"free({n.Id.Name});");
                     EmitIndentation();
                 }
             }
         }
+
         AssNodeGen(n);
         EmitLine(";");
     }
@@ -513,10 +535,12 @@ public class CodeGenerationVisitor : IVisitor
         EmitLine(") {");
         // Body
         EnterScope();
-        foreach (var stmt in n.Stmts) {
+        foreach (var stmt in n.Stmts)
+        {
             EmitIndentation();
             stmt.Accept(this);
         }
+
         ExitScope();
         EmitIndentation();
         EmitLine("}\r\n");
@@ -565,20 +589,25 @@ public class CodeGenerationVisitor : IVisitor
         }
     }
 
-    public void Visit(RetNode n) {
+    public void Visit(RetNode n)
+    {
         // If no expression, emit empty return
-        if (n.RetVal is null) {
+        if (n.RetVal is null)
+        {
             EmitLine("return;");
         }
-        else {
+        else
+        {
             // If returning from function, free arrays declared in scope
-            if (n.SurroundingFuncType.IsArray) {
+            if (n.SurroundingFuncType.IsArray)
+            {
                 // If in outer scope, free all arrays except returned and remove from list - else free without removing from list
                 // Typed functions always end on return, so this is where we 'forget' about the obsolete arrays
                 // In inner scopes, we want to free them, but still 'remember' them to free at any returns in outer scopes
                 bool isInOuterScope = n.Type.ScopeLevel - 1 == n.SurroundingFuncType.ScopeLevel;
                 FreeArrays(n.SurroundingFuncType.ScopeLevel, (IdNode) n.RetVal, isInOuterScope);
             }
+
             EmitAppend("return ");
             n.RetVal.Accept(this);
             EmitLine(";");
@@ -602,7 +631,8 @@ public class CodeGenerationVisitor : IVisitor
         n.Condition.Accept(this);
         EmitLine(") {");
         EnterScope();
-        foreach(var stmt in n.ThenClause) {
+        foreach (var stmt in n.ThenClause)
+        {
             EmitIndentation();
             stmt.Accept(this);
         }
@@ -619,7 +649,7 @@ public class CodeGenerationVisitor : IVisitor
                 elseIf.Accept(this);
             }
         }
-        
+
         if (n.ElseClause?.Count > 0)
         {
             EmitIndentation();
@@ -639,11 +669,12 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(VarsNode n)
     {
-        if(n.Dcls.Count > 0) EmitLine("// Global variables");
+        if (n.Dcls.Count > 0) EmitLine("// Global variables");
         foreach (var dclNode in n.Dcls)
         {
             dclNode.Accept(this);
         }
+
         EmitLine("");
     }
 
@@ -680,7 +711,8 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(LoopNode n)
     {
         EnterScope();
-        foreach(var stmt in n.Stmts) {
+        foreach (var stmt in n.Stmts)
+        {
             EmitIndentation();
             stmt.Accept(this);
         }

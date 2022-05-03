@@ -107,10 +107,10 @@ public class AstPrintVisitor : IVisitor
         {
             Indent();
             Print(((PinType) node.Type).Mode.ToString().ToLower() + " ");
-            
+
             // Print Id node's type (analogpin or digitalpin)
             Print(node.Left.Type.ActualType.ToString().ToLower() + " ");
-            
+
             node.Left.Accept(this);
             Print(" = ");
             node.Right.Accept(this);

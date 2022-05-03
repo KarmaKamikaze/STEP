@@ -12,8 +12,8 @@ public class ASTVisitorTests
 {
     private AstBuilderVisitor _astBuilder = new();
 
-    private STEPParser.ProgramContext GetParseTree(string input) 
-    { 
+    private STEPParser.ProgramContext GetParseTree(string input)
+    {
         AntlrInputStream streamReader = new(input);
         STEPLexer lexer = new(streamReader);
         CommonTokenStream tokenStream = new(lexer);
@@ -36,20 +36,20 @@ public class ASTVisitorTests
 
         var parseTree = GetParseTree(program);
 
-        var idNode = new IdNode() { Name = "x", NodeType = AstNodeType.IdNode};
-        var numNode = new NumberNode() { Value = 1, NodeType = AstNodeType.NumberNode };
-        var varDclNode = new VarDclNode() 
+        var idNode = new IdNode() {Name = "x", NodeType = AstNodeType.IdNode};
+        var numNode = new NumberNode() {Value = 1, NodeType = AstNodeType.NumberNode};
+        var varDclNode = new VarDclNode()
         {
             Left = idNode,
             Right = numNode,
             NodeType = AstNodeType.VarDclNode
         };
-        var setupNode = new SetupNode() 
+        var setupNode = new SetupNode()
         {
-            Stmts = new() { varDclNode },
+            Stmts = new() {varDclNode},
             NodeType = AstNodeType.SetupNode
         };
-        var expectedAst = new ProgNode() { SetupBlock = setupNode, NodeType = AstNodeType.ProgNode };
+        var expectedAst = new ProgNode() {SetupBlock = setupNode, NodeType = AstNodeType.ProgNode};
 
         // Act
         // Get AST from the AstBuilderVisitor
@@ -88,15 +88,15 @@ public class ASTVisitorTests
                                  end setup";
         var parseTree = GetParseTree(program);
 
-        var innerIf = new IfNode { Condition = new BoolNode { Value = true, NodeType = AstNodeType.BoolNode } };
+        var innerIf = new IfNode {Condition = new BoolNode {Value = true, NodeType = AstNodeType.BoolNode}};
         var outerIf = new IfNode
         {
-            Condition = new BoolNode { Value = false, NodeType = AstNodeType.BoolNode },
-            ElseClause = new() { innerIf },
+            Condition = new BoolNode {Value = false, NodeType = AstNodeType.BoolNode},
+            ElseClause = new() {innerIf},
             NodeType = AstNodeType.IfNode
         };
-        var setupNode = new SetupNode { Stmts = new() { outerIf }, NodeType = AstNodeType.SetupNode };
-        var expectedAst = new ProgNode { SetupBlock = setupNode, NodeType = AstNodeType.ProgNode };
+        var setupNode = new SetupNode {Stmts = new() {outerIf}, NodeType = AstNodeType.SetupNode};
+        var expectedAst = new ProgNode {SetupBlock = setupNode, NodeType = AstNodeType.ProgNode};
 
         // Act
         var actualAst = _astBuilder.Visit(parseTree);
@@ -117,26 +117,26 @@ public class ASTVisitorTests
                                  end setup";
         var parseTree = GetParseTree(program);
 
-        var firstElseIf = new ElseIfNode 
-        { 
-            Condition = new BoolNode { Value = false, NodeType = AstNodeType.BoolNode },
+        var firstElseIf = new ElseIfNode
+        {
+            Condition = new BoolNode {Value = false, NodeType = AstNodeType.BoolNode},
             Body = new List<StmtNode>(),
-            NodeType = AstNodeType.ElseIfNode 
+            NodeType = AstNodeType.ElseIfNode
         };
-        var lastElseIf = new ElseIfNode 
-        { 
-            Condition = new BoolNode { Value = true, NodeType = AstNodeType.BoolNode }, 
+        var lastElseIf = new ElseIfNode
+        {
+            Condition = new BoolNode {Value = true, NodeType = AstNodeType.BoolNode},
             Body = new List<StmtNode>(),
-            NodeType = AstNodeType.ElseIfNode 
+            NodeType = AstNodeType.ElseIfNode
         };
         var outerIf = new IfNode
         {
-            Condition = new BoolNode { Value = false, NodeType = AstNodeType.BoolNode },
-            ElseIfClauses = new List<ElseIfNode>() { firstElseIf, lastElseIf },
+            Condition = new BoolNode {Value = false, NodeType = AstNodeType.BoolNode},
+            ElseIfClauses = new List<ElseIfNode>() {firstElseIf, lastElseIf},
             NodeType = AstNodeType.IfNode
         };
-        var setupNode = new SetupNode { Stmts = new() { outerIf }, NodeType = AstNodeType.SetupNode };
-        var expectedAst = new ProgNode { SetupBlock = setupNode, NodeType = AstNodeType.ProgNode };
+        var setupNode = new SetupNode {Stmts = new() {outerIf}, NodeType = AstNodeType.SetupNode};
+        var expectedAst = new ProgNode {SetupBlock = setupNode, NodeType = AstNodeType.ProgNode};
 
         // Act
         var actualAst = _astBuilder.Visit(parseTree);

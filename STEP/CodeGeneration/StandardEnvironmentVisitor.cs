@@ -63,17 +63,14 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(NumberNode n)
     {
-
     }
 
     public void Visit(StringNode n)
     {
-        
     }
 
     public void Visit(BoolNode n)
     {
-        
     }
 
     public void Visit(ArrDclNode n)
@@ -84,7 +81,7 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(ArrLiteralNode n)
     {
-        foreach(var element in n.Elements)
+        foreach (var element in n.Elements)
         {
             element.Accept(this);
         }
@@ -166,7 +163,7 @@ public class StandardEnvironmentVisitor : IVisitor
     public void Visit(WhileNode n)
     {
         n.Condition.Accept(this);
-        foreach(var stmt in n.Body)
+        foreach (var stmt in n.Body)
         {
             stmt.Accept(this);
         }
@@ -177,7 +174,7 @@ public class StandardEnvironmentVisitor : IVisitor
         n.Initializer.Accept(this);
         n.Update.Accept(this);
         n.Limit.Accept(this);
-        foreach(var stmt in n.Body)
+        foreach (var stmt in n.Body)
         {
             stmt.Accept(this);
         }
@@ -185,17 +182,15 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(ContNode n)
     {
-        
     }
 
     public void Visit(BreakNode n)
     {
-        
     }
 
     public void Visit(LoopNode n)
     {
-        foreach(var stmt in n.Stmts)
+        foreach (var stmt in n.Stmts)
         {
             stmt.Accept(this);
         }
@@ -203,7 +198,7 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(FuncDefNode n)
     {
-        foreach(var stmt in n.Stmts)
+        foreach (var stmt in n.Stmts)
         {
             stmt.Accept(this);
         }
@@ -215,7 +210,7 @@ public class StandardEnvironmentVisitor : IVisitor
         if (n.Id.AttributesRef is StdFuncSymTableEntry symbol)
         {
             n.Id.Name = symbol.ArduinoName;
-            foreach(var param in n.Params)
+            foreach (var param in n.Params)
             {
                 param.Accept(this);
             }
@@ -237,7 +232,7 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(FuncsNode n)
     {
-        foreach(var dcl in n.FuncDcls)
+        foreach (var dcl in n.FuncDcls)
         {
             dcl.Accept(this);
         }
@@ -245,23 +240,24 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(RetNode n)
     {
-        
     }
 
     public void Visit(IfNode n)
     {
         n.Condition.Accept(this);
-        foreach(var stmt in n.ThenClause)
+        foreach (var stmt in n.ThenClause)
         {
             stmt.Accept(this);
         }
-        if(n.ElseIfClauses != null)
+
+        if (n.ElseIfClauses != null)
         {
             foreach (var elseIf in n.ElseIfClauses)
             {
                 elseIf.Accept(this);
             }
         }
+
         if (n.ElseClause != null)
         {
             foreach (var stmt in n.ElseClause)
@@ -282,7 +278,7 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(VarsNode n)
     {
-        foreach(var dcl in n.Dcls)
+        foreach (var dcl in n.Dcls)
         {
             dcl.Accept(this);
         }
@@ -298,10 +294,9 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(SetupNode n)
     {
-        foreach(var stmt in n.Stmts)
+        foreach (var stmt in n.Stmts)
         {
             stmt.Accept(this);
         }
     }
 }
-
