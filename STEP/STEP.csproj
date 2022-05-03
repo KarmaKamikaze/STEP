@@ -15,8 +15,4 @@
       <PackageReference Include="NLog" Version="5.0.0-rc2" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="avr-destination" />
-    </ItemGroup>
-
 </Project>
