@@ -17,31 +17,13 @@ class Program
     {
         if (args.Length < 1 || args.Contains("-help"))
             Exit("Usage: STEP.exe filename [Optional: -print] [Optional: -upload PORT] [Optional: -output PORT]");
+
+        string port = CheckPort(args);
         
         if (args.Length is 1 or 2 && args.Contains("-output"))
         {
-            int portIndex = args.ToList().IndexOf("-output") + 1;
-            // If no port is specified, the arduino uploader will attempt to guess the correct one.
-            if (portIndex >= args.Length)
-            {
-                ArduinoCompiler arduinoCompiler = new ArduinoCompiler(null);
-                arduinoCompiler.Monitor();
-                Exit("End of output!");
-            }
-
-            string port = args[portIndex];
-            
-            // Pattern matches COM[number] (windows) and /dev/ttyACM[number] (linux)
-            Regex regex = new Regex("(COM\\d+|\\/dev\\/ttyACM\\d+)");
-            if (regex.IsMatch(port))
-            {
-                ArduinoCompiler arduinoCompiler = new ArduinoCompiler(port);
-                arduinoCompiler.Monitor();
-            }
-            else
-            {
-                throw new ArgumentException("Please supply a valid port after the -output parameter.");
-            }
+            ArduinoCompiler arduinoCompiler = new ArduinoCompiler(port);
+            arduinoCompiler.Monitor();
             
             Exit("End of output!");
         }
@@ -88,34 +70,11 @@ class Program
             // Upload compiled hex program to Arduino board
             if (args.Length > 1 && args.Contains("-upload"))
             {
-                int portIndex = args.ToList().IndexOf("-upload") + 1;
-                // If no port is specified, the arduino uploader will attempt to guess the correct one.
-                if (portIndex >= args.Length)
-                {
-                    ArduinoCompiler arduinoCompiler = new ArduinoCompiler(null);
-                    arduinoCompiler.Upload(Path.GetFileNameWithoutExtension(args[0]));
+                ArduinoCompiler arduinoCompiler = new ArduinoCompiler(port);
+                arduinoCompiler.Upload(Path.GetFileNameWithoutExtension(args[0]));
 
-                    if (args.Contains("-output"))
-                        arduinoCompiler.Monitor();
-                    
-                    Exit("Finished!");
-                }
-                
-                string port = args[portIndex];
-                
-                Regex regex = new Regex("(COM\\d+|\\/dev\\/ttyACM\\d+)");
-                if (regex.IsMatch(port))
-                {
-                    ArduinoCompiler arduinoCompiler = new ArduinoCompiler(port);
-                    arduinoCompiler.Upload(Path.GetFileNameWithoutExtension(args[0]));
-
-                    if (args.Contains("-output"))
-                        arduinoCompiler.Monitor();
-                }
-                else
-                {
-                    throw new ArgumentException("Please supply a valid port after the -upload parameter.");
-                }
+                if (args.Contains("-output"))
+                    arduinoCompiler.Monitor();
             }
         }
         catch (Exception e)
@@ -124,6 +83,12 @@ class Program
         }
 
         Exit("Finished!");
+    }
+    
+    private static string CheckPort(string[] applicationArgs)
+    {
+        Regex regex = new Regex("(COM\\d+|\\/dev\\/ttyACM\\d+)");
+        return applicationArgs.FirstOrDefault(arg => regex.IsMatch(arg));
     }
 
     private static void Exit(string message)
