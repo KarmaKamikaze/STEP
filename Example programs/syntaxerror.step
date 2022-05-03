@@ -1,0 +1,9 @@
+variables
+    number x = 5
+end variables
+
+functions
+    number function add2(number n)
+        return n + 2
+    end function
+end functions

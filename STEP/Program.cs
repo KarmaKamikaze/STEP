@@ -50,9 +50,13 @@ class Program
 
         // Parse the source code
         STEPParser parser = new STEPParser(tokenStream);
+        STEPErrorListener errorListener = new STEPErrorListener();
+        // Remove default console error reporter
+        parser.RemoveErrorListener(ConsoleErrorListener<IToken>.Instance);
+        // Add new error reporter (throws exception, ending compilation on parser error
+        parser.AddErrorListener(errorListener);
 
-        try
-        {
+        try {
             Console.WriteLine("Performing syntactic analysis...");
             STEPParser.ProgramContext tree = parser.program(); // Parse the input starting at the "program" rule.
 
@@ -67,8 +71,7 @@ class Program
             TypeVisitor typeVisitor = new();
             root.Accept(typeVisitor);
 
-            if (args.Length > 1 && args.Contains("-print"))
-            {
+            if (args.Length > 1 && args.Contains("-print")) {
                 Console.WriteLine("Pretty-printing the source program...");
                 // Print AST
                 AstPrintVisitor printer = new AstPrintVisitor();
@@ -86,8 +89,7 @@ class Program
             codeGen.OutputToBaseFile(Path.GetFileNameWithoutExtension(args[0]));
 
             // Upload compiled hex program to Arduino board
-            if (args.Length > 1 && args.Contains("-upload"))
-            {
+            if (args.Length > 1 && args.Contains("-upload")) {
                 Console.WriteLine($"Uploading program to Arduino {(port == null ? $"on port {port}" : "")}...");
                 ArduinoCompiler arduinoCompiler = new ArduinoCompiler(port);
                 arduinoCompiler.Upload(Path.GetFileNameWithoutExtension(args[0]));
@@ -96,37 +98,38 @@ class Program
                     arduinoCompiler.Monitor();
             }
         }
-        catch (TypeMismatchException e)
-        {
-            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Expected {string.Join(", ", e.Expected)}, actual was {e.Actual})");
+        catch (TypeMismatchException e) {
+            Exit(
+                $"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Expected {string.Join(", ", e.Expected)}, actual was {e.Actual})");
         }
-        catch (ArraySizeMismatchException e)
-        {
-            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Destination array \"{e.DestinationArray.Name}\" has size {e.DestinationArray.Type.ArrSize}, but \"{e.SourceArray.Name}\" has size {e.SourceArray.Type.ArrSize})");
+        catch (ArraySizeMismatchException e) {
+            Exit(
+                $"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Destination array \"{e.DestinationArray.Name}\" has size {e.DestinationArray.Type.ArrSize}, but \"{e.SourceArray.Name}\" has size {e.SourceArray.Type.ArrSize})");
         }
-        catch (DuplicatePinDeclarationException e)
-        {
-            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier \"{e.VariableId}\", pin {e.Pin})"); // TODO: Distinction between analog and digital pins?
+        catch (DuplicatePinDeclarationException e) {
+            Exit(
+                $"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier \"{e.VariableId}\", pin {e.Pin})"); // TODO: Distinction between analog and digital pins?
         }
-        catch (DuplicateDeclarationException e)
-        {
+        catch (DuplicateDeclarationException e) {
             Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier \"{e.VariableId}\")");
         }
-        catch (PinTableUnexpectedTypeException e)
-        {
+        catch (PinTableUnexpectedTypeException e) {
 #if DEBUG
-            Exit($"An internal error occurred: {e.Message} (Expected {string.Join(", ", e.Expected)}, actual was {e.Actual})");
-#else 
+            Exit(
+                $"An internal error occurred: {e.Message} (Expected {string.Join(", ", e.Expected)}, actual was {e.Actual})");
+#else
             Exit("An unexpected error occurred");
 #endif
         }
-        catch (ParameterCountMismatchException e)
-        {
-            Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} ({(e.VariableId != null ? $"Identifier \"{e.VariableId}\"." : "")}Expected {e.ExpectedCount}, actual was {e.ActualCount})");
+        catch (ParameterCountMismatchException e) {
+            Exit(
+                $"{GetErrorPrefix(e.SourcePosition)} {e.Message} ({(e.VariableId != null ? $"Identifier \"{e.VariableId}\"." : "")}Expected {e.ExpectedCount}, actual was {e.ActualCount})");
         }
-        catch (SymbolNotDeclaredException e)
-        {
+        catch (SymbolNotDeclaredException e) {
             Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier \"{e.VariableId}\")");
+        }
+        catch (SemanticException e) {
+            Exit($"Semantic error occurred on line {e.Line}, position {e.CharPositionInLine}: {e.Message}");
         }
         catch (Exception e)
         {
