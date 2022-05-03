@@ -1,4 +1,4 @@
-# STEP (Step To Effective Programming)
+# STEP (Step Towards Effective Programming)
 
 SUMMARY
 
