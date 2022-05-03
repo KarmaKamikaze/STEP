@@ -128,8 +128,8 @@ class Program
         catch (SymbolNotDeclaredException e) {
             Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier \"{e.VariableId}\")");
         }
-        catch (SemanticException e) {
-            Exit($"Semantic error occurred on line {e.Line}, position {e.CharPositionInLine}: {e.Message}");
+        catch (SyntaxException e) {
+            Exit($"Syntax error occurred on line {e.Line}, position {e.CharPositionInLine}: {e.Message}");
         }
         catch (Exception e)
         {
