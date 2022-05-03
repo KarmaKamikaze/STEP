@@ -87,6 +87,7 @@ class Program
     
     private static string CheckPort(string[] applicationArgs)
     {
+        // Pattern matches COM[number] (windows) and /dev/ttyACM[number] (linux)
         Regex regex = new Regex("(COM\\d+|\\/dev\\/ttyACM\\d+)");
         return applicationArgs.FirstOrDefault(arg => regex.IsMatch(arg));
     }
