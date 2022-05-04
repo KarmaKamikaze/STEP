@@ -33,6 +33,7 @@ public class ArduinoCompiler
             throw new ApplicationException("Please download the arduino-cli and place it in the ArduinoCLI folder.");
         }
 
+        // hack because of this: https://github.com/dotnet/corefx/issues/10361
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             // The /C flag means that cmd should execute the following command and exit without waiting for further input.
@@ -46,7 +47,7 @@ public class ArduinoCompiler
 
             compiler?.WaitForExit();
         }
-        else
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             Process compiler = Process.Start("/bin/bash",
                 $"{directoryPath}/ArduinoCLI/arduino-cli " +
@@ -56,6 +57,21 @@ public class ArduinoCompiler
                 $"{directoryPath}/{filename}/");
 
             compiler?.WaitForExit();
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Process compiler = Process.Start("/bin/bash",
+                $"{directoryPath}/ArduinoCLI/arduino-cli " +
+                "compile " +
+                "--export-binaries " +
+                "-b arduino:avr:uno " +
+                $"{directoryPath}/{filename}/");
+
+            compiler?.WaitForExit();
+        }
+        else
+        {
+            throw new ApplicationException("OS is not supported by the C# Process initializer.");
         }
 
         if (!File.Exists(directoryPath + $"/{filename}/build/arduino.avr.uno/{filename}.ino.hex"))
