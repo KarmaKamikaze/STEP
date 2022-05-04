@@ -10,23 +10,23 @@ It promotes structured programming, and supports simple single-run terminal prog
 1. Familiarize yourself with the structure of a STEP program
 
 An empty STEP program might look like this:
+```
+variables
 
-    variables
+end variables
 
-    end variables
+setup
 
-    setup
+end setup
 
-    end setup
+loop
 
-    loop
+end loop
 
-    end loop
+functions
 
-    functions
-
-    end functions
-
+end functions
+```
 There are four main _scopes_. It is mandatory to provide either `setup` or `loop` - the rest are optional.
 
 2. Understand the scopes
@@ -46,11 +46,11 @@ There are four main _scopes_. It is mandatory to provide either `setup` or `loop
 STEP is formally documented in the [development journal](https://www.youtube.com/watch?v=dQw4w9WgXcQ). 
 
 4. Hello, world!
-
-        setup
-            Print("Hello, world!")
-        end setup
-
+```
+setup
+    Print("Hello, world!")
+end setup
+```
 ## Getting started
 
 To get a local copy up and running, follow these steps.
