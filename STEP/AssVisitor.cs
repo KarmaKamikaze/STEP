@@ -21,7 +21,7 @@ public class AssVisitor : TypeVisitor
         }
         else
         {
-            n.Type.ActualType = TypeVal.Error;
+            throw new SymbolNotDeclaredException("The identifier has not been declared in an active scope", n.SourcePosition, n.Name);
         }
     }
 }

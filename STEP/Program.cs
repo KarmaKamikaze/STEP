@@ -68,8 +68,6 @@ class Program
             Console.WriteLine("Performing syntactic analysis...");
             STEPParser.ProgramContext tree = parser.program(); // Parse the input starting at the "program" rule.
 
-            // TODO: error listener
-
             // Build AST
             AstBuilderVisitor astBuilder = new AstBuilderVisitor();
             AstNode root = astBuilder.Build(tree);
@@ -127,6 +125,8 @@ class Program
         {
             Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier \"{e.VariableId}\")");
         }
+// Disable warning during release build that variable e is not used.        
+#pragma warning disable CS0168
         catch (PinTableUnexpectedTypeException e)
         {
 #if DEBUG
@@ -136,6 +136,7 @@ class Program
             Exit("An unexpected error occurred");
 #endif
         }
+#pragma warning restore CS0168
         catch (ParameterCountMismatchException e)
         {
             Exit(
