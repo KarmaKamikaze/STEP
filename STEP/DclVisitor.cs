@@ -14,14 +14,6 @@ public class DclVisitor : TypeVisitor
 
     public override void Visit(IdNode n)
     {
-        var symbol = _symbolTable.RetrieveSymbol(n.Name);
-        if (symbol is null)
-        {
-            _symbolTable.EnterSymbol(n);
-        }
-        else
-        {
-            throw new SymbolNotDeclaredException("The identifier has not been declared in an active scope", n.SourcePosition, n.Name);
-        }
+        _symbolTable.EnterSymbol(n);
     }
 }
