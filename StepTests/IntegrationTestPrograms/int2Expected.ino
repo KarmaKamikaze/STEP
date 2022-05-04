@@ -7,14 +7,14 @@ boolean boo = true;
 
 // Functions
 void blankfunc(String array[]) {
-    String* tempArray = (String*)malloc(3 * sizeof(String));
+    String* tempArray = (String*)calloc(3, sizeof(String));
     String __temp0__[] = {"test1", "test2", "test3"};
     memcpy(tempArray, __temp0__, sizeof(__temp0__[0])*3);
     free(tempArray);
 }
 
 String stringfunc(double num, boolean isConstant) {
-    String* arr = (String*)malloc(3 * sizeof(String));
+    String* arr = (String*)calloc(3, sizeof(String));
     String __temp1__[] = {"t1", "t2", "t3"};
     memcpy(arr, __temp1__, sizeof(__temp1__[0])*3);
     blankfunc(arr);
