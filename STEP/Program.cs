@@ -119,6 +119,8 @@ class Program
         {
             Exit($"{GetErrorPrefix(e.SourcePosition)} {e.Message} (Identifier \"{e.VariableId}\")");
         }
+// Disable warning during release build that variable e is not used.        
+#pragma warning disable CS0168
         catch (PinTableUnexpectedTypeException e)
         {
 #if DEBUG
@@ -128,6 +130,7 @@ class Program
             Exit("An unexpected error occurred");
 #endif
         }
+#pragma warning restore CS0168
         catch (ParameterCountMismatchException e)
         {
             Exit(
