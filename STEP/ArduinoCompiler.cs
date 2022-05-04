@@ -27,35 +27,54 @@ public class ArduinoCompiler
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-        // Check if arduino-cli files are present in correct folder
-        if (!File.Exists($"{directoryPath}/ArduinoCLI/arduino-cli.exe"))
-        {
-            throw new ApplicationException("Please download the arduino-cli and place it in the ArduinoCLI folder.");
-        }
-
+        // hack because of this: https://github.com/dotnet/corefx/issues/10361
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
+            // Check if arduino-cli files are present in correct folder
+            if (!File.Exists($"{directoryPath}/ArduinoCLI/arduino-cli.exe"))
+            {
+                throw new ApplicationException("Please download the arduino-cli and place it in the ArduinoCLI folder.");
+            }
+            
             // The /C flag means that cmd should execute the following command and exit without waiting for further input.
-            Process compiler = Process.Start("cmd.exe",
-                "/C " +
-                $"{directoryPath}/ArduinoCLI/arduino-cli.exe " +
+            ExecuteProcess("cmd.exe", "/C " +
+                                      $"{directoryPath}/ArduinoCLI/arduino-cli.exe " +
+                                      "compile " +
+                                      "--export-binaries " +
+                                      "-b arduino:avr:uno " +
+                                      $"{directoryPath}/{filename}/");
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            // Check if arduino-cli files are present in correct folder
+            if (!File.Exists($"{directoryPath}/ArduinoCLI/arduino-cli"))
+            {
+                throw new ApplicationException("Please download the arduino-cli and place it in the ArduinoCLI folder.");
+            }
+            
+            ExecuteProcess($"{directoryPath}/ArduinoCLI/arduino-cli",
                 "compile " +
                 "--export-binaries " +
                 "-b arduino:avr:uno " +
                 $"{directoryPath}/{filename}/");
-
-            compiler?.WaitForExit();
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            // Check if arduino-cli files are present in correct folder
+            if (!File.Exists($"{directoryPath}/ArduinoCLI/arduino-cli"))
+            {
+                throw new ApplicationException("Please download the arduino-cli and place it in the ArduinoCLI folder.");
+            }
+            
+            ExecuteProcess($"{directoryPath}/ArduinoCLI/arduino-cli",
+                "compile " +
+                "--export-binaries " +
+                "-b arduino:avr:uno " +
+                $"{directoryPath}/{filename}/");
         }
         else
         {
-            Process compiler = Process.Start("/bin/bash",
-                $"{directoryPath}/ArduinoCLI/arduino-cli " +
-                "compile " +
-                "--export-binaries " +
-                "-b arduino:avr:uno " +
-                $"{directoryPath}/{filename}/");
-
-            compiler?.WaitForExit();
+            throw new ApplicationException("OS is not supported by the C# Process initializer.");
         }
 
         if (!File.Exists(directoryPath + $"/{filename}/build/arduino.avr.uno/{filename}.ino.hex"))
@@ -89,24 +108,64 @@ public class ArduinoCompiler
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         Console.WriteLine("\nEntering Output-mode...\n");
-        Process monitor = Process.Start("cmd.exe",
-            "/C " +
-            $"{directoryPath}/ArduinoCLI/arduino-cli.exe " +
-            "monitor " +
-            $"-p {_port} " +
-            "-b arduino:avr:uno ");
 
-        monitor?.WaitForExit();
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            // The /C flag means that cmd should execute the following command and exit without waiting for further input.
+            ExecuteProcess("cmd.exe", "/C " +
+                                      $"{directoryPath}/ArduinoCLI/arduino-cli.exe " +
+                                      "monitor " +
+                                      $"-p {_port} " +
+                                      "-b arduino:avr:uno");
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            ExecuteProcess($"{directoryPath}/ArduinoCLI/arduino-cli", 
+                "monitor " +
+                $"-p {_port} " +
+                "-b arduino:avr:uno");
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            ExecuteProcess($"{directoryPath}/ArduinoCLI/arduino-cli", 
+                "monitor " +
+                $"-p {_port} " +
+                "-b arduino:avr:uno");
+        }
+        else
+        {
+            throw new ApplicationException("OS is not supported by the C# Process initializer.");
+        }
     }
 
     public void ListPorts()
     {
         string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            // The /C flag means that cmd should execute the following command and exit without waiting for further input.
+            ExecuteProcess("cmd.exe", $"/C {directoryPath}/ArduinoCLI/arduino-cli.exe board list");
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            ExecuteProcess($"{directoryPath}/ArduinoCLI/arduino-cli", $"board list");
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            ExecuteProcess($"{directoryPath}/ArduinoCLI/arduino-cli", $"board list");
+        }
+        else
+        {
+            throw new ApplicationException("OS is not supported by the C# Process initializer.");
+        }
+    }
 
-        Process portListener = Process.Start("cmd.exe",
-            $"/C {directoryPath}/ArduinoCLI/arduino-cli.exe board list");
+    public void ExecuteProcess(string fileName, string arguments)
+    {
+        Process process = Process.Start(fileName, arguments);
 
-        portListener?.WaitForExit();
+        process?.WaitForExit();
     }
 
     private class NLogArduinoUploaderLogger : IArduinoUploaderLogger

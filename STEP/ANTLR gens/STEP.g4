@@ -127,16 +127,6 @@ grammar STEP;
   loopelsestmt
         : ELSE loopifbody*;
 
-//  ifstmt 
-//        : IF LPAREN logicexpr RPAREN stmt* ENDIF
-//        | IF LPAREN logicexpr RPAREN stmt* ELSE stmt* ENDIF
-//        ;
-//  
-//  loopifstmt 
-//        : IF LPAREN logicexpr RPAREN loopifbody* ENDIF 
-//        | IF LPAREN logicexpr RPAREN loopifbody* ELSE loopifbody* ENDIF
-//        ;
-
   whilestmt 
         : REPEATWHILE LPAREN logicexpr RPAREN loop_stmt* ENDWHILE
         ;
@@ -359,12 +349,6 @@ grammar STEP;
   UPTO                          : 'up to';
   DOWNTO                        : 'down to';
   CHANGEBY                      : 'change by';
-  SWITCH                        : 'switch';
-  ENDSWITCH                     : 'end switch';
-  WHEN                          : 'when';
-  DO                            : 'do';
-  FALLTHROUGH                   : 'fallthrough';
-  OTHERWISEDO                   : 'otherwise do';
   RETURN                        : 'return';
   AND                           : 'and';
   OR                            : 'or';
