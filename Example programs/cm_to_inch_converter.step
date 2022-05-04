@@ -15,7 +15,7 @@ setup
             end if
         end if
     end if
-    repeat for(number i = 1 up to 100, change by 1) # 100 steps, 1 to 100
+    repeat for(number i = 1 up to 100, change by -1) # 100 steps, 1 to 100
         number[2] b
         Print(i + "     " + cmToInch(i))
     end for

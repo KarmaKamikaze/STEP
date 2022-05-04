@@ -440,8 +440,14 @@ public class CodeGenerationVisitor : IVisitor
             n.Initializer.Accept(this);
             ForNodeHelper(n.Initializer, n);
         }
-
-        n.Update.Accept(this);
+        
+        // Only emit value
+        if (n.Update is UMinusNode un) {
+            un.Left.Accept(this);
+        }
+        else {
+            n.Update.Accept(this);
+        }
 
         EmitLine(") {");
         EnterScope();
@@ -456,8 +462,7 @@ public class CodeGenerationVisitor : IVisitor
         EmitLine("}");
     }
 
-    private void ForNodeHelper(AstNode node, ForNode n)
-    {
+    private void ForNodeHelper(AstNode node, ForNode n) {
         EmitAppend("; ");
         //Generate Limit Condition
         node.Accept(this);
@@ -468,9 +473,7 @@ public class CodeGenerationVisitor : IVisitor
         node.Accept(this);
         EmitAppend(" = ");
         node.Accept(this);
-        if (n.Update is not UMinusNode) {
-            EmitAppend(" + ");
-        }
+        EmitAppend(n.Update is not UMinusNode ? " + " : " - ");
     }
 
     private void ForNodeHelperAssNode(AssNode node, ForNode n)
@@ -478,14 +481,14 @@ public class CodeGenerationVisitor : IVisitor
         EmitAppend("; ");
         //Generate Limit Condition
         ForNodeHelperAssNodeHelper(node);
-        EmitAppend(" <= ");
+        EmitAppend(n.IsUpTo ? " <= " : " >= ");
         n.Limit.Accept(this);
         EmitAppend("; ");
         //Generate part of the Update Condition
         ForNodeHelperAssNodeHelper(node);
         EmitAppend(" = ");
         ForNodeHelperAssNodeHelper(node);
-        EmitAppend(" + ");
+        EmitAppend(n.Update is not UMinusNode ? " + " : " - ");
     }
 
     private void ForNodeHelperAssNodeHelper(AssNode node)

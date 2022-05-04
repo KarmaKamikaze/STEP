@@ -498,7 +498,7 @@ public class CodeGenerationVisitorTests
         NumberNode limitNode = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode updateNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
 
-        ForNode forNode = new ForNode() {Initializer = assInit, Limit = limitNode, Update = updateNode};
+        ForNode forNode = new ForNode() {Initializer = assInit, Limit = limitNode, Update = updateNode, IsUpTo = true};
 
         //Act
         _visitor.Visit(forNode);
@@ -522,7 +522,7 @@ public class CodeGenerationVisitorTests
         NumberNode limitNode = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode updateNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
 
-        ForNode forNode = new ForNode() {Initializer = assInit, Limit = limitNode, Update = updateNode};
+        ForNode forNode = new ForNode() {Initializer = assInit, Limit = limitNode, Update = updateNode, IsUpTo = true};
 
         //Act
         _visitor.Visit(forNode);
