@@ -2,10 +2,10 @@
 
 namespace STEP;
 
-public class STEPErrorListener : BaseErrorListener
+public class STEPErrorListener<T> : ConsoleErrorListener<T>
 {
     // Throw exception upon error, ending compilation rather than continuing parse
-    public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line,
+    public override void SyntaxError(TextWriter output, IRecognizer recognizer, T offendingSymbol, int line,
         int charPositionInLine,
         string msg, RecognitionException e)
     {

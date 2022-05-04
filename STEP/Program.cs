@@ -42,20 +42,26 @@ class Program
 
         // Stream reader opens source file
         AntlrFileStream streamReader = new AntlrFileStream(args[0]);
+        
+        // Create custom error listeners (throws exception, ending compilation on parser error)
+        STEPErrorListener<int> lexerErrorListener = new();
+        STEPErrorListener<IToken> parserErrorListener = new();
 
         // Read the source code file
         STEPLexer lexer = new STEPLexer(streamReader);
-
+        // Remove default console error listener
+        lexer.RemoveErrorListener(ConsoleErrorListener<int>.Instance);
+        // Add custom error listener
+        lexer.AddErrorListener(lexerErrorListener);
         // Get token stream
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 
         // Parse the source code
         STEPParser parser = new STEPParser(tokenStream);
-        STEPErrorListener errorListener = new STEPErrorListener();
-        // Remove default console error reporter
+        // Remove default console error listener
         parser.RemoveErrorListener(ConsoleErrorListener<IToken>.Instance);
-        // Add new error reporter (throws exception, ending compilation on parser error
-        parser.AddErrorListener(errorListener);
+        // Add custom error listener
+        parser.AddErrorListener(parserErrorListener);
 
         try
         {
