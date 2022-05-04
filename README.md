@@ -2,14 +2,14 @@
 
 STEP is an imperative and type-safe programming language for Arduino.
 It is beginner friendly and targets students in the range of 8 to 16 years.
-It promotes structured programming, and supports simple single-run terminal programs and continuously Arduino programs.
+It promotes structured programming, and supports simple single-run terminal programs and continuous Arduino programs.
 
 <!-- GETTING STARTED -->
 ## Writing your first program
 
 1. Familiarize yourself with the structure of a STEP program
 
-An empty STEP program will look like this:
+An empty STEP program might look like this:
 
     variables
 
@@ -27,7 +27,7 @@ An empty STEP program will look like this:
 
     end functions
 
-There are four main _scopes_. It is mandatory to provide either `setup` or `loop` - the rest are mandatory.
+There are four main _scopes_. It is mandatory to provide either `setup` or `loop` - the rest are optional.
 
 2. Understand the scopes
 
