@@ -142,7 +142,7 @@ grammar STEP;
         ;
   
   forstmt 
-        :  REPEATFOR LPAREN for_iter_opt TO expr COMMA CHANGEBY expr RPAREN loop_stmt* ENDFOR
+        :  REPEATFOR LPAREN for_iter_opt (UPTO|DOWNTO) expr COMMA CHANGEBY expr RPAREN loop_stmt* ENDFOR
         ;
   
   for_iter_opt 
@@ -356,7 +356,8 @@ grammar STEP;
   ENDWHILE                      : 'end while';
   REPEATFOR                     : 'repeat for';
   ENDFOR                        : 'end for';
-  TO                            : 'to';
+  UPTO                          : 'up to';
+  DOWNTO                        : 'down to';
   CHANGEBY                      : 'change by';
   SWITCH                        : 'switch';
   ENDSWITCH                     : 'end switch';

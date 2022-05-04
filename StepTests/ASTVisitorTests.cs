@@ -21,60 +21,6 @@ public class ASTVisitorTests
         return parser.program();
     }
 
-    #region Literals
-
-    // Assume that the ANTLR-generated parser works correctly (it should have its own unit tests)
-    // These tests are for checking that the ASTs built by the AstBuilderVisitor from parse trees are correct.
-    // So these are integration tests that should check the generated ASTs for larger programs.
-    [Fact]
-    public void VisitAst_SetupWithNumLiteralDeclaration_BuildsCorrectAst()
-    {
-        // Arrange
-        const string program = @"setup
-                                     number x = 1
-                                 end setup";
-
-        var parseTree = GetParseTree(program);
-
-        var idNode = new IdNode() {Name = "x", NodeType = AstNodeType.IdNode};
-        var numNode = new NumberNode() {Value = 1, NodeType = AstNodeType.NumberNode};
-        var varDclNode = new VarDclNode()
-        {
-            Left = idNode,
-            Right = numNode,
-            NodeType = AstNodeType.VarDclNode
-        };
-        var setupNode = new SetupNode()
-        {
-            Stmts = new() {varDclNode},
-            NodeType = AstNodeType.SetupNode
-        };
-        var expectedAst = new ProgNode() {SetupBlock = setupNode, NodeType = AstNodeType.ProgNode};
-
-        // Act
-        // Get AST from the AstBuilderVisitor
-        var actualAst = _astBuilder.Visit(parseTree);
-
-        // Assert
-        Assert.Equal(expectedAst, actualAst);
-
-        // Check if the actual AST is equivalent to the expected AST
-        //Dam and Casper Died right about here
-
-        ////////////////-|
-        //            //-|
-        //     ||     //-|
-        //  ||||||||  //-|
-        //     ||     //-|
-        //     ||     //-|
-        //            //-|
-        //            //-|
-        // HOLY BIBLE //-|
-        ////////////////-|
-    }
-
-    #endregion
-
     [Fact]
     public void VisitAst_IfWithinElseClause_BuildsCorrectAst()
     {

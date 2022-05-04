@@ -558,13 +558,13 @@ public class TypeVisitor : IVisitor
             throw new TypeMismatchException("Unexpected type in for-loop initializer", initNode.SourcePosition,
                 initNode.Type, expectedType);
         }
-        else if (n.Limit.Type != expectedType)
+        if (n.Limit.Type != expectedType)
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeMismatchException("Unexpected type in for-loop limit expression", n.Limit.SourcePosition,
                 n.Limit.Type, expectedType);
         }
-        else if (n.Update.Type != expectedType)
+        if (n.Update.Type != expectedType)
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeMismatchException("Unexpected type in for-loop update expression", n.Update.SourcePosition,

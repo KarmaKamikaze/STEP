@@ -29,6 +29,7 @@ String stringfunc(double num, boolean isConstant) {
 }
 
 void setup() {
+    Serial.begin(9600);
     pinMode(1, INPUT);
     pinMode(A3, OUTPUT);
 

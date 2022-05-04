@@ -7,7 +7,7 @@ blank function print(number i)
 end function
 
 blank function printArray(number[] array, number count)
-    repeat for(number i = 0 to count, change by 1)
+    repeat for(number i = 0 up to count, change by 1)
         if(array[i] >= 0)
             print(array[i])
         end if
