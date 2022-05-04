@@ -1,0 +1,49 @@
+variables
+    input digitalpin dpin = 1
+    output analogpin apin = 3
+    constant number num = 10.5
+    string str = "test"
+    boolean boo = true
+end variables
+
+setup
+    str = "test2"
+    number num2 = 0
+    repeat for(number i = num2 up to num, change by 3)
+        num2 = num2 + 1 * 1 + (2 + -2)
+    end for
+end setup
+
+
+loop 
+    number num3 = 1
+    repeat while(true)
+        if(num3 > 2 * 10 + (15-15))
+            break
+        else if(num3 > num or num3 == num)
+            num3 = num3 * 2
+            continue
+        else
+            num3 = num3 + 1
+        end if
+    end while
+    
+    str = stringfunc(num3, boo)
+end loop
+
+functions 
+    blank function blankfunc(string[] array)
+        string[3] tempArray = ["test1", "test2", "test3"]
+    end function
+    string function stringfunc(number num, boolean isConstant)
+        string[3] arr = ["t1", "t2", "t3"]
+        blankfunc(arr)
+        if(isConstant or true and false)
+            return "constant " + num
+        else
+            return "not constant " + num
+        end if 
+        return "fail"
+    end function
+end functions
+

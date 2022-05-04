@@ -1,0 +1,30 @@
+setup
+end setup
+
+functions
+
+blank function print(number i)
+end function
+
+blank function printArray(number[] array, number count)
+    repeat for(number i = 0 up to count, change by 1)
+        if(array[i] >= 0)
+            print(array[i])
+        end if
+    end for
+end function
+
+##number[] function reverseArray(number[] array, number count)
+    number j = count - 1
+    
+    repeat for(number i = 0 to count, change by 1)
+        number x = array[i]
+        array[i] = array[j]
+        array[j] = x
+        j = j - 1
+    end for
+    return array
+end function##
+
+end functions
+

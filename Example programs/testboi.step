@@ -1,0 +1,45 @@
+variables
+  input analogpin pin1 = 1
+  output digitalpin pin2 = 2
+end variables
+
+loop
+  number[3] thisIsCursed = [1, 2, 3]
+end loop
+
+functions
+  string function func1(string test)
+    string str = "teststring"
+    repeat while(true)
+      if(true)
+        break
+      end if
+    end while
+    return test
+  end function
+
+  number[] function func2(string test, number[] num) 
+    boolean bool1 = true
+    if(bool1)
+      return num
+    end if
+    return num
+  end function
+
+
+  blank function blankfunc()
+    number x = 10
+    boolean b = true
+    if(b)
+    end if
+  end function
+
+  blank function ifelsefunc()
+    if(true)
+    else if(false)
+      if(true)
+      end if
+    end if
+  end function
+end functions
+

@@ -1,0 +1,11 @@
+# Based on the 'Blink' example for Arduino by Scott Fitzgerald, Arturo Guadalupi, and Colby Newman.
+variables
+  output digitalpin BuiltInLED = 13
+end variables
+
+loop
+  WriteToDigitalPin(BuiltInLED, On)
+  Wait(1000)
+  WriteToDigitalPin(BuiltInLED, Off)
+  Wait(1000)
+end loop

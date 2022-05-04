@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "STEP", "STEP\STEP.csproj", "{CEF13E4E-393E-406C-B30B-BC13E2FE6D82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepTests", "StepTests\StepTests.csproj", "{38ABD39C-D30F-4772-80A2-94A5A30A5099}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CEF13E4E-393E-406C-B30B-BC13E2FE6D82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEF13E4E-393E-406C-B30B-BC13E2FE6D82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEF13E4E-393E-406C-B30B-BC13E2FE6D82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEF13E4E-393E-406C-B30B-BC13E2FE6D82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38ABD39C-D30F-4772-80A2-94A5A30A5099}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38ABD39C-D30F-4772-80A2-94A5A30A5099}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38ABD39C-D30F-4772-80A2-94A5A30A5099}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38ABD39C-D30F-4772-80A2-94A5A30A5099}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

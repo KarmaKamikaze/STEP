@@ -1,0 +1,8 @@
+setup
+  RandomSeed(100)
+end setup
+
+loop
+  Print(Random(0, 1000))
+  Wait(1000)
+end loop
