@@ -62,8 +62,6 @@ class Program
             Console.WriteLine("Performing syntactic analysis...");
             STEPParser.ProgramContext tree = parser.program(); // Parse the input starting at the "program" rule.
 
-            // TODO: error listener
-
             // Build AST
             AstBuilderVisitor astBuilder = new AstBuilderVisitor();
             AstNode root = astBuilder.Build(tree);
