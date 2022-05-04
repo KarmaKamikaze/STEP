@@ -831,4 +831,4 @@ public class TypeVisitor : IVisitor
 
         ExitScope();
     }
-}
+} 
