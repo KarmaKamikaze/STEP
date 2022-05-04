@@ -1,9 +1,57 @@
 # STEP (Step Towards Effective Programming)
 
-SUMMARY
+STEP is an imperative and type-safe programming language for Arduino.
+It is beginner friendly and targets students in the range of 8 to 16 years.
+It promotes structured programming, and supports simple single-run terminal programs and continuous Arduino programs.
 
 <!-- GETTING STARTED -->
-## Getting Started
+## Writing your first program
+
+1. Familiarize yourself with the structure of a STEP program
+
+An empty STEP program might look like this:
+```
+variables
+
+end variables
+
+setup
+
+end setup
+
+loop
+
+end loop
+
+functions
+
+end functions
+```
+There are four main _scopes_. It is mandatory to provide either `setup` or `loop` - the rest are optional.
+
+2. Understand the scopes
+
+| Scope name      | Description                                                                         |
+| --------------- | ----------------------------------------------------------------------------------- |
+| variables       | Contains global variable declarations [^global]                                     |
+| setup           | Contains code that should be run at initialization of program                       |
+| loop            | Contains code that will run repeatedly until Arduino device is turned off           |
+| functions       | Contains function definitions [^function]                                           |
+
+[^global]: A global variable is accessible from anywhere in the program
+[^function]: A procedure that can be executed from anywhere in the program
+
+3. Understand the keywords, statements and control structures
+
+STEP is formally documented in the [development journal](https://www.youtube.com/watch?v=dQw4w9WgXcQ). 
+
+4. Hello, world!
+```
+setup
+    Print("Hello, world!")
+end setup
+```
+## Getting started
 
 To get a local copy up and running, follow these steps.
 
@@ -71,7 +119,27 @@ tar –xvzf arduino-cli_latest_macOS_64bit.tar.gz
 
 ## Using the compiler
 
-DESCRIPTION & WALKTHROUGH
+1. Familiarize yourself with the compiler arguments
+
+| Argument        | Description                                              |
+| --------------- | -------------------------------------------------------- |
+| -pp             | Prints the arduino code in the terminal                  |
+| -upload [port]  | Uploads the arduino code to the arduino device [^port]      |
+| -output [port]  | Displays arduino output in terminal after uploading [^port] |
+| -ports          | Displays what devices are connected to which ports       |
+
+[^port]: If no port is supplied, the compiler attempts to guess the correct port
+
+2. Run the compiler
+
+Linux & macOS:
+```sh
+./STEP [sourcefile] [args]
+```
+Windows:
+```sh
+./STEP.exe [sourcefile] [args]
+``` 
 
 
 <!-- LICENSE -->
