@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using STEP.AST.Nodes;
@@ -10,6 +10,7 @@ public class CodeGenerationVisitor : IVisitor
     private readonly StringBuilder _stringBuilder = new();
     private string Output => _stringBuilder.ToString();
     private readonly StringBuilder _pinSetup = new();
+    private readonly StringBuilder _memcpySetup = new();
     private int _scopeLevel;
     private int _tempCount;
     private readonly List<IdNode> _arrDclsInScope = new(); // Keeps track of array declarations currently in scope
@@ -113,10 +114,19 @@ public class CodeGenerationVisitor : IVisitor
     private void CopyArrayHelper(ArrDclNode n, ArrLiteralNode lit)
     {
         // Copies array from arr literal into LHS
-        EmitIndentation();
         string tempName = $"__temp{_tempCount - 1}__";
-        EmitLine(
-            $"memcpy({n.Left.Name}, {tempName}, sizeof({tempName}[0])*{Math.Min(n.Left.Type.ArrSize, lit.Type.ArrSize)});");
+        string memcpyString = $"memcpy({n.Left.Name}, {tempName}, sizeof({tempName}[0])*{Math.Min(n.Left.Type.ArrSize, lit.Type.ArrSize)});";
+        // Calls to memcpy are not allowed in the "global" scope, so it must be moved to setup()
+        if (n.Type.ScopeLevel == 0)
+        {
+            _memcpySetup.Append(' ', 4); // Ensure that it is correctly indented in setup()
+            _memcpySetup.AppendLine(memcpyString);
+        }
+        else
+        {
+            EmitIndentation();
+            EmitLine(memcpyString);
+        }
     }
 
     // Adds tabs to format output code
@@ -240,7 +250,7 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(ArrLiteralNode n)
     {
         int count = n.Elements.Count;
-        if (count == 0) return;
+        if (count == 0) return;       
         EmitIndentation();
         EmitAppend(n.Type);
         EmitAppend($"__temp{_tempCount}__[] = {{");
@@ -689,9 +699,10 @@ public class CodeGenerationVisitor : IVisitor
         n.FuncsBlock?.Accept(this);
         EmitLine("void setup() {");
         EmitLine("    Serial.begin(9600);");
+        // Add memcpy calls for globally defined array
+        EmitAppend(_memcpySetup.ToString());
         // Add declared pinModes from variables scope
-        if (_pinSetup.ToString() != String.Empty)
-            EmitLine(_pinSetup.ToString());
+        EmitAppend(_pinSetup.ToString());
         n.SetupBlock?.Accept(this);
         EmitLine("}");
         EmitLine("void loop() {");
