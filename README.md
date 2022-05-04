@@ -53,7 +53,7 @@ Windows:
 ```sh
 tar –xvzf arduino-cli_latest_Windows_64bit.zip
 ```
-Linux:
+macOS:
 ```sh
 tar –xvzf arduino-cli_latest_macOS_64bit.tar.gz
 ```
