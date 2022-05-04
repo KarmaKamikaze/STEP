@@ -32,7 +32,6 @@ void setup() {
     Serial.begin(9600);
     pinMode(1, INPUT);
     pinMode(A3, OUTPUT);
-
     str = "test2";
     double num2 = 0;
     for(double i = num2; i <= num; i = i + 3) {

@@ -610,7 +610,7 @@ public class CodeGenerationVisitorTests
     {
         // Arrange
         string expected =
-            $"#define x 1\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    Serial.begin(9600);\r\n    pinMode(1, {expectedMode});\r\n\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
+            $"#define x 1\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    Serial.begin(9600);\r\n    pinMode(1, {expectedMode});\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
         var n = new NumberNode() {Value = 1};
         var x = new IdNode {Name = "x"};
         var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = givenPinMode}};
@@ -633,7 +633,7 @@ public class CodeGenerationVisitorTests
     {
         // Arrange
         string expected =
-            $"#define {variableName} {pinNumber}\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    Serial.begin(9600);\r\n    pinMode({pinNumber}, INPUT);\r\n\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
+            $"#define {variableName} {pinNumber}\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    Serial.begin(9600);\r\n    pinMode({pinNumber}, INPUT);\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
         var n = new NumberNode() {Value = pinNumber};
         var x = new IdNode {Name = variableName};
         var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = PinMode.INPUT}};
