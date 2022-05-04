@@ -220,7 +220,7 @@ public class CodeGenerationVisitor : IVisitor
         n.Left.Accept(this);
         EmitAppend($" = (");
         EmitAppend(n.Type, "*");
-        EmitAppend($")malloc({n.Size} * sizeof(");
+        EmitAppend($")calloc({n.Size}, sizeof(");
         EmitAppend(n.Type, "))");
         EmitLine(";");
         // Copy array
