@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Runtime.InteropServices;
@@ -1340,9 +1340,10 @@ public class TypeCheckerTests
             },
             ReturnType = new Type() {ActualType = TypeVal.Number}
         };
+        var funcsNode = new FuncsNode { FuncDcls = new() { funcDefNode } };
 
         // Act
-        funcDefNode.Accept(_typeVisitor);
+        funcsNode.Accept(_typeVisitor);
 
         // Assert
         Assert.Equal(TypeVal.Number, funcDefNode.Type.ActualType);
@@ -1454,53 +1455,6 @@ public class TypeCheckerTests
 
         // Assert
         Assert.Throws<ArgumentOutOfRangeException>(test);
-    }
-
-    [Fact]
-    public void IdNode_UsedBeforeDeclaration_IsAssociatedWithCorrectDeclaration()
-    {
-        /* blank function funcA()
-         *   funcB()
-         * end function
-         * 
-         * blank function funcB()
-         * end function
-         */
-
-        // Arrange
-        var funcB = new FuncDefNode
-        {
-            FormalParams = new(),
-            Id = new IdNode { Name = "funcB" },
-            ReturnType = new Type { ActualType = TypeVal.Blank },
-            Type = new Type { ActualType = TypeVal.Blank },
-            Stmts = new()
-        };
-        var funcA = new FuncDefNode
-        {
-            FormalParams = new(),
-            Id = new IdNode { Name = "funcA" },
-            ReturnType = new Type { ActualType = TypeVal.Blank },
-            Type = new Type { ActualType = TypeVal.Blank },
-            Stmts = new()
-            {
-                new FuncStmtNode
-                {
-                    Id = new IdNode { Name = funcB.Id.Name },
-                    Params = new()
-                }
-            }
-        };
-        var funcBlock = new FuncsNode
-        {
-            FuncDcls = new List<FuncDefNode> { funcA, funcB }
-        };
-
-        // Act
-        var action = () => _typeVisitor.Visit(funcBlock);
-
-        // Assert - should run without errors
-        action();
     }
 
     #endregion

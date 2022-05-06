@@ -1,0 +1,27 @@
+variables
+    
+end variables
+
+setup
+end setup
+
+loop
+    number p = GetRandomNumber()
+    Print(p)
+end loop
+
+functions
+    number function GetRandomNumber()
+        RandomSeed(420)
+        return Random(0, 1000)
+    end function
+    
+    blank function PrintRandomNumber()
+        number x = GetRandomNumber()
+        PrintNumber(x)
+    end function
+    
+    blank function PrintNumber(number x)
+        Print(x)
+    end function
+end functions

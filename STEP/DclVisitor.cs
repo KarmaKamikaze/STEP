@@ -16,4 +16,10 @@ public class DclVisitor : TypeVisitor
     {
         _symbolTable.EnterSymbol(n);
     }
+
+    public override void Visit(FuncDefNode n)
+    {
+        n.Type = n.ReturnType;
+        _symbolTable.EnterSymbol(n);
+    }
 }

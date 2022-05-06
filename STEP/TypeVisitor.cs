@@ -602,7 +602,7 @@ public class TypeVisitor : IVisitor
         ExitScope();
     }
 
-    public void Visit(FuncDefNode n)
+    public virtual void Visit(FuncDefNode n)
     {
         EnterScope();
         foreach (var param in n.FormalParams)
@@ -617,9 +617,6 @@ public class TypeVisitor : IVisitor
         }
 
         ExitScope();
-
-        n.Type = n.ReturnType;
-        _symbolTable.EnterSymbol(n);
     }
 
     public void Visit(FuncExprNode n)
@@ -707,6 +704,11 @@ public class TypeVisitor : IVisitor
 
     public void Visit(FuncsNode n)
     {
+        var dclVisitor = new DclVisitor(_symbolTable);
+        foreach (var funcDcl in n.FuncDcls)
+        {
+            funcDcl.Accept(dclVisitor);
+        }
         foreach (var funcDcl in n.FuncDcls)
         {
             funcDcl.Accept(this);

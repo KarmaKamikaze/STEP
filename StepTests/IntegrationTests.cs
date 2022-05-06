@@ -60,4 +60,55 @@ public class IntegrationTests
                 "int2Source.step", "int2Expected.ino"
             }
         };
+
+    [Fact]
+    public void TypeVisitor_Function1CallsFunction2WhichIsDeclaredLater_WorksFlawlessly()
+    {
+        // The scope rules of STEP state that any function must be able to call other functions,
+        // regardless of the order in which they are declared (to avoid the need for prototypes)
+
+        /* blank function funcA()
+         *   funcB()
+         * end function
+         * 
+         * blank function funcB()
+         * end function
+         */
+
+        // Arrange
+        var typeVisitor = new TypeVisitor();
+        var funcB = new FuncDefNode
+        {
+            FormalParams = new(),
+            Id = new IdNode { Name = "funcB" },
+            ReturnType = new Type { ActualType = TypeVal.Blank },
+            Type = new Type { ActualType = TypeVal.Blank },
+            Stmts = new()
+        };
+        var funcA = new FuncDefNode
+        {
+            FormalParams = new(),
+            Id = new IdNode { Name = "funcA" },
+            ReturnType = new Type { ActualType = TypeVal.Blank },
+            Type = new Type { ActualType = TypeVal.Blank },
+            Stmts = new()
+            {
+                new FuncStmtNode
+                {
+                    Id = new IdNode { Name = funcB.Id.Name },
+                    Params = new()
+                }
+            }
+        };
+        var funcBlock = new FuncsNode
+        {
+            FuncDcls = new List<FuncDefNode> { funcA, funcB }
+        };
+
+        // Act
+        var action = () => typeVisitor.Visit(funcBlock);
+
+        // Assert - should run without errors
+        action();
+    }
 }
