@@ -17,6 +17,27 @@ public class DclVisitor : TypeVisitor
         _symbolTable.EnterSymbol(n);
     }
 
+    public override void Visit(FuncsNode n)
+    {
+        foreach (var dcl in n.FuncDcls)
+        {
+            dcl.Accept(this);
+        }
+    }
+
+    public override void Visit(VarDclNode n)
+    {
+        n.Left.Accept(this);
+    }
+
+    public override void Visit(VarsNode n)
+    {
+        foreach (var dcl in n.Dcls)
+        {
+            dcl.Accept(this);
+        }
+    }
+
     public override void Visit(FuncDefNode n)
     {
         n.Type = n.ReturnType;

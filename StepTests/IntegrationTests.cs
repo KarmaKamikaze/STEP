@@ -104,9 +104,76 @@ public class IntegrationTests
         {
             FuncDcls = new List<FuncDefNode> { funcA, funcB }
         };
+        var programNode = new ProgNode { FuncsBlock = funcBlock };
 
         // Act
-        var action = () => typeVisitor.Visit(funcBlock);
+        var action = () => typeVisitor.Visit(programNode);
+
+        // Assert - should run without errors
+        action();
+    }
+
+    [Fact]
+    public void TypeVisitor_FunctionCallInGlobalVariable_WorksFlawlessly()
+    {
+        /* variables
+         *   number x = GetNumber()
+         * end variables
+         * 
+         * setup
+         * end setup
+         * 
+         * functions
+         *   number function GetNumber()
+         *     return 1
+         *   end function
+         * end functions
+         */
+
+        // Arrange
+        var typeVisitor = new TypeVisitor();
+        var variables = new VarsNode
+        {
+            Dcls = new List<VarDclNode>
+            {
+                new VarDclNode
+                {
+                    Left = new IdNode 
+                    { 
+                        Name = "x",
+                        Type = new Type { ActualType = TypeVal.Number }
+                    },
+                    Right = new FuncExprNode { Id = new IdNode { Name = "GetNumber" }, Params = new() }
+                }
+            }
+        };
+        var func = new FuncDefNode
+        {
+            Id = new IdNode { Name = "GetNumber" },
+            ReturnType = new Type { ActualType = TypeVal.Number },
+            FormalParams = new(),
+            Stmts = new List<StmtNode>
+            {
+                new RetNode 
+                { 
+                    RetVal = new NumberNode 
+                    { 
+                        Value = 1, 
+                        Type = new Type {ActualType = TypeVal.Number } 
+                    },
+                    SurroundingFuncType = new Type { ActualType = TypeVal.Number }
+                }
+            }
+        };
+        var funcsNode = new FuncsNode { FuncDcls = new List<FuncDefNode> { func } };
+        var programNode = new ProgNode
+        {
+            VarsBlock = variables,
+            FuncsBlock = funcsNode
+        };
+
+        // Act
+        var action = () => typeVisitor.Visit(programNode);
 
         // Assert - should run without errors
         action();

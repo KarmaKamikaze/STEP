@@ -86,23 +86,28 @@ public class TypeCheckerTests
         const string id = "x";
 
         // Intercept symbol table entry request, save locally
+        Dictionary<string, SymTableEntry> symTable = new();
         SymTableEntry symbolTableEntry = new();
         _symbolTableMock.Setup(x => x.EnterSymbol(It.IsAny<IdNode>()))
-            .Callback<IdNode>((id) => symbolTableEntry = new SymTableEntry() {Name = id.Name, Type = id.Type});
-
+            .Callback<IdNode>((id) => symTable.Add(id.Name, new SymTableEntry { Name = id.Name, Type = id.Type}));
+        _symbolTableMock.Setup(x => x.RetrieveSymbol(id))
+            .Returns<string>(id => symTable[id]);
         var dclNode = new VarDclNode()
         {
             Left = new IdNode() {Name = id, Type = new Type() {ActualType = TypeVal.Number}},
             Right = new NumberNode() {Value = 50}
         };
         var idNode = new IdNode() {Name = id};
+        var setupNode = new SetupNode
+        {
+            Stmts = new List<StmtNode>
+            {
+                dclNode, new AssNode { Id = idNode, Expr = idNode }
+            }
+        };
 
         // Act
-        _typeVisitor.Visit(dclNode);
-        // Intercept symbol table receive request, use local
-        _symbolTableMock.Setup(x => x.RetrieveSymbol(id))
-            .Returns(symbolTableEntry);
-        _typeVisitor.Visit(idNode);
+        _typeVisitor.Visit(setupNode);
 
         // Assert
         Assert.Equal(dclNode.Right.Type.ActualType, idNode.Type.ActualType);
@@ -1259,9 +1264,10 @@ public class TypeCheckerTests
         {
             FuncDcls = new List<FuncDefNode>() {funcDefNode}
         };
+        var programNode = new ProgNode { FuncsBlock = funcsNode };
 
         // Act
-        funcsNode.Accept(_typeVisitor);
+        programNode.Accept(_typeVisitor);
 
         // Assert
         Assert.Equal(TypeVal.Number, funcDefNode.Type.ActualType);
@@ -1341,9 +1347,10 @@ public class TypeCheckerTests
             ReturnType = new Type() {ActualType = TypeVal.Number}
         };
         var funcsNode = new FuncsNode { FuncDcls = new() { funcDefNode } };
+        var programNode = new ProgNode { FuncsBlock = funcsNode };
 
         // Act
-        funcsNode.Accept(_typeVisitor);
+        programNode.Accept(_typeVisitor);
 
         // Assert
         Assert.Equal(TypeVal.Number, funcDefNode.Type.ActualType);

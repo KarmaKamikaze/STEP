@@ -1,5 +1,5 @@
 variables
-    
+    constant number q = GetRandomNumber()
 end variables
 
 setup
@@ -8,9 +8,10 @@ end setup
 loop
     number p = GetRandomNumber()
     Print(p)
+    Wait(2000)
 end loop
 
-functions
+functions   
     number function GetRandomNumber()
         RandomSeed(420)
         return Random(0, 1000)
@@ -22,6 +23,6 @@ functions
     end function
     
     blank function PrintNumber(number x)
-        Print(x)
+        Print(x + q)
     end function
 end functions

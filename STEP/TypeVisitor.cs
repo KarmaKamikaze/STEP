@@ -283,10 +283,13 @@ public class TypeVisitor : IVisitor
         // index is >= 0 and < ArrSize?
     }
 
-    public void Visit(VarDclNode n)
+    public virtual void Visit(VarDclNode n)
     {
-        DclVisitor dclVisitor = new DclVisitor(_symbolTable);
-        n.Left.Accept(dclVisitor);
+        if (_scopeLevel > 0) // Global variables are already handled at this point, so avoid redeclaring them
+        {
+            var dclVisitor = new DclVisitor(_symbolTable);
+            n.Left.Accept(dclVisitor);
+        }
         n.Right.Accept(this);
         if (n.Left.Type == n.Right.Type)
         {
@@ -702,13 +705,8 @@ public class TypeVisitor : IVisitor
         }
     }
 
-    public void Visit(FuncsNode n)
+    public virtual void Visit(FuncsNode n)
     {
-        var dclVisitor = new DclVisitor(_symbolTable);
-        foreach (var funcDcl in n.FuncDcls)
-        {
-            funcDcl.Accept(dclVisitor);
-        }
         foreach (var funcDcl in n.FuncDcls)
         {
             funcDcl.Accept(this);
@@ -805,7 +803,7 @@ public class TypeVisitor : IVisitor
         ExitScope();
     }
 
-    public void Visit(VarsNode n)
+    public virtual void Visit(VarsNode n)
     {
         foreach (var node in n.Dcls)
         {
@@ -816,6 +814,17 @@ public class TypeVisitor : IVisitor
 
     public void Visit(ProgNode n)
     {
+        // Ensure that global variables and functions are written into the symbol table
+        var dclVisitor = new DclVisitor(_symbolTable);
+        if (n.VarsBlock != null)
+        {
+            n.VarsBlock.Accept(dclVisitor);
+        }
+        if (n.FuncsBlock != null)
+        {
+            n.FuncsBlock.Accept(dclVisitor);
+        }
+        // Then perform type/scope checking
         n.VarsBlock?.Accept(this);
         n.FuncsBlock?.Accept(this);
         n.SetupBlock?.Accept(this);
