@@ -1456,6 +1456,53 @@ public class TypeCheckerTests
         Assert.Throws<ArgumentOutOfRangeException>(test);
     }
 
+    [Fact]
+    public void IdNode_UsedBeforeDeclaration_IsAssociatedWithCorrectDeclaration()
+    {
+        /* blank function funcA()
+         *   funcB()
+         * end function
+         * 
+         * blank function funcB()
+         * end function
+         */
+
+        // Arrange
+        var funcB = new FuncDefNode
+        {
+            FormalParams = new(),
+            Id = new IdNode { Name = "funcB" },
+            ReturnType = new Type { ActualType = TypeVal.Blank },
+            Type = new Type { ActualType = TypeVal.Blank },
+            Stmts = new()
+        };
+        var funcA = new FuncDefNode
+        {
+            FormalParams = new(),
+            Id = new IdNode { Name = "funcA" },
+            ReturnType = new Type { ActualType = TypeVal.Blank },
+            Type = new Type { ActualType = TypeVal.Blank },
+            Stmts = new()
+            {
+                new FuncStmtNode
+                {
+                    Id = new IdNode { Name = funcB.Id.Name },
+                    Params = new()
+                }
+            }
+        };
+        var funcBlock = new FuncsNode
+        {
+            FuncDcls = new List<FuncDefNode> { funcA, funcB }
+        };
+
+        // Act
+        var action = () => _typeVisitor.Visit(funcBlock);
+
+        // Assert - should run without errors
+        action();
+    }
+
     #endregion
 
     #region Statements
