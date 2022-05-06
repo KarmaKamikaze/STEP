@@ -121,14 +121,15 @@ tar –xvzf arduino-cli_latest_macOS_64bit.tar.gz
 
 1. Familiarize yourself with the compiler arguments
 
-| Argument        | Description                                              |
-| --------------- | -------------------------------------------------------- |
-| -pp             | Prints the arduino code in the terminal                  |
-| -upload [port]  | Uploads the arduino code to the arduino device [^port]      |
-| -output [port]  | Displays arduino output in terminal after uploading [^port] |
-| -ports          | Displays what devices are connected to which ports       |
+| Argument        | Description                                                  |
+| --------------- | ------------------------------------------------------------ |
+| -print          | Prints the source code in the terminal                       |
+| -upload [port]  | Uploads the compiled code to the arduino device [^port]      |
+| -output [port]  | Displays arduino serial output in terminal [^port] [^output] |
+| -ports          | Displays what devices are connected to which ports           |
 
 [^port]: If no port is supplied, the compiler attempts to guess the correct port
+[^output]: The output argument can be used seperately to display the output of an already uploaded program on the arduino. It can also be specified in combination with the upload argument to enter monitor mode immediately after porting the program to the arduino.
 
 2. Run the compiler
 
