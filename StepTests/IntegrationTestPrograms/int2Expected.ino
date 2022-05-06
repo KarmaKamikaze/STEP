@@ -1,5 +1,9 @@
 ﻿#define apin 3
 #define dpin 1
+// Function prototypes
+void blankfunc(String*);
+String stringfunc(double, boolean);
+
 // Global variables
 const double num = 10.5;
 String str = "test";

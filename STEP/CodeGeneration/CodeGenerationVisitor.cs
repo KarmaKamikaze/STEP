@@ -695,6 +695,11 @@ public class CodeGenerationVisitor : IVisitor
 
     public void Visit(ProgNode n)
     {
+        if (n.FuncsBlock != null && n.VarsBlock != null)
+        {
+            EmitFunctionPrototypes(n.FuncsBlock);
+        }
+
         n.VarsBlock?.Accept(this);
         n.FuncsBlock?.Accept(this);
         EmitLine("void setup() {");
@@ -708,6 +713,27 @@ public class CodeGenerationVisitor : IVisitor
         EmitLine("void loop() {");
         n.LoopBlock?.Accept(this);
         EmitLine("}");
+    }
+
+    private void EmitFunctionPrototypes(FuncsNode n)
+    {
+        EmitLine("// Function prototypes");
+        foreach (var dcl in n.FuncDcls)
+        {
+            EmitAppend(dcl.ReturnType, dcl.ReturnType.IsArray ? "* " : " ");
+            EmitAppend(dcl.Id.Name + "(");
+            for (int i = 0; i < dcl.FormalParams.Count; i++)
+            {
+                var param = dcl.FormalParams[i];
+                EmitAppend(param.Type, param.Type.IsArray ? "*" : "");
+                if (i < dcl.FormalParams.Count - 1)
+                {
+                    EmitAppend(", ");
+                }
+            }
+            EmitLine(");");
+        }
+        EmitLine("");
     }
 
     public void Visit(SetupNode n)
