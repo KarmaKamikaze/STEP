@@ -240,6 +240,10 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(RetNode n)
     {
+        if (n.RetVal != null)
+        {
+            n.RetVal.Accept(this);
+        }
     }
 
     public void Visit(IfNode n)
