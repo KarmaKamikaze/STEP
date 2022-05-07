@@ -9,3 +9,13 @@ setup
     end if
   end while
 end setup
+
+functions
+  boolean function isEven(number x)
+    return true
+  end function
+
+  boolean function isOdd(number x)
+    return true
+  end function
+end functions
