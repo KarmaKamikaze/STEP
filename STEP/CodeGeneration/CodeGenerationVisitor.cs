@@ -14,6 +14,7 @@ public class CodeGenerationVisitor : IVisitor
     private int _scopeLevel;
     private int _tempCount;
     private readonly List<IdNode> _arrDclsInScope = new(); // Keeps track of array declarations currently in scope
+    private readonly string _nl = Environment.NewLine;
 
     public void OutputToBaseFile(string filename)
     {
@@ -558,7 +559,7 @@ public class CodeGenerationVisitor : IVisitor
 
         ExitScope();
         EmitIndentation();
-        EmitLine("}\r\n");
+        EmitLine($"}}{_nl}");
     }
 
     public void Visit(FuncExprNode n)
@@ -810,10 +811,10 @@ public class CodeGenerationVisitor : IVisitor
                 break;
         }
 
-        _pinSetup.Append(");\r\n");
+        _pinSetup.Append($");{_nl}");
 
         // Save variable names as constant declarations and prepend to generated code
-        string variableConstant = $"#define {n.Left.Name} {pinVisitor.GetPinCode()}\r\n";
+        string variableConstant = $"#define {n.Left.Name} {pinVisitor.GetPinCode()}{_nl}";
         _stringBuilder.Insert(0, variableConstant);
     }
 }

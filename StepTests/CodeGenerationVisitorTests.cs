@@ -15,6 +15,8 @@ public class CodeGenerationVisitorTests
 {
     private readonly CodeGenerationVisitor _visitor = new();
 
+    private string _nl = Environment.NewLine; 
+
     #region FuncDefNode
 
     [Fact]
@@ -28,7 +30,7 @@ public class CodeGenerationVisitorTests
          */
 
         // Arrange
-        const string expected = "double x(double a, double b) {\r\n}\r\n\r\n";
+        string expected = $"double x(double a, double b) {{{_nl}}}{_nl}{_nl}";
         var param1 = new IdNode {Name = "a", Type = new STEP.Type {ActualType = TypeVal.Number}};
         var param2 = new IdNode {Name = "b", Type = new STEP.Type {ActualType = TypeVal.Number}};
         var funcId = new IdNode {Name = "x", Type = new STEP.Type {ActualType = TypeVal.Number}};
@@ -59,7 +61,7 @@ public class CodeGenerationVisitorTests
          */
 
         // Arrange
-        const string expected = "double x() {\r\n}\r\n\r\n";
+        string expected = $"double x() {{{_nl}}}{_nl}{_nl}";
         var funcId = new IdNode {Name = "x", Type = new STEP.Type {ActualType = TypeVal.Number}};
         var funcDcl = new FuncDefNode
         {
@@ -87,7 +89,7 @@ public class CodeGenerationVisitorTests
         // Arrange
         // string x = "This is a string" + 25 + 10 * 2 ->
         // => String x = "This is a string" + String(25 + 10 * 2);\r\n
-        const string expected = "String x = \"This is a string\" + String(25 + 10 * 2);\r\n";
+        string expected = $"String x = \"This is a string\" + String(25 + 10 * 2);{_nl}";
         var two = new NumberNode() {Value = 2, Type = new STEP.Type() {ActualType = TypeVal.Number}};
         var ten = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
         var multExpr = new MultNode()
@@ -132,7 +134,7 @@ public class CodeGenerationVisitorTests
         // Arrange
         // string x = true + " " + "funk"
         // => String x = String(true) + " " + "funk";\r\n
-        const string expected = "String x = String(true) + \" \" + \"funk\";\r\n";
+        string expected = $"String x = String(true) + \" \" + \"funk\";{_nl}";
 
         var trueBool = new BoolNode {Value = true, Type = new STEP.Type {ActualType = TypeVal.Boolean}};
         var space = new StringNode {Value = "\" \"", Type = new STEP.Type {ActualType = TypeVal.String}};
@@ -171,7 +173,7 @@ public class CodeGenerationVisitorTests
         // string x = "foo" + 15 + 30 + "bar"
         // => String x = "foo" + String(15) + String(30) + "bar";\r\n
         // Arrange
-        const string expected = "String x = \"foo\" + String(15) + String(30) + \"bar\";\r\n";
+        string expected = $"String x = \"foo\" + String(15) + String(30) + \"bar\";{_nl}";
 
         var foo = new StringNode {Value = "\"foo\"", Type = new STEP.Type {ActualType = TypeVal.String}};
         var num15 = new NumberNode {Value = 15, Type = new STEP.Type {ActualType = TypeVal.Number}};
@@ -218,7 +220,7 @@ public class CodeGenerationVisitorTests
         // where GetDay returns a number and month is a number
         // => String x = String(GetDay()) + ", " + String(month);\r\n
         // Arrange
-        const string expected = "String x = String(GetDay()) + \", \" + String(month);\r\n";
+        string expected = $"String x = String(GetDay()) + \", \" + String(month);{_nl}";
         var getDayId = new IdNode {Name = "GetDay"};
         var getDay = new FuncExprNode
             {Id = getDayId, Params = new(), Type = new STEP.Type {ActualType = TypeVal.Number}};
@@ -268,7 +270,7 @@ public class CodeGenerationVisitorTests
          */
 
         // Arrange
-        const string expected = "if(true) {\r\n}\r\n";
+        string expected = $"if(true) {{{_nl}}}{_nl}";
         var condition = new BoolNode {Value = true, Type = new STEP.Type {ActualType = TypeVal.Boolean}};
         var ifStmt = new IfNode {Condition = condition, ThenClause = new List<StmtNode>()};
 
@@ -299,7 +301,7 @@ public class CodeGenerationVisitorTests
          */
 
         // Arrange
-        const string expected = "if(true) {\r\n    return a;\r\n}\r\nelse {\r\n    return b;\r\n}\r\n";
+        string expected = $"if(true) {{{_nl}    return a;{_nl}}}{_nl}else {{{_nl}    return b;{_nl}}}{_nl}";
         var condition = new BoolNode {Value = true, Type = new STEP.Type {ActualType = TypeVal.Boolean}};
         var a = new IdNode {Name = "a"};
         var retStmt1 = new RetNode {RetVal = a};
@@ -343,8 +345,8 @@ public class CodeGenerationVisitorTests
          */
 
         // Arrange
-        const string expected =
-            "if(x) {\r\n    return x;\r\n}\r\nelse if(y) {\r\n    return y;\r\n}\r\nelse if(z) {\r\n    return z;\r\n}\r\n";
+        string expected =
+            $"if(x) {{{_nl}    return x;{_nl}}}{_nl}else if(y) {{{_nl}    return y;{_nl}}}{_nl}else if(z) {{{_nl}    return z;{_nl}}}{_nl}";
         var x = new IdNode {Name = "x"};
         var retx = new RetNode {RetVal = x};
         var y = new IdNode {Name = "y"};
@@ -396,8 +398,8 @@ public class CodeGenerationVisitorTests
          */
 
         // Arrange
-        const string expected =
-            "if(x) {\r\n    return x;\r\n}\r\nelse if(y) {\r\n    return y;\r\n}\r\nelse if(z) {\r\n    return z;\r\n}\r\nelse {\r\n    return q;\r\n}\r\n";
+        string expected =
+            $"if(x) {{{_nl}    return x;{_nl}}}{_nl}else if(y) {{{_nl}    return y;{_nl}}}{_nl}else if(z) {{{_nl}    return z;{_nl}}}{_nl}else {{{_nl}    return q;{_nl}}}{_nl}";
         var x = new IdNode {Name = "x"};
         var retx = new RetNode {RetVal = x};
         var y = new IdNode {Name = "y"};
@@ -439,7 +441,7 @@ public class CodeGenerationVisitorTests
          */
 
         // Arrange
-        const string expected = "if(x) {\r\n    return x;\r\n}\r\n";
+        string expected = $"if(x) {{{_nl}    return x;{_nl}}}{_nl}";
         var x = new IdNode {Name = "x"};
         var retx = new RetNode {RetVal = x};
         var y = new IdNode {Name = "y"};
@@ -467,7 +469,7 @@ public class CodeGenerationVisitorTests
     public void ForNodeVarDclInitializerIsCreatedCorrectly()
     {
         //Arrange
-        const string expected = "for(double i = 0; i <= 10; i = i + 1) {\r\n}\r\n";
+        string expected = $"for(double i = 0; i <= 10; i = i + 1) {{{_nl}}}{_nl}";
         IdNode idNode = new IdNode() {Name = "i", Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode exprNode = new NumberNode() {Value = 0, Type = new STEP.Type() {ActualType = TypeVal.Number}};
         VarDclNode varInit = new VarDclNode()
@@ -490,7 +492,7 @@ public class CodeGenerationVisitorTests
     public void ForNodeIdAssNodeInitializerIsCreatedCorrectly()
     {
         //Arrange
-        const string expected = "for(i = 0; i <= 10; i = i + 1) {\r\n}\r\n";
+        string expected = $"for(i = 0; i <= 10; i = i + 1) {{{_nl}}}{_nl}";
         IdNode idNode = new IdNode() {Name = "i", Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode exprNode = new NumberNode() {Value = 0, Type = new STEP.Type() {ActualType = TypeVal.Number}};
         AssNode assInit = new AssNode() {Id = idNode, Expr = exprNode};
@@ -512,7 +514,7 @@ public class CodeGenerationVisitorTests
     public void ForNodeArrAccAssNodeInitializerIsCreatedCorrectly()
     {
         //Arrange
-        const string expected = "for(i[(int) 1] = 0; i[(int) 1] <= 10; i[(int) 1] = i[(int) 1] + 1) {\r\n}\r\n";
+        string expected = $"for(i[(int) 1] = 0; i[(int) 1] <= 10; i[(int) 1] = i[(int) 1] + 1) {{{_nl}}}{_nl}";
         IdNode idNode = new IdNode() {Name = "i", Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode exprNode = new NumberNode() {Value = 0, Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode indexNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
@@ -536,7 +538,7 @@ public class CodeGenerationVisitorTests
     public void ForNodeIdInitializerIsCreatedCorrectly()
     {
         //Arrange
-        const string expected = "for(i; i <= 10; i = i + 1) {\r\n}\r\n";
+        string expected = $"for(i; i <= 10; i = i + 1) {{{_nl}}}{_nl}";
         IdNode idNode = new IdNode() {Name = "i", Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode limitNode = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode updateNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
@@ -555,7 +557,7 @@ public class CodeGenerationVisitorTests
     public void ForNodeArrAccInitializerIsCreatedCorrectly()
     {
         //Arrange
-        const string expected = "for(i[(int) 1]; i[(int) 1] <= 10; i[(int) 1] = i[(int) 1] + 1) {\r\n}\r\n";
+        string expected = $"for(i[(int) 1]; i[(int) 1] <= 10; i[(int) 1] = i[(int) 1] + 1) {{{_nl}}}{_nl}";
         IdNode idNode = new IdNode() {Name = "i", Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode indexNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
 
@@ -578,7 +580,7 @@ public class CodeGenerationVisitorTests
     public void ForNodeBodyIsCreatedCorrectly()
     {
         //Arrange
-        const string expected = "for(i; i <= 10; i = i + 1) {\r\n    break;\r\n}\r\n";
+        string expected = $"for(i; i <= 10; i = i + 1) {{{_nl}    break;{_nl}}}{_nl}";
         IdNode idNode = new IdNode() {Name = "i", Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode limitNode = new NumberNode() {Value = 10, Type = new STEP.Type() {ActualType = TypeVal.Number}};
         NumberNode updateNode = new NumberNode() {Value = 1, Type = new STEP.Type() {ActualType = TypeVal.Number}};
@@ -610,7 +612,7 @@ public class CodeGenerationVisitorTests
     {
         // Arrange
         string expected =
-            $"#define x 1\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    Serial.begin(9600);\r\n    pinMode(1, {expectedMode});\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
+            $"#define x 1{_nl}// Global variables{_nl}{_nl}void setup() {{{_nl}    Serial.begin(9600);{_nl}    pinMode(1, {expectedMode});{_nl}}}{_nl}void loop() {{{_nl}}}{_nl}";
         var n = new NumberNode() {Value = 1};
         var x = new IdNode {Name = "x"};
         var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = givenPinMode}};
@@ -633,7 +635,7 @@ public class CodeGenerationVisitorTests
     {
         // Arrange
         string expected =
-            $"#define {variableName} {pinNumber}\r\n// Global variables\r\n\r\nvoid setup() {{\r\n    Serial.begin(9600);\r\n    pinMode({pinNumber}, INPUT);\r\n}}\r\nvoid loop() {{\r\n}}\r\n";
+            $"#define {variableName} {pinNumber}{_nl}// Global variables{_nl}{_nl}void setup() {{{_nl}    Serial.begin(9600);{_nl}    pinMode({pinNumber}, INPUT);{_nl}}}{_nl}void loop() {{{_nl}}}{_nl}";
         var n = new NumberNode() {Value = pinNumber};
         var x = new IdNode {Name = variableName};
         var pinDclNode = new PinDclNode() {Left = x, Right = n, Type = new PinType() {Mode = PinMode.INPUT}};
