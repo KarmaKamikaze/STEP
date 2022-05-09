@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Antlr4.Runtime;
+using Moq;
 using STEP;
 using STEP.AST;
 using STEP.AST.Nodes;
 using STEP.CodeGeneration;
 using Xunit;
+using Type = STEP.Type;
 
 namespace StepTests;
 
@@ -62,7 +65,7 @@ public class IntegrationTests
         };
 
     [Fact]
-    public void TypeVisitor_Function1CallsFunction2WhichIsDeclaredLater_WorksFlawlessly()
+    public void TypeVisitor_Function1CallsFunction2WhichIsDeclaredLater_DoesNotThrowException()
     {
         // The scope rules of STEP state that any function must be able to call other functions,
         // regardless of the order in which they are declared (to avoid the need for prototypes)
@@ -110,11 +113,18 @@ public class IntegrationTests
         var action = () => typeVisitor.Visit(programNode);
 
         // Assert - should run without errors
-        action();
+        try
+        {
+            action.Invoke();
+        }
+        catch (SymbolNotDeclaredException e)
+        {
+            Assert.True(false, e.Message);
+        }
     }
 
     [Fact]
-    public void TypeVisitor_FunctionCallInGlobalVariable_WorksFlawlessly()
+    public void TypeVisitor_FunctionCallInGlobalVariable_DoesNotThrowException()
     {
         /* variables
          *   number x = GetNumber()
@@ -176,6 +186,13 @@ public class IntegrationTests
         var action = () => typeVisitor.Visit(programNode);
 
         // Assert - should run without errors
-        action();
+        try
+        {
+            action.Invoke();
+        }
+        catch (SymbolNotDeclaredException e)
+        {
+            Assert.True(false, e.Message);
+        }
     }
 }
