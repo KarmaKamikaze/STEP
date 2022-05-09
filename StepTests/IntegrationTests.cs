@@ -24,8 +24,8 @@ public class IntegrationTests
     [MemberData(nameof(programStrings))]
     public void IntegrationTest1(string sourceFile, string expectedFile)
     {
-        string sourceFilePath =
-            Directory.GetCurrentDirectory() + "\\..\\..\\..\\IntegrationTestPrograms\\" + sourceFile;
+        // Tests everything
+        string sourceFilePath = Directory.GetCurrentDirectory() + "\\..\\..\\..\\IntegrationTestPrograms\\" + sourceFile;
         string sourceText = File.ReadAllText(sourceFilePath);
         STEPParser.ProgramContext tree = GetParseTree(sourceText);
 
@@ -46,6 +46,63 @@ public class IntegrationTests
         string expected = File.ReadAllText(expectedFilePath);
 
         Assert.Equal(expected, actual);
+    }
+    
+    [Fact]
+    public void IntegrationTVisitorSTable() {
+        // Tests TypeVisitor + SymbolTable
+        // Arrange
+        var typeVisitor = new TypeVisitor();
+        var exprNode = new PlusNode() {
+            Left = new NumberNode() {Value = 2},
+            Right = new NumberNode() {Value = 5}
+        };
+        var idNode = new IdNode() {
+            Name = "a",
+            Type = new Type() {ActualType = TypeVal.Number}
+        };
+        var varDcl = new VarDclNode() {
+            Left = idNode,
+            Right = exprNode
+        };
+        var boolLeft = new GThanNode() {
+            Left = new IdNode(){Name = "a"},
+            Right = new NumberNode(){Value = 5}
+        };
+        var boolRight = new EqNode() {
+            Left = new NumberNode(){Value = 10},
+            Right = new NumberNode(){Value = 10} 
+        };
+        var boolCond = new AndNode() {
+            Left = boolLeft,
+            Right = boolRight
+        };
+        var ifNode = new IfNode() {
+            Condition = boolCond,
+            ThenClause = new List<StmtNode>() {new ContNode()}
+        };
+        var progNode = new ProgNode() {
+            SetupBlock = new SetupNode() {
+                Stmts = new List<StmtNode>() {
+                    varDcl,
+                    ifNode
+                }
+            }
+        };
+        
+        // Act
+        progNode.Accept(typeVisitor);
+        
+        // Assert
+        // Is the vardcl ok? requires expr node = number, as var id is number
+        Assert.Equal(TypeVal.Ok, varDcl.Type.ActualType);
+        Assert.Equal(TypeVal.Number, exprNode.Type.ActualType);
+        
+        // Is the ifnode ok? requires condition = bool, andnode exprs = bool 
+        Assert.Equal(TypeVal.Ok, ifNode.Type.ActualType);
+        Assert.Equal(TypeVal.Boolean, boolCond.Type.ActualType);
+        Assert.Equal(TypeVal.Boolean, boolLeft.Type.ActualType);
+        Assert.Equal(TypeVal.Boolean, boolRight.Type.ActualType);
     }
 
     public static IEnumerable<string[]> programStrings =>
