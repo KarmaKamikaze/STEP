@@ -1,6 +1,6 @@
 using STEP.AST;
 
-namespace STEP;
+namespace STEP.Exceptions;
 
 public class DuplicateDeclarationException : CompilationException
 {

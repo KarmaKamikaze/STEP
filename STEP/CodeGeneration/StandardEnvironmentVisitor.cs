@@ -1,5 +1,6 @@
 ﻿using STEP.AST;
 using STEP.AST.Nodes;
+using STEP.Symbols;
 
 namespace STEP.CodeGeneration;
 

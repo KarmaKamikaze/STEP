@@ -5,6 +5,7 @@ using STEP;
 using STEP.AST;
 using STEP.AST.Nodes;
 using STEP.CodeGeneration;
+using STEP.SemanticAnalysis;
 using Xunit;
 
 namespace StepTests;
