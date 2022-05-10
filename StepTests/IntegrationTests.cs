@@ -49,8 +49,8 @@ public class IntegrationTests
     }
     
     [Fact]
-    public void IntegrationTVisitorSTable() {
-        // Tests TypeVisitor + SymbolTable
+    public void IntegrationTypeVisitorSymbolTable() {
+        // Tests TypeVisitor + SymbolTable integration, as well as traversal of more complex tree than unit tests
         // Arrange
         var typeVisitor = new TypeVisitor();
         var exprNode = new PlusNode() {
