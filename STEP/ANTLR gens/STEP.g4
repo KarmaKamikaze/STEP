@@ -195,6 +195,7 @@ grammar STEP;
         | INTLITERAL
         | STRLITERAL 
         | BOOLLITERAL
+        | DURATIONLITERAL
         ;
   
   // Boolean expressions
@@ -319,6 +320,7 @@ grammar STEP;
   NUMLITERAL                    : ('0' | [1-9] DIGIT*) ('.' DIGIT+)?;
   STRLITERAL                    : DBLQUOTE STRING_CONTENT* DBLQUOTE;
   BOOLLITERAL                   : NEG? ('true' | 'false');
+  DURATIONLITERAL               : INTLITERAL ('ms' | 's' | 'm' | 'h' | 'd');
 
 // Keywords
   SETUP                         : 'setup';

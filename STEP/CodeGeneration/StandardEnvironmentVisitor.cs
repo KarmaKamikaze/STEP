@@ -73,6 +73,9 @@ public class StandardEnvironmentVisitor : IVisitor
     {
     }
 
+    public void Visit(DurationNode n) {
+    }
+
     public void Visit(ArrDclNode n)
     {
         n.Left.Accept(this);
