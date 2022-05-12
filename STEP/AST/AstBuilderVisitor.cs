@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using STEP.AST.Nodes;
+using STEP.Exceptions;
 using System.Globalization;
 using System.Xml.Linq;
 
@@ -556,20 +557,20 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
         if (context.NUMLITERAL() != null)
         {
-            NumberNode numNode = (NumberNode) NodeFactory.MakeNode(AstNodeType.NumberNode);
-            numNode.Value = Double.Parse(context.NUMLITERAL().GetText(), new CultureInfo("en-US"));
-            numNode.SourcePosition = GetSourcePosition(context.NUMLITERAL());
+            NumberNode node = (NumberNode) NodeFactory.MakeNode(AstNodeType.NumberNode);
+            node.Value = Double.Parse(context.NUMLITERAL().GetText(), new CultureInfo("en-US"));
+            node.SourcePosition = GetSourcePosition(context.NUMLITERAL());
 
-            return numNode;
+            return node;
         }
         else if (context.INTLITERAL() != null)
         {
             // TODO: Should this be a special IntNode/PinNode?
-            NumberNode numNode = (NumberNode) NodeFactory.MakeNode(AstNodeType.NumberNode);
-            numNode.Value = int.Parse(context.INTLITERAL().GetText(), new CultureInfo("en-US"));
-            numNode.SourcePosition = GetSourcePosition(context.INTLITERAL());
+            NumberNode node = (NumberNode) NodeFactory.MakeNode(AstNodeType.NumberNode);
+            node.Value = int.Parse(context.INTLITERAL().GetText(), new CultureInfo("en-US"));
+            node.SourcePosition = GetSourcePosition(context.INTLITERAL());
 
-            return numNode;
+            return node;
         }
         else if (context.STRLITERAL() != null)
         {
@@ -579,7 +580,7 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
             return node;
         }
-        else // boolean literal is not null
+        else if (context.BOOLLITERAL() != null) // boolean literal is not null
         {
             BoolNode node = (BoolNode) NodeFactory.MakeNode(AstNodeType.BoolNode);
             node.Value = context.BOOLLITERAL().GetText().ToLower() == "true";
@@ -587,6 +588,29 @@ public class AstBuilderVisitor : STEPBaseVisitor<AstNode>
 
             return node;
         }
+        else {
+            DurationNode node = (DurationNode) NodeFactory.MakeNode(AstNodeType.DurationNode);
+            node.Value = GetLeadingInt(context.DURATIONLITERAL().GetText());
+            node.SourcePosition = GetSourcePosition(context.DURATIONLITERAL());
+            node.Scale = GetString(context.DURATIONLITERAL().GetText()) switch {
+                "ms" => DurationNode.DurationScale.Ms,
+                "s" => DurationNode.DurationScale.S,
+                "m" => DurationNode.DurationScale.M,
+                "h" => DurationNode.DurationScale.H,
+                "d" => DurationNode.DurationScale.D,
+                _ => node.Scale
+            };
+
+            return node;
+        }
+    }
+
+    private int GetLeadingInt(string input) {
+        return Int32.Parse(new string(input.Trim().TakeWhile(c => char.IsDigit(c)).ToArray()));
+    }
+
+    private string GetString(string input) {
+        return new string(input.Where(c => char.IsLetter(c)).ToArray());
     }
 
     public override AstNode VisitFunccall([NotNull] STEPParser.FunccallContext context)

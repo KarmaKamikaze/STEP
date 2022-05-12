@@ -1,7 +1,7 @@
 ﻿using STEP.AST;
 using STEP.AST.Nodes;
 
-namespace STEP;
+namespace STEP.Exceptions;
 
 public sealed class ArraySizeMismatchException : CompilationException
 {

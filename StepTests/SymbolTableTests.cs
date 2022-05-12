@@ -1,6 +1,7 @@
-using STEP;
 using STEP.AST;
 using STEP.AST.Nodes;
+using STEP.Exceptions;
+using STEP.Symbols;
 using Xunit;
 
 namespace StepTests;

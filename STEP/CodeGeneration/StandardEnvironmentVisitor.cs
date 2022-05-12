@@ -1,5 +1,6 @@
 ﻿using STEP.AST;
 using STEP.AST.Nodes;
+using STEP.Symbols;
 
 namespace STEP.CodeGeneration;
 
@@ -71,6 +72,9 @@ public class StandardEnvironmentVisitor : IVisitor
 
     public void Visit(BoolNode n)
     {
+    }
+
+    public void Visit(DurationNode n) {
     }
 
     public void Visit(ArrDclNode n)

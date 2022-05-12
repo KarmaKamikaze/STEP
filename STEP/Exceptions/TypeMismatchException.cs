@@ -1,7 +1,8 @@
 ﻿using STEP.AST;
 using System.Runtime.Serialization;
+using Type = STEP.AST.Type;
 
-namespace STEP;
+namespace STEP.Exceptions;
 
 public class TypeMismatchException : CompilationException
 {

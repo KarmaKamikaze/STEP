@@ -1,6 +1,7 @@
 ﻿using STEP.AST.Nodes;
+using STEP.Exceptions;
 
-namespace STEP.AST;
+namespace STEP.Symbols;
 
 public class PinTable : IPinTable
 {
@@ -25,7 +26,7 @@ public class PinTable : IPinTable
                 break;
             default:
                 throw new PinTableUnexpectedTypeException($"Unexpected data type in Pin Table", type,
-                    new TypeVal[] {TypeVal.Digitalpin, TypeVal.Analogpin});
+                    new TypeVal[] { TypeVal.Digitalpin, TypeVal.Analogpin });
         }
     }
 }

@@ -23,6 +23,7 @@ public enum AstNodeType
     NumberNode,
     StringNode,
     BoolNode,
+    DurationNode,
     FuncExprNode,
     ArrayAccessNode,
     ArrayLiteralNode,

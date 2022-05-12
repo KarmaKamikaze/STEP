@@ -1,4 +1,6 @@
-﻿namespace STEP.AST.Nodes;
+﻿using STEP.Symbols;
+
+namespace STEP.AST.Nodes;
 
 public class IdNode : ExprNode
 {

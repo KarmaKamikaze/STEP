@@ -1,10 +1,10 @@
 ﻿using STEP.AST;
 
-namespace STEP;
+namespace STEP.Exceptions;
 
 public class ParameterCountMismatchException : CompilationException
 {
-    public ParameterCountMismatchException(string message, SourcePosition sourcePosition, int expected, int actual) 
+    public ParameterCountMismatchException(string message, SourcePosition sourcePosition, int expected, int actual)
         : base(message, sourcePosition)
     {
         ExpectedCount = expected;
@@ -17,7 +17,7 @@ public class ParameterCountMismatchException : CompilationException
         VariableId = variableId;
     }
 
-    public int ExpectedCount {  get; }
-    public int ActualCount {  get; }
+    public int ExpectedCount { get; }
+    public int ActualCount { get; }
     public string VariableId { get; }
 }

@@ -5,7 +5,7 @@ end variables
 
 loop
   WriteToDigitalPin(BuiltInLED, On)
-  Wait(1000)
+  Wait(1s)
   WriteToDigitalPin(BuiltInLED, Off)
-  Wait(1000)
+  Wait(1s)
 end loop

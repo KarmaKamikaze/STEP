@@ -1,7 +1,7 @@
-﻿using STEP.AST;
-using STEP.AST.Nodes;
+﻿using STEP.AST.Nodes;
+using STEP.Symbols;
 
-namespace STEP;
+namespace STEP.SemanticAnalysis;
 
 public class DclVisitor : TypeVisitor
 {

@@ -1,7 +1,10 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
+using STEP.AST;
 using STEP.AST.Nodes;
+using Type = STEP.AST.Type;
 
 namespace STEP.CodeGeneration;
 
@@ -220,6 +223,23 @@ public class CodeGenerationVisitor : IVisitor
     public void Visit(BoolNode n)
     {
         EmitAppend(n.Value.ToString().ToLowerInvariant());
+    }
+
+    public void Visit(DurationNode n) {
+        EmitAppend(TimeToMs(n.Value, n.Scale));
+    }
+
+    private string TimeToMs(double timeUnits, DurationNode.DurationScale scale) {
+        // Convert number to ms
+        double convertedVal = scale switch {
+            DurationNode.DurationScale.Ms => timeUnits,
+            DurationNode.DurationScale.S => timeUnits * 1000,
+            DurationNode.DurationScale.M => timeUnits * 1000 * 60,
+            DurationNode.DurationScale.H => timeUnits * 1000 * 60 * 60,
+            DurationNode.DurationScale.D => timeUnits * 1000 * 60 * 60 * 24,
+            _ => throw new ArgumentOutOfRangeException(nameof(scale), scale, null)
+        };
+        return convertedVal.ToString();
     }
 
     public void Visit(ArrDclNode n)

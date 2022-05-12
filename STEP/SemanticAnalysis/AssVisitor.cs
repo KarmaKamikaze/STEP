@@ -1,7 +1,8 @@
-﻿using STEP.AST;
-using STEP.AST.Nodes;
+﻿using STEP.AST.Nodes;
+using STEP.Exceptions;
+using STEP.Symbols;
 
-namespace STEP;
+namespace STEP.SemanticAnalysis;
 
 public class AssVisitor : TypeVisitor
 {
