@@ -2,6 +2,8 @@
 using STEP;
 using STEP.AST;
 using STEP.AST.Nodes;
+using STEP.Exceptions;
+using STEP.SemanticAnalysis;
 using Xunit;
 
 namespace StepTests;

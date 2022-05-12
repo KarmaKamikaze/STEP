@@ -1,4 +1,4 @@
-namespace STEP;
+namespace STEP.Exceptions;
 
 public class CloseGlobalScopeException : Exception
 {

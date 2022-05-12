@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Runtime.InteropServices;
-using STEP;
 using STEP.AST;
 using STEP.AST.Nodes;
 using Xunit;
 using Moq;
-using Type = STEP.Type;
+using STEP.Exceptions;
+using STEP.Symbols;
+using STEP.SemanticAnalysis;
+using Type = STEP.AST.Type;
 
 namespace StepTests;
 

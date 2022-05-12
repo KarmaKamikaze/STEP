@@ -2,7 +2,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
+using STEP.AST;
 using STEP.AST.Nodes;
+using Type = STEP.AST.Type;
 
 namespace STEP.CodeGeneration;
 

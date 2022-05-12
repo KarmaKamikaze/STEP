@@ -1,6 +1,8 @@
+using STEP.AST;
 using STEP.AST.Nodes;
+using Type = STEP.AST.Type;
 
-namespace STEP.AST;
+namespace STEP.Symbols;
 
 public class SymTableEntry
 {

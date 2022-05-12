@@ -1,9 +1,8 @@
 ﻿using System.Globalization;
 using System.Text;
 using STEP.AST.Nodes;
-using STEP.CodeGeneration;
 
-namespace STEP;
+namespace STEP.CodeGeneration;
 
 public class PinCodeVisitor : CodeGenerationVisitor
 {

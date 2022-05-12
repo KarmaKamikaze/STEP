@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime;
+using STEP.Exceptions;
 
-namespace STEP;
+namespace STEP.SyntacticalAnalysis;
 
 public class STEPErrorListener<T> : ConsoleErrorListener<T>
 {

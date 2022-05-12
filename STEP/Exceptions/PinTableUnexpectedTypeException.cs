@@ -1,7 +1,7 @@
 ﻿using STEP.AST.Nodes;
 using System.Runtime.Serialization;
 
-namespace STEP;
+namespace STEP.Exceptions;
 
 internal class PinTableUnexpectedTypeException : Exception
 {
@@ -21,7 +21,7 @@ internal class PinTableUnexpectedTypeException : Exception
     {
     }
 
-    public PinTableUnexpectedTypeException(string message, TypeVal actual, params TypeVal[] expected) : base(message) 
+    public PinTableUnexpectedTypeException(string message, TypeVal actual, params TypeVal[] expected) : base(message)
     {
         Actual = actual;
         Expected = new(expected);

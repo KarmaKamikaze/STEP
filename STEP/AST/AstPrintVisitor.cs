@@ -265,7 +265,7 @@ public class AstPrintVisitor : IVisitor
 
     public void Visit(DurationNode n) {
         if (n != null) {
-            Print($"[{n.Value}{n.Scale}");
+            Print($"{n.Value}{n.Scale.ToString().ToLower()}");
         }
     }
 

@@ -1,7 +1,10 @@
 ﻿using STEP.AST;
 using STEP.AST.Nodes;
+using STEP.Exceptions;
+using STEP.Symbols;
+using Type = STEP.AST.Type;
 
-namespace STEP;
+namespace STEP.SemanticAnalysis;
 
 public class TypeVisitor : IVisitor
 {
@@ -36,7 +39,7 @@ public class TypeVisitor : IVisitor
     {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        var expectedType = new Type() {ActualType = TypeVal.Boolean};
+        var expectedType = new Type() { ActualType = TypeVal.Boolean };
         if (n.Left.Type != expectedType)
         {
             n.Type.ActualType = TypeVal.Error;
@@ -57,7 +60,7 @@ public class TypeVisitor : IVisitor
     {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        var expectedType = new Type() {ActualType = TypeVal.Boolean};
+        var expectedType = new Type() { ActualType = TypeVal.Boolean };
         if (n.Left.Type != expectedType)
         {
             n.Type.ActualType = TypeVal.Error;
@@ -110,7 +113,7 @@ public class TypeVisitor : IVisitor
     {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        var expectedType = new Type() {ActualType = TypeVal.Number};
+        var expectedType = new Type() { ActualType = TypeVal.Number };
         if (n.Left.Type != expectedType)
         {
             n.Type.ActualType = TypeVal.Error;
@@ -131,7 +134,7 @@ public class TypeVisitor : IVisitor
     {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        var expectedType = new Type() {ActualType = TypeVal.Number};
+        var expectedType = new Type() { ActualType = TypeVal.Number };
         if (n.Left.Type != expectedType)
         {
             n.Type.ActualType = TypeVal.Error;
@@ -152,7 +155,7 @@ public class TypeVisitor : IVisitor
     {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        var expectedType = new Type() {ActualType = TypeVal.Number};
+        var expectedType = new Type() { ActualType = TypeVal.Number };
         if (n.Left.Type != expectedType)
         {
             n.Type.ActualType = TypeVal.Error;
@@ -173,7 +176,7 @@ public class TypeVisitor : IVisitor
     {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        var expectedType = new Type() {ActualType = TypeVal.Number};
+        var expectedType = new Type() { ActualType = TypeVal.Number };
         if (n.Left.Type != expectedType)
         {
             n.Type.ActualType = TypeVal.Error;
@@ -193,7 +196,7 @@ public class TypeVisitor : IVisitor
     public void Visit(NegNode n)
     {
         n.Left.Accept(this);
-        var expectedType = new Type() {ActualType = TypeVal.Boolean};
+        var expectedType = new Type() { ActualType = TypeVal.Boolean };
         if (n.Left.Type == expectedType)
         {
             n.Type.ActualType = TypeVal.Boolean;
@@ -281,7 +284,7 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeMismatchException("Unexpected type for array indexing", n.Index.SourcePosition, n.Index.Type,
-                new Type {ActualType = TypeVal.Number});
+                new Type { ActualType = TypeVal.Number });
         }
         // Index is expression node, should we "calculate" the expression if possible to check if
         // index is >= 0 and < ArrSize?
@@ -417,7 +420,7 @@ public class TypeVisitor : IVisitor
     {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        var expectedType = new Type {ActualType = TypeVal.Number};
+        var expectedType = new Type { ActualType = TypeVal.Number };
         if (n.Left.Type.ActualType != TypeVal.Number)
         {
             n.Type.ActualType = TypeVal.Error;
@@ -438,7 +441,7 @@ public class TypeVisitor : IVisitor
     {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        var expectedType = new Type {ActualType = TypeVal.Number};
+        var expectedType = new Type { ActualType = TypeVal.Number };
         if (n.Left.Type.ActualType != TypeVal.Number)
         {
             n.Type.ActualType = TypeVal.Error;
@@ -459,7 +462,7 @@ public class TypeVisitor : IVisitor
     {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        var expectedType = new Type {ActualType = TypeVal.Number};
+        var expectedType = new Type { ActualType = TypeVal.Number };
         if (n.Left.Type.ActualType != TypeVal.Number)
         {
             n.Type.ActualType = TypeVal.Error;
@@ -480,7 +483,7 @@ public class TypeVisitor : IVisitor
     {
         n.Left.Accept(this);
         n.Right.Accept(this);
-        var expectedType = new Type {ActualType = TypeVal.Number};
+        var expectedType = new Type { ActualType = TypeVal.Number };
         if (n.Left.Type.ActualType != TypeVal.Number)
         {
             n.Type.ActualType = TypeVal.Error;
@@ -514,7 +517,7 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeMismatchException("Unexpected type in expression", n.Left.SourcePosition, n.Left.Type,
-                new Type {ActualType = TypeVal.Number});
+                new Type { ActualType = TypeVal.Number });
         }
     }
 
@@ -530,7 +533,7 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeMismatchException("Unexpected type in the while-loop condition", n.Condition.SourcePosition,
-                n.Condition.Type, new Type {ActualType = TypeVal.Boolean});
+                n.Condition.Type, new Type { ActualType = TypeVal.Boolean });
         }
 
         foreach (var stmtNode in n.Body)
@@ -548,7 +551,7 @@ public class TypeVisitor : IVisitor
         n.Initializer.Accept(this);
         n.Limit.Accept(this);
         n.Update.Accept(this);
-        var expectedType = new Type() {ActualType = TypeVal.Number};
+        var expectedType = new Type() { ActualType = TypeVal.Number };
         var initNode = n.Initializer;
         if (initNode is VarDclNode vn)
         {
@@ -748,7 +751,7 @@ public class TypeVisitor : IVisitor
     public void Visit(IfNode n)
     {
         n.Condition.Accept(this);
-        var expectedType = new Type() {ActualType = TypeVal.Boolean};
+        var expectedType = new Type() { ActualType = TypeVal.Boolean };
         if (n.Condition.Type == expectedType)
         {
             n.Type.ActualType = TypeVal.Ok;
@@ -757,7 +760,7 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeMismatchException("Unexpected type in the if-statement condition", n.Condition.SourcePosition,
-                n.Condition.Type, new Type {ActualType = TypeVal.Boolean});
+                n.Condition.Type, new Type { ActualType = TypeVal.Boolean });
         }
 
         EnterScope();
@@ -792,7 +795,7 @@ public class TypeVisitor : IVisitor
         {
             n.Type.ActualType = TypeVal.Error;
             throw new TypeMismatchException("Unexpected type in the else-if-statement condition",
-                n.Condition.SourcePosition, n.Condition.Type, new Type {ActualType = TypeVal.Boolean});
+                n.Condition.SourcePosition, n.Condition.Type, new Type { ActualType = TypeVal.Boolean });
         }
 
         n.Type.ActualType = TypeVal.Ok;
@@ -835,4 +838,4 @@ public class TypeVisitor : IVisitor
 
         ExitScope();
     }
-} 
+}

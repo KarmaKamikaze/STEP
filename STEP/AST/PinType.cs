@@ -1,6 +1,6 @@
 ﻿using STEP.AST.Nodes;
 
-namespace STEP;
+namespace STEP.AST;
 
 public class PinType : Type
 {
