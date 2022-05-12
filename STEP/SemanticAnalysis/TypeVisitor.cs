@@ -224,6 +224,10 @@ public class TypeVisitor : IVisitor
         n.Type.ActualType = TypeVal.Boolean;
     }
 
+    public void Visit(DurationNode n) {
+        n.Type.ActualType = TypeVal.Duration;
+    }
+
     public void Visit(ArrDclNode n)
     {
         DclVisitor dclVisitor = new DclVisitor(_symbolTable);

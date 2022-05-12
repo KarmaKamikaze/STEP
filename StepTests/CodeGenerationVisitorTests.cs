@@ -600,6 +600,33 @@ public class CodeGenerationVisitorTests
         Assert.Equal(expected, actual);
     }
 
+    [Theory]
+    [InlineData(1, DurationNode.DurationScale.Ms)]
+    [InlineData(1000, DurationNode.DurationScale.S)]
+    [InlineData(60000, DurationNode.DurationScale.M)]
+    [InlineData(3600000, DurationNode.DurationScale.H)]
+    [InlineData(86400000, DurationNode.DurationScale.D)]
+    public void WaitFuncCall_CorrectConversion(double duration, DurationNode.DurationScale scale) {
+        // Arrange
+        string expected = $"delay({duration});{Environment.NewLine}";
+        FuncStmtNode funcNode = new FuncStmtNode() {
+            Id = new IdNode() {Name = "delay"}, // Std env visitor changes "Wait" to "delay"
+            Params = new List<ExprNode>() {
+                new DurationNode() {
+                    Value = 1,
+                    Scale = scale
+                }
+            }
+        };
+        
+        // Act
+        _visitor.Visit(funcNode);
+        string actual = _visitor.OutputToString();
+        
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+
     #endregion
 
     #region PinDclNode

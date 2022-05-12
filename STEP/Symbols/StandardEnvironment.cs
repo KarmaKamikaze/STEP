@@ -104,9 +104,9 @@ public static class StandardEnvironment
         ArduinoName = "delay",
         Parameters = new()
         {
-            { "ms", new Type { ActualType = TypeVal.Number } }
+            {"duration", new Type {ActualType = TypeVal.Duration}} 
         },
-        Type = new Type { ActualType = TypeVal.Blank }
+        Type = new Type {ActualType = TypeVal.Blank}
     };
 
     #endregion

@@ -47,6 +47,8 @@ public static class NodeFactory
                 return new StringNode() {NodeType = AstNodeType.StringNode};
             case AstNodeType.BoolNode:
                 return new BoolNode() {NodeType = AstNodeType.BoolNode};
+            case AstNodeType.DurationNode:
+                return new DurationNode() {NodeType = AstNodeType.DurationNode};
             case AstNodeType.FuncExprNode:
                 return new FuncExprNode() {NodeType = AstNodeType.FuncExprNode};
             case AstNodeType.ArrayAccessNode:
