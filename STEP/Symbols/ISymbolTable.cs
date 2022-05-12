@@ -1,6 +1,7 @@
 using STEP.AST.Nodes;
+using STEP.Exceptions;
 
-namespace STEP.AST;
+namespace STEP.Symbols;
 
 /// <summary>
 /// An interface for a Symbol Table for use in contextual analysis.

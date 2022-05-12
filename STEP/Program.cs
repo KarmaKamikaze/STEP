@@ -3,6 +3,9 @@ using Antlr4.Runtime;
 using STEP.AST;
 using STEP.AST.Nodes;
 using STEP.CodeGeneration;
+using STEP.Exceptions;
+using STEP.SemanticAnalysis;
+using STEP.SyntacticalAnalysis;
 
 namespace STEP;
 

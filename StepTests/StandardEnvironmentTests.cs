@@ -2,6 +2,8 @@
 using STEP;
 using STEP.AST;
 using STEP.AST.Nodes;
+using STEP.Exceptions;
+using STEP.SemanticAnalysis;
 using Xunit;
 
 namespace StepTests;
@@ -135,5 +137,52 @@ public class StandardEnvironmentTests
 
         // Act, assert
         _typeVisitor.Visit(funcDcl);
+    }
+    
+    [Theory]
+    [InlineData(DurationNode.DurationScale.Ms)]
+    [InlineData(DurationNode.DurationScale.S)]
+    [InlineData(DurationNode.DurationScale.M)]
+    [InlineData(DurationNode.DurationScale.H)]
+    [InlineData(DurationNode.DurationScale.D)]
+
+    public void Wait_ValidParameters_ThrowsNoException(DurationNode.DurationScale scale)
+    {
+        /*
+         * Wait(500ms) - ms, s, m, d and h all accepted
+         * 
+         */
+
+        // Arrange
+        var wait = new FuncStmtNode
+        {
+            Id = new IdNode {Name = "Wait"},
+            Params = new List<ExprNode> {new DurationNode() {Value = 500, Scale = scale}}
+        };
+
+        // Act, assert
+        _typeVisitor.Visit(wait);
+    }
+    
+    [Fact]
+    public void Wait_InvalidParameters_ThrowsTypeException()
+    {
+        /*
+         * Wait(500) - number not accepted
+         * 
+         */
+
+        // Arrange
+        var wait = new FuncStmtNode
+        {
+            Id = new IdNode {Name = "Wait"},
+            Params = new List<ExprNode> {new NumberNode() {Value = 500}}
+        };
+
+        // Act
+        var test = () => _typeVisitor.Visit(wait);
+        
+        // Assert
+        Assert.Throws<TypeMismatchException>(test);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace STEP.AST;
+﻿namespace STEP.Symbols;
 
 public class StdFuncSymTableEntry : FunctionSymTableEntry
 {

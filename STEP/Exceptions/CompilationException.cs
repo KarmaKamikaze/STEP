@@ -1,7 +1,7 @@
 ﻿using STEP.AST;
 using System.Runtime.Serialization;
 
-namespace STEP;
+namespace STEP.Exceptions;
 
 public class CompilationException : Exception
 {

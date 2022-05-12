@@ -1,6 +1,9 @@
+using STEP.AST;
 using STEP.AST.Nodes;
+using STEP.Exceptions;
+using Type = STEP.AST.Type;
 
-namespace STEP.AST;
+namespace STEP.Symbols;
 
 /// <summary>
 /// A stack-based implementation of a Symbol Table for contextual analysis.
@@ -49,18 +52,18 @@ public class SymbolTable : ISymbolTable
 
     public void OpenScope()
     {
-        this._depth++;
+        _depth++;
         _scopeStack.Push(new Dictionary<string, SymTableEntry>());
     }
 
     public void CloseScope()
     {
-        if (this._depth == 0)
+        if (_depth == 0)
         {
             throw new CloseGlobalScopeException("Cannot close the global scope (at depth 0)");
         }
 
-        this._depth--;
+        _depth--;
         _scopeStack.Pop();
     }
 
